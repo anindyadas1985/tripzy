@@ -111,7 +111,7 @@ export const AuthPage: React.FC = () => {
               <h1 className="text-4xl font-bold bg-gradient-to-r from-sky-600 to-blue-600 bg-clip-text text-transparent">
                 Tripzy
               </h1>
-              <p className="text-gray-600 text-sm">Travel Orchestration Platform</p>
+              <p className="text-gray-600 text-sm">Plan. Book. Go.</p>
             </div>
           </div>
           <p className="text-xl text-gray-700 max-w-2xl mx-auto">

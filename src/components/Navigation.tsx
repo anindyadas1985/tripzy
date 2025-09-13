@@ -36,7 +36,7 @@ export const Navigation: React.FC<NavigationProps> = ({ activeView, setActiveVie
                 Tripzy
               </span>
               <div className="text-xs text-gray-500 -mt-1">
-                {user ? `Welcome, ${user.name}` : vendor ? `${vendor.businessName}` : 'Travel Orchestration'}
+                {user ? `Welcome, ${user.name}` : vendor ? `${vendor.businessName}` : 'Plan. Book. Go.'}
               </div>
             </div>
           </div>
