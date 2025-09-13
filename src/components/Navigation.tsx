@@ -1,16 +1,17 @@
 import React from 'react';
-import { Plane, Map, Calendar, Home, Bell } from 'lucide-react';
+import { Plane, Map, Calendar, Home, Bell, User, Plus } from 'lucide-react';
 
 interface NavigationProps {
-  activeView: 'dashboard' | 'planner' | 'booking' | 'navigation';
-  setActiveView: (view: 'dashboard' | 'planner' | 'booking' | 'navigation') => void;
+  activeView: 'dashboard' | 'create' | 'planner' | 'booking' | 'navigation' | 'profile';
+  setActiveView: (view: 'dashboard' | 'create' | 'planner' | 'booking' | 'navigation' | 'profile') => void;
 }
 
 export const Navigation: React.FC<NavigationProps> = ({ activeView, setActiveView }) => {
   const navItems = [
     { id: 'dashboard' as const, label: 'Dashboard', icon: Home },
-    { id: 'planner' as const, label: 'Plan Trip', icon: Calendar },
-    { id: 'booking' as const, label: 'Bookings', icon: Plane },
+    { id: 'create' as const, label: 'Create Trip', icon: Plus },
+    { id: 'planner' as const, label: 'Plan', icon: Calendar },
+    { id: 'booking' as const, label: 'Book', icon: Plane },
     { id: 'navigation' as const, label: 'Navigate', icon: Map },
   ];
 
@@ -18,11 +19,16 @@ export const Navigation: React.FC<NavigationProps> = ({ activeView, setActiveVie
     <nav className="fixed top-0 left-0 right-0 bg-white/95 backdrop-blur-sm border-b border-gray-200 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
-          <div className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-gradient-to-br from-sky-500 to-blue-600 rounded-lg flex items-center justify-center">
-              <Plane className="w-5 h-5 text-white" />
+          <div className="flex items-center space-x-3">
+            <div className="w-10 h-10 bg-gradient-to-br from-sky-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg">
+              <Plane className="w-6 h-6 text-white" />
             </div>
-            <span className="text-xl font-bold text-gray-900">Tripzy</span>
+            <div>
+              <span className="text-2xl font-bold bg-gradient-to-r from-sky-600 to-blue-600 bg-clip-text text-transparent">
+                Tripzy
+              </span>
+              <div className="text-xs text-gray-500 -mt-1">Travel Orchestration</div>
+            </div>
           </div>
 
           <div className="hidden md:flex items-center space-x-1">
@@ -32,10 +38,10 @@ export const Navigation: React.FC<NavigationProps> = ({ activeView, setActiveVie
                 <button
                   key={item.id}
                   onClick={() => setActiveView(item.id)}
-                  className={`flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                  className={`flex items-center space-x-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${
                     activeView === item.id
-                      ? 'bg-sky-100 text-sky-700 shadow-sm'
-                      : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                      ? 'bg-gradient-to-r from-sky-500 to-blue-600 text-white shadow-lg shadow-sky-500/25'
+                      : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
                   }`}
                 >
                   <Icon className="w-4 h-4" />
@@ -45,15 +51,27 @@ export const Navigation: React.FC<NavigationProps> = ({ activeView, setActiveVie
             })}
           </div>
 
-          <button className="relative p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg transition-colors">
-            <Bell className="w-5 h-5" />
-            <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
-          </button>
+          <div className="flex items-center space-x-2">
+            <button className="relative p-2.5 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-xl transition-colors">
+              <Bell className="w-5 h-5" />
+              <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full"></span>
+            </button>
+            <button 
+              onClick={() => setActiveView('profile')}
+              className={`p-2.5 rounded-xl transition-colors ${
+                activeView === 'profile' 
+                  ? 'bg-sky-100 text-sky-700' 
+                  : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+              }`}
+            >
+              <User className="w-5 h-5" />
+            </button>
+          </div>
         </div>
       </div>
 
       {/* Mobile Navigation */}
-      <div className="md:hidden border-t border-gray-200">
+      <div className="md:hidden border-t border-gray-200 bg-white">
         <div className="flex items-center justify-around py-2">
           {navItems.map((item) => {
             const Icon = item.icon;
@@ -63,7 +81,7 @@ export const Navigation: React.FC<NavigationProps> = ({ activeView, setActiveVie
                 onClick={() => setActiveView(item.id)}
                 className={`flex flex-col items-center space-y-1 px-3 py-2 rounded-lg text-xs font-medium transition-all duration-200 ${
                   activeView === item.id
-                    ? 'text-sky-700'
+                    ? 'text-sky-700 bg-sky-50'
                     : 'text-gray-600'
                 }`}
               >
