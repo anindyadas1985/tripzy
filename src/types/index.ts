@@ -256,3 +256,37 @@ export interface ExpenseSummary {
   totalOwed: number;
   balance: number; // positive means they are owed money, negative means they owe money
 }
+
+export interface User {
+  id: string;
+  name: string;
+  email: string;
+  phone?: string;
+  userType: 'traveler' | 'vendor';
+  isVerified: boolean;
+  createdAt: Date;
+}
+
+export interface Vendor {
+  id: string;
+  businessName: string;
+  ownerName: string;
+  email: string;
+  phone: string;
+  businessType: 'hotel' | 'airline' | 'transport' | 'activity' | 'restaurant';
+  address: string;
+  city: string;
+  state: string;
+  pincode: string;
+  gstNumber?: string;
+  isVerified: boolean;
+  rating: number;
+  totalBookings: number;
+  createdAt: Date;
+}
+
+export interface AuthState {
+  isAuthenticated: boolean;
+  user: User | null;
+  vendor: Vendor | null;
+}

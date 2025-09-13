@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { AuthPage } from './components/AuthPage';
 import { Navigation } from './components/Navigation';
 import { Dashboard } from './components/Dashboard';
 import { TripCreator } from './components/TripCreator';
@@ -9,7 +11,8 @@ import { UserProfile } from './components/UserProfile';
 import { ExpenseSharing } from './components/ExpenseSharing';
 import { TripProvider } from './contexts/TripContext';
 
-function App() {
+const AppContent: React.FC = () => {
+  const { isAuthenticated } = useAuth();
   const [activeView, setActiveView] = useState<'dashboard' | 'create' | 'planner' | 'booking' | 'navigation' | 'expenses' | 'profile'>('dashboard');
   const [isOnline, setIsOnline] = useState(navigator.onLine);
 
@@ -29,28 +32,40 @@ function App() {
     };
   }, []);
 
+  if (!isAuthenticated) {
+    return <AuthPage />;
+  }
+
   return (
-    <TripProvider>
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
-        {!isOnline && (
-          <div className="bg-orange-500 text-white text-center py-2 text-sm font-medium">
-            You're offline. Some features may be limited.
-          </div>
-        )}
-        
-        <Navigation activeView={activeView} setActiveView={setActiveView} />
-        
-        <main className={`${!isOnline ? 'pt-20' : 'pt-16'}`}>
-          {activeView === 'dashboard' && <Dashboard />}
-          {activeView === 'create' && <TripCreator />}
-          {activeView === 'planner' && <TripPlanner />}
-          {activeView === 'booking' && <BookingHub />}
-          {activeView === 'navigation' && <NavigationMap />}
-          {activeView === 'expenses' && <ExpenseSharing />}
-          {activeView === 'profile' && <UserProfile />}
-        </main>
-      </div>
-    </TripProvider>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+      {!isOnline && (
+        <div className="bg-orange-500 text-white text-center py-2 text-sm font-medium">
+          You're offline. Some features may be limited.
+        </div>
+      )}
+      
+      <Navigation activeView={activeView} setActiveView={setActiveView} />
+      
+      <main className={`${!isOnline ? 'pt-20' : 'pt-16'}`}>
+        {activeView === 'dashboard' && <Dashboard />}
+        {activeView === 'create' && <TripCreator />}
+        {activeView === 'planner' && <TripPlanner />}
+        {activeView === 'booking' && <BookingHub />}
+        {activeView === 'navigation' && <NavigationMap />}
+        {activeView === 'expenses' && <ExpenseSharing />}
+        {activeView === 'profile' && <UserProfile />}
+      </main>
+    </div>
+  );
+};
+
+function App() {
+  return (
+    <AuthProvider>
+      <TripProvider>
+        <AppContent />
+      </TripProvider>
+    </AuthProvider>
   );
 }
 

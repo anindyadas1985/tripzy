@@ -1,5 +1,6 @@
 import React from 'react';
 import { Plane, Map, Calendar, Home, Bell, User, Plus, Receipt } from 'lucide-react';
+import { useAuth } from '../contexts/AuthContext';
 
 interface NavigationProps {
   activeView: 'dashboard' | 'create' | 'planner' | 'booking' | 'navigation' | 'expenses' | 'profile';
@@ -7,6 +8,8 @@ interface NavigationProps {
 }
 
 export const Navigation: React.FC<NavigationProps> = ({ activeView, setActiveView }) => {
+  const { logout, user, vendor } = useAuth();
+  
   const navItems = [
     { id: 'dashboard' as const, label: 'Dashboard', icon: Home },
     { id: 'create' as const, label: 'Create Trip', icon: Plus },
@@ -15,6 +18,10 @@ export const Navigation: React.FC<NavigationProps> = ({ activeView, setActiveVie
     { id: 'navigation' as const, label: 'Navigate', icon: Map },
     { id: 'expenses' as const, label: 'Expenses', icon: Receipt },
   ];
+
+  const handleLogout = () => {
+    logout();
+  };
 
   return (
     <nav className="fixed top-0 left-0 right-0 bg-white/95 backdrop-blur-sm border-b border-gray-200 z-50">
@@ -28,7 +35,9 @@ export const Navigation: React.FC<NavigationProps> = ({ activeView, setActiveVie
               <span className="text-2xl font-bold bg-gradient-to-r from-sky-600 to-blue-600 bg-clip-text text-transparent">
                 Tripzy
               </span>
-              <div className="text-xs text-gray-500 -mt-1">Travel Orchestration</div>
+              <div className="text-xs text-gray-500 -mt-1">
+                {user ? `Welcome, ${user.name}` : vendor ? `${vendor.businessName}` : 'Travel Orchestration'}
+              </div>
             </div>
           </div>
 
@@ -57,6 +66,7 @@ export const Navigation: React.FC<NavigationProps> = ({ activeView, setActiveVie
               <Bell className="w-5 h-5" />
               <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full"></span>
             </button>
+            
             <button 
               onClick={() => setActiveView('profile')}
               className={`p-2.5 rounded-xl transition-colors ${
@@ -66,6 +76,14 @@ export const Navigation: React.FC<NavigationProps> = ({ activeView, setActiveVie
               }`}
             >
               <User className="w-5 h-5" />
+            </button>
+            
+            <button 
+              onClick={handleLogout}
+              className="p-2.5 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-xl transition-colors"
+              title="Logout"
+            >
+              <span className="text-sm font-medium">Logout</span>
             </button>
           </div>
         </div>
