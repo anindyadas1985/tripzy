@@ -6,22 +6,26 @@ import { TripPlanner } from './components/TripPlanner';
 import { BookingHub } from './components/BookingHub';
 import { NavigationMap } from './components/NavigationMap';
 import { UserProfile } from './components/UserProfile';
+import { ExpenseSharing } from './components/ExpenseSharing';
 import { TripProvider } from './contexts/TripContext';
 
 function App() {
-  const [activeView, setActiveView] = useState<'dashboard' | 'create' | 'planner' | 'booking' | 'navigation' | 'profile'>('dashboard');
+  const [activeView, setActiveView] = useState<'dashboard' | 'create' | 'planner' | 'booking' | 'navigation' | 'expenses' | 'profile'>('dashboard');
   const [isOnline, setIsOnline] = useState(navigator.onLine);
 
   useEffect(() => {
     const handleOnline = () => setIsOnline(true);
     const handleOffline = () => setIsOnline(false);
+    const handleNavigateToExpenses = () => setActiveView('expenses');
 
     window.addEventListener('online', handleOnline);
     window.addEventListener('offline', handleOffline);
+    window.addEventListener('navigate-to-expenses', handleNavigateToExpenses);
 
     return () => {
       window.removeEventListener('online', handleOnline);
       window.removeEventListener('offline', handleOffline);
+      window.removeEventListener('navigate-to-expenses', handleNavigateToExpenses);
     };
   }, []);
 
@@ -42,6 +46,7 @@ function App() {
           {activeView === 'planner' && <TripPlanner />}
           {activeView === 'booking' && <BookingHub />}
           {activeView === 'navigation' && <NavigationMap />}
+          {activeView === 'expenses' && <ExpenseSharing />}
           {activeView === 'profile' && <UserProfile />}
         </main>
       </div>

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Plus, Search, MapPin, CreditCard, Share2, Download } from 'lucide-react';
+import { Plus, Search, MapPin, CreditCard, Share2, Download, Receipt } from 'lucide-react';
 
 export const QuickActions: React.FC = () => {
   const actions = [
@@ -30,6 +30,13 @@ export const QuickActions: React.FC = () => {
       description: 'Share with friends',
       color: 'from-orange-500 to-red-500',
       action: () => {}
+    },
+    {
+      icon: Receipt,
+      title: 'Split Expenses',
+      description: 'Track shared costs',
+      color: 'from-pink-500 to-rose-500',
+      action: () => window.dispatchEvent(new CustomEvent('navigate-to-expenses'))
     }
   ];
 

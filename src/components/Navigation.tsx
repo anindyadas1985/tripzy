@@ -1,9 +1,9 @@
 import React from 'react';
-import { Plane, Map, Calendar, Home, Bell, User, Plus } from 'lucide-react';
+import { Plane, Map, Calendar, Home, Bell, User, Plus, Receipt } from 'lucide-react';
 
 interface NavigationProps {
-  activeView: 'dashboard' | 'create' | 'planner' | 'booking' | 'navigation' | 'profile';
-  setActiveView: (view: 'dashboard' | 'create' | 'planner' | 'booking' | 'navigation' | 'profile') => void;
+  activeView: 'dashboard' | 'create' | 'planner' | 'booking' | 'navigation' | 'expenses' | 'profile';
+  setActiveView: (view: 'dashboard' | 'create' | 'planner' | 'booking' | 'navigation' | 'expenses' | 'profile') => void;
 }
 
 export const Navigation: React.FC<NavigationProps> = ({ activeView, setActiveView }) => {
@@ -13,6 +13,7 @@ export const Navigation: React.FC<NavigationProps> = ({ activeView, setActiveVie
     { id: 'planner' as const, label: 'Plan', icon: Calendar },
     { id: 'booking' as const, label: 'Book', icon: Plane },
     { id: 'navigation' as const, label: 'Navigate', icon: Map },
+    { id: 'expenses' as const, label: 'Expenses', icon: Receipt },
   ];
 
   return (

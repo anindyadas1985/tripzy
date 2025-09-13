@@ -214,3 +214,45 @@ export interface ReceiptItem {
   unitPrice: number;
   total: number;
 }
+
+export interface ExpenseShare {
+  id: string;
+  tripId: string;
+  title: string;
+  description?: string;
+  totalAmount: number;
+  currency: string;
+  paidBy: string; // user ID who paid
+  paidByName: string;
+  date: Date;
+  category: 'flight' | 'hotel' | 'food' | 'transport' | 'activity' | 'shopping' | 'other';
+  receipt?: string; // image URL
+  splits: ExpenseSplit[];
+  isSettled: boolean;
+  createdAt: Date;
+}
+
+export interface ExpenseSplit {
+  userId: string;
+  userName: string;
+  amount: number;
+  isPaid: boolean;
+  paidAt?: Date;
+}
+
+export interface TripMember {
+  id: string;
+  name: string;
+  email: string;
+  avatar?: string;
+  isOwner: boolean;
+  joinedAt: Date;
+}
+
+export interface ExpenseSummary {
+  userId: string;
+  userName: string;
+  totalPaid: number;
+  totalOwed: number;
+  balance: number; // positive means they are owed money, negative means they owe money
+}

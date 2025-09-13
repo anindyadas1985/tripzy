@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState } from 'react';
-import { Trip, Booking, TripUpdate, UserProfile } from '../types';
+import { Trip, Booking, TripUpdate, UserProfile, ExpenseShare, TripMember } from '../types';
 
 interface TripContextType {
   trips: Trip[];
@@ -8,6 +8,10 @@ interface TripContextType {
   setBookings: React.Dispatch<React.SetStateAction<Booking[]>>;
   updates: TripUpdate[];
   setUpdates: React.Dispatch<React.SetStateAction<TripUpdate[]>>;
+  expenses: ExpenseShare[];
+  setExpenses: React.Dispatch<React.SetStateAction<ExpenseShare[]>>;
+  tripMembers: TripMember[];
+  setTripMembers: React.Dispatch<React.SetStateAction<TripMember[]>>;
   activeTrip: Trip | null;
   setActiveTrip: React.Dispatch<React.SetStateAction<Trip | null>>;
   userProfile: UserProfile | null;
@@ -18,6 +22,8 @@ interface TripContextType {
   updateTrip: (tripId: string, updates: Partial<Trip>) => void;
   deleteTrip: (tripId: string) => void;
   shareTrip: (tripId: string) => string;
+  addExpense: (expense: Omit<ExpenseShare, 'id' | 'createdAt'>) => void;
+  settleExpense: (expenseId: string, userId: string) => void;
 }
 
 export const TripContext = createContext<TripContextType | undefined>(undefined);
@@ -34,6 +40,8 @@ export const TripProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [trips, setTrips] = useState<Trip[]>([]);
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [updates, setUpdates] = useState<TripUpdate[]>([]);
+  const [expenses, setExpenses] = useState<ExpenseShare[]>([]);
+  const [tripMembers, setTripMembers] = useState<TripMember[]>([]);
   const [activeTrip, setActiveTrip] = useState<Trip | null>(null);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [isOffline, setIsOffline] = useState(false);
@@ -80,6 +88,30 @@ export const TripProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return shareCode;
   };
 
+  const addExpense = (expenseData: Omit<ExpenseShare, 'id' | 'createdAt'>) => {
+    const newExpense: ExpenseShare = {
+      ...expenseData,
+      id: Date.now().toString(),
+      createdAt: new Date()
+    };
+    setExpenses(prev => [...prev, newExpense]);
+  };
+
+  const settleExpense = (expenseId: string, userId: string) => {
+    setExpenses(prev => prev.map(expense => 
+      expense.id === expenseId 
+        ? {
+            ...expense,
+            splits: expense.splits.map(split =>
+              split.userId === userId
+                ? { ...split, isPaid: true, paidAt: new Date() }
+                : split
+            )
+          }
+        : expense
+    ));
+  };
+
   const value = {
     trips,
     setTrips,
@@ -87,6 +119,10 @@ export const TripProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setBookings,
     updates,
     setUpdates,
+    expenses,
+    setExpenses,
+    tripMembers,
+    setTripMembers,
     activeTrip,
     setActiveTrip,
     userProfile,
@@ -96,7 +132,9 @@ export const TripProvider: React.FC<{ children: React.ReactNode }> = ({ children
     createTrip,
     updateTrip,
     deleteTrip,
-    shareTrip
+    shareTrip,
+    addExpense,
+    settleExpense
   };
 
   return (
