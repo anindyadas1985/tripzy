@@ -23,6 +23,7 @@ export const Navigation: React.FC<NavigationProps> = ({ activeView, setActiveVie
               <Plane className="w-5 h-5 text-white" />
             </div>
             <span className="text-xl font-bold text-gray-900">TravelFlow</span>
+            <span className="text-xl font-bold text-gray-900">Tripzy</span>
           </div>
 
           <div className="hidden md:flex items-center space-x-1">
