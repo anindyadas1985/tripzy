@@ -9,11 +9,12 @@ import { BookingHub } from './components/BookingHub';
 import { NavigationMap } from './components/NavigationMap';
 import { UserProfile } from './components/UserProfile';
 import { ExpenseSharing } from './components/ExpenseSharing';
+import { TripMemoryBook } from './components/TripMemoryBook';
 import { TripProvider } from './contexts/TripContext';
 
 const AppContent: React.FC = () => {
   const { isAuthenticated } = useAuth();
-  const [activeView, setActiveView] = useState<'dashboard' | 'create' | 'planner' | 'booking' | 'navigation' | 'expenses' | 'profile'>('dashboard');
+  const [activeView, setActiveView] = useState<'dashboard' | 'create' | 'planner' | 'booking' | 'navigation' | 'expenses' | 'memories' | 'profile'>('dashboard');
   const [isOnline, setIsOnline] = useState(navigator.onLine);
 
   useEffect(() => {
@@ -24,6 +25,7 @@ const AppContent: React.FC = () => {
     const handleNavigateToBooking = () => setActiveView('booking');
     const handleNavigateToNavigation = () => setActiveView('navigation');
     const handleNavigateToExpenses = () => setActiveView('expenses');
+    const handleNavigateToMemories = () => setActiveView('memories');
 
     window.addEventListener('online', handleOnline);
     window.addEventListener('offline', handleOffline);
@@ -32,6 +34,7 @@ const AppContent: React.FC = () => {
     window.addEventListener('navigate-to-booking', handleNavigateToBooking);
     window.addEventListener('navigate-to-navigation', handleNavigateToNavigation);
     window.addEventListener('navigate-to-expenses', handleNavigateToExpenses);
+    window.addEventListener('navigate-to-memories', handleNavigateToMemories);
 
     return () => {
       window.removeEventListener('online', handleOnline);
@@ -41,6 +44,7 @@ const AppContent: React.FC = () => {
       window.removeEventListener('navigate-to-booking', handleNavigateToBooking);
       window.removeEventListener('navigate-to-navigation', handleNavigateToNavigation);
       window.removeEventListener('navigate-to-expenses', handleNavigateToExpenses);
+      window.removeEventListener('navigate-to-memories', handleNavigateToMemories);
     };
   }, []);
 
@@ -65,6 +69,7 @@ const AppContent: React.FC = () => {
         {activeView === 'booking' && <BookingHub />}
         {activeView === 'navigation' && <NavigationMap />}
         {activeView === 'expenses' && <ExpenseSharing />}
+        {activeView === 'memories' && <TripMemoryBook />}
         {activeView === 'profile' && <UserProfile />}
       </main>
     </div>

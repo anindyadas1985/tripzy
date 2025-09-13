@@ -7,9 +7,9 @@ export const mockTrips: Trip[] = [
     destination: 'Paris, France',
     startDate: new Date('2025-03-15'),
     endDate: new Date('2025-03-22'),
-    status: 'upcoming',
+    status: 'completed',
     budget: 250000,
-    spent: 85000,
+    spent: 185000,
     travelers: 2,
     image: 'https://images.pexels.com/photos/338515/pexels-photo-338515.jpeg',
     itinerary: [

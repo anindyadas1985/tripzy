@@ -1,10 +1,10 @@
 import React from 'react';
-import { Plane, Map, Calendar, Home, Bell, User, Plus, Receipt } from 'lucide-react';
+import { Plane, Map, Calendar, Home, Bell, User, Plus, Receipt, Book } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 
 interface NavigationProps {
-  activeView: 'dashboard' | 'create' | 'planner' | 'booking' | 'navigation' | 'expenses' | 'profile';
-  setActiveView: (view: 'dashboard' | 'create' | 'planner' | 'booking' | 'navigation' | 'expenses' | 'profile') => void;
+  activeView: 'dashboard' | 'create' | 'planner' | 'booking' | 'navigation' | 'expenses' | 'memories' | 'profile';
+  setActiveView: (view: 'dashboard' | 'create' | 'planner' | 'booking' | 'navigation' | 'expenses' | 'memories' | 'profile') => void;
 }
 
 export const Navigation: React.FC<NavigationProps> = ({ activeView, setActiveView }) => {
@@ -17,6 +17,7 @@ export const Navigation: React.FC<NavigationProps> = ({ activeView, setActiveVie
     { id: 'booking' as const, label: 'Book', icon: Plane },
     { id: 'navigation' as const, label: 'Navigate', icon: Map },
     { id: 'expenses' as const, label: 'Expenses', icon: Receipt },
+    { id: 'memories' as const, label: 'Memories', icon: Book },
   ];
 
   const handleLogout = () => {
