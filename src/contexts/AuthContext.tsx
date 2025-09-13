@@ -52,7 +52,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         ownerName: 'Rajesh Kumar',
         email: email,
         phone: '+91 98765 43210',
-        businessType: 'hotel',
+        businessType: 'hotel' as any,
         address: '123 MG Road',
         city: 'Mumbai',
         state: 'Maharashtra',

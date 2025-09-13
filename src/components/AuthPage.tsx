@@ -87,7 +87,17 @@ export const AuthPage: React.FC = () => {
     { value: 'airline', label: 'Airline & Aviation', icon: '✈️' },
     { value: 'transport', label: 'Transportation', icon: '🚗' },
     { value: 'activity', label: 'Tours & Activities', icon: '🎭' },
-    { value: 'restaurant', label: 'Restaurant & Dining', icon: '🍽️' }
+    { value: 'restaurant', label: 'Restaurant & Dining', icon: '🍽️' },
+    { value: 'petrol_pump', label: 'Petrol Pump & Fuel Station', icon: '⛽' },
+    { value: 'towing_service', label: 'Towing & Roadside Assistance', icon: '🚛' },
+    { value: 'ev_charging', label: 'EV Charging Station', icon: '🔌' },
+    { value: 'car_rental', label: 'Car Rental & Leasing', icon: '🚙' },
+    { value: 'travel_insurance', label: 'Travel Insurance', icon: '🛡️' },
+    { value: 'forex', label: 'Foreign Exchange', icon: '💱' },
+    { value: 'taxi_service', label: 'Taxi & Cab Service', icon: '🚕' },
+    { value: 'parking', label: 'Parking Services', icon: '🅿️' },
+    { value: 'medical_service', label: 'Medical & Emergency Services', icon: '🏥' },
+    { value: 'travel_agency', label: 'Travel Agency', icon: '🧳' }
   ];
 
   const indianStates = [
@@ -387,7 +397,7 @@ export const AuthPage: React.FC = () => {
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">Business Type</label>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-3 max-h-64 overflow-y-auto">
                       {businessTypes.map((type) => (
                         <button
                           key={type.value}

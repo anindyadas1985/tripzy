@@ -273,7 +273,7 @@ export interface Vendor {
   ownerName: string;
   email: string;
   phone: string;
-  businessType: 'hotel' | 'airline' | 'transport' | 'activity' | 'restaurant';
+  businessType: 'hotel' | 'airline' | 'transport' | 'activity' | 'restaurant' | 'petrol_pump' | 'towing_service' | 'ev_charging' | 'car_rental' | 'travel_insurance' | 'forex' | 'taxi_service' | 'parking' | 'medical_service' | 'travel_agency';
   address: string;
   city: string;
   state: string;
