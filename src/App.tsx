@@ -19,15 +19,27 @@ const AppContent: React.FC = () => {
   useEffect(() => {
     const handleOnline = () => setIsOnline(true);
     const handleOffline = () => setIsOnline(false);
+    const handleNavigateToCreate = () => setActiveView('create');
+    const handleNavigateToPlanner = () => setActiveView('planner');
+    const handleNavigateToBooking = () => setActiveView('booking');
+    const handleNavigateToNavigation = () => setActiveView('navigation');
     const handleNavigateToExpenses = () => setActiveView('expenses');
 
     window.addEventListener('online', handleOnline);
     window.addEventListener('offline', handleOffline);
+    window.addEventListener('navigate-to-create', handleNavigateToCreate);
+    window.addEventListener('navigate-to-planner', handleNavigateToPlanner);
+    window.addEventListener('navigate-to-booking', handleNavigateToBooking);
+    window.addEventListener('navigate-to-navigation', handleNavigateToNavigation);
     window.addEventListener('navigate-to-expenses', handleNavigateToExpenses);
 
     return () => {
       window.removeEventListener('online', handleOnline);
       window.removeEventListener('offline', handleOffline);
+      window.removeEventListener('navigate-to-create', handleNavigateToCreate);
+      window.removeEventListener('navigate-to-planner', handleNavigateToPlanner);
+      window.removeEventListener('navigate-to-booking', handleNavigateToBooking);
+      window.removeEventListener('navigate-to-navigation', handleNavigateToNavigation);
       window.removeEventListener('navigate-to-expenses', handleNavigateToExpenses);
     };
   }, []);
