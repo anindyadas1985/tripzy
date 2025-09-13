@@ -4,26 +4,58 @@ import { Database } from './database.types';
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
-if (!supabaseUrl || !supabaseAnonKey) {
-  throw new Error('Missing Supabase environment variables');
-}
-
-export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
-  auth: {
-    autoRefreshToken: true,
-    persistSession: true,
-    detectSessionInUrl: true
+// Create a mock client if environment variables are not provided (for development)
+const createSupabaseClient = () => {
+  if (!supabaseUrl || !supabaseAnonKey) {
+    console.warn('Supabase environment variables not found. Running in demo mode.');
+    // Return a mock client for development
+    return {
+      auth: {
+        getUser: () => Promise.resolve({ data: { user: null }, error: null }),
+        signUp: () => Promise.resolve({ data: { user: null }, error: null }),
+        signInWithPassword: () => Promise.resolve({ data: { user: null }, error: null }),
+        signOut: () => Promise.resolve({ error: null })
+      },
+      from: () => ({
+        select: () => ({ data: [], error: null }),
+        insert: () => ({ select: () => ({ single: () => ({ data: null, error: null }) }) }),
+        update: () => ({ eq: () => ({ data: null, error: null }) }),
+        delete: () => ({ eq: () => ({ data: null, error: null }) }),
+        eq: () => ({ data: [], error: null }),
+        order: () => ({ data: [], error: null }),
+        limit: () => ({ data: [], error: null })
+      }),
+      channel: () => ({
+        on: () => ({ subscribe: () => ({ unsubscribe: () => {} }) })
+      })
+    };
   }
-});
+  
+  return createClient<Database>(supabaseUrl, supabaseAnonKey, {
+    auth: {
+      autoRefreshToken: true,
+      persistSession: true,
+      detectSessionInUrl: true
+    }
+  });
+};
+
+export const supabase = createSupabaseClient() as any;
 
 // Helper functions for common operations
 export const getCurrentUser = async () => {
+  if (!supabaseUrl || !supabaseAnonKey) {
+    return null; // Return null in demo mode
+  }
   const { data: { user }, error } = await supabase.auth.getUser();
   if (error) throw error;
   return user;
 };
 
 export const signUp = async (email: string, password: string, userData: any) => {
+  if (!supabaseUrl || !supabaseAnonKey) {
+    return { user: { id: '1', email, created_at: new Date().toISOString() } };
+  }
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
@@ -36,6 +68,9 @@ export const signUp = async (email: string, password: string, userData: any) => 
 };
 
 export const signIn = async (email: string, password: string) => {
+  if (!supabaseUrl || !supabaseAnonKey) {
+    return { user: { id: '1', email, created_at: new Date().toISOString() } };
+  }
   const { data, error } = await supabase.auth.signInWithPassword({
     email,
     password
@@ -45,12 +80,18 @@ export const signIn = async (email: string, password: string) => {
 };
 
 export const signOut = async () => {
+  if (!supabaseUrl || !supabaseAnonKey) {
+    return; // No-op in demo mode
+  }
   const { error } = await supabase.auth.signOut();
   if (error) throw error;
 };
 
 // Trip operations
 export const createTrip = async (tripData: any) => {
+  if (!supabaseUrl || !supabaseAnonKey) {
+    return { ...tripData, id: Date.now().toString() }; // Mock response
+  }
   const user = await getCurrentUser();
   if (!user) throw new Error('User not authenticated');
 
@@ -68,6 +109,9 @@ export const createTrip = async (tripData: any) => {
 };
 
 export const getUserTrips = async () => {
+  if (!supabaseUrl || !supabaseAnonKey) {
+    return []; // Mock empty response
+  }
   const user = await getCurrentUser();
   if (!user) throw new Error('User not authenticated');
 
@@ -94,6 +138,9 @@ export const getUserTrips = async () => {
 
 // Booking operations
 export const createBooking = async (bookingData: any) => {
+  if (!supabaseUrl || !supabaseAnonKey) {
+    return { ...bookingData, id: Date.now().toString() }; // Mock response
+  }
   const user = await getCurrentUser();
   if (!user) throw new Error('User not authenticated');
 
@@ -112,6 +159,9 @@ export const createBooking = async (bookingData: any) => {
 
 // Expense sharing operations
 export const createExpense = async (expenseData: any) => {
+  if (!supabaseUrl || !supabaseAnonKey) {
+    return { ...expenseData, id: Date.now().toString() }; // Mock response
+  }
   const { data, error } = await supabase
     .from('expense_shares')
     .insert(expenseData)
@@ -123,6 +173,9 @@ export const createExpense = async (expenseData: any) => {
 };
 
 export const getTripExpenses = async (tripId: string) => {
+  if (!supabaseUrl || !supabaseAnonKey) {
+    return []; // Mock empty response
+  }
   const { data, error } = await supabase
     .from('expense_shares')
     .select('*')
@@ -135,6 +188,9 @@ export const getTripExpenses = async (tripId: string) => {
 
 // Notification operations
 export const getUserNotifications = async () => {
+  if (!supabaseUrl || !supabaseAnonKey) {
+    return []; // Mock empty response
+  }
   const user = await getCurrentUser();
   if (!user) throw new Error('User not authenticated');
 
@@ -150,6 +206,9 @@ export const getUserNotifications = async () => {
 };
 
 export const markNotificationAsRead = async (notificationId: string) => {
+  if (!supabaseUrl || !supabaseAnonKey) {
+    return; // No-op in demo mode
+  }
   const { error } = await supabase
     .from('notifications')
     .update({ 
@@ -163,6 +222,9 @@ export const markNotificationAsRead = async (notificationId: string) => {
 
 // Location operations
 export const searchLocations = async (query: string) => {
+  if (!supabaseUrl || !supabaseAnonKey) {
+    return []; // Mock empty response
+  }
   const { data, error } = await supabase
     .from('locations')
     .select('*')
@@ -174,6 +236,9 @@ export const searchLocations = async (query: string) => {
 };
 
 export const createLocation = async (locationData: any) => {
+  if (!supabaseUrl || !supabaseAnonKey) {
+    return { ...locationData, id: Date.now().toString() }; // Mock response
+  }
   const { data, error } = await supabase
     .from('locations')
     .insert(locationData)
