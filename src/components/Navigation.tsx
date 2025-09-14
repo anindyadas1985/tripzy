@@ -1,10 +1,10 @@
 import React from 'react';
-import { Plane, Map, Calendar, Home, Bell, User, Plus, Receipt, Book } from 'lucide-react';
+import { Plane, Map, Calendar, Home, Bell, User, Plus, Receipt, Book, Mic } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 
 interface NavigationProps {
-  activeView: 'dashboard' | 'create' | 'planner' | 'booking' | 'navigation' | 'expenses' | 'memories' | 'profile';
-  setActiveView: (view: 'dashboard' | 'create' | 'planner' | 'booking' | 'navigation' | 'expenses' | 'memories' | 'profile') => void;
+  activeView: 'dashboard' | 'create' | 'voice' | 'planner' | 'booking' | 'navigation' | 'expenses' | 'memories' | 'profile';
+  setActiveView: (view: 'dashboard' | 'create' | 'voice' | 'planner' | 'booking' | 'navigation' | 'expenses' | 'memories' | 'profile') => void;
 }
 
 export const Navigation: React.FC<NavigationProps> = ({ activeView, setActiveView }) => {
@@ -13,6 +13,7 @@ export const Navigation: React.FC<NavigationProps> = ({ activeView, setActiveVie
   const navItems = [
     { id: 'dashboard' as const, label: 'Dashboard', icon: Home },
     { id: 'create' as const, label: 'Create Trip', icon: Plus },
+    { id: 'voice' as const, label: 'Voice Plan', icon: Mic },
     { id: 'planner' as const, label: 'Plan', icon: Calendar },
     { id: 'booking' as const, label: 'Book', icon: Plane },
     { id: 'navigation' as const, label: 'Navigate', icon: Map },

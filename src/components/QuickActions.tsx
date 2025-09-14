@@ -1,5 +1,5 @@
 import React from 'react';
-import { Plus, Search, MapPin, CreditCard, Share2, Download, Receipt, Book } from 'lucide-react';
+import { Plus, Search, MapPin, CreditCard, Share2, Download, Receipt, Book, Mic } from 'lucide-react';
 
 export const QuickActions: React.FC = () => {
   const actions = [
@@ -9,6 +9,13 @@ export const QuickActions: React.FC = () => {
       description: 'Start planning a new adventure',
       color: 'from-sky-500 to-blue-600',
       action: () => window.dispatchEvent(new CustomEvent('navigate-to-create'))
+    },
+    {
+      icon: Mic,
+      title: 'Voice Plan',
+      description: 'Speak your travel plans',
+      color: 'from-purple-500 to-pink-600',
+      action: () => window.dispatchEvent(new CustomEvent('navigate-to-voice'))
     },
     {
       icon: Search,

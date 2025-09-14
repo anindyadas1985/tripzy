@@ -10,11 +10,12 @@ import { NavigationMap } from './components/NavigationMap';
 import { UserProfile } from './components/UserProfile';
 import { ExpenseSharing } from './components/ExpenseSharing';
 import { TripMemoryBook } from './components/TripMemoryBook';
+import { VoiceTripPlanner } from './components/VoiceTripPlanner';
 import { TripProvider } from './contexts/TripContext';
 
 const AppContent: React.FC = () => {
   const { isAuthenticated } = useAuth();
-  const [activeView, setActiveView] = useState<'dashboard' | 'create' | 'planner' | 'booking' | 'navigation' | 'expenses' | 'memories' | 'profile'>('dashboard');
+  const [activeView, setActiveView] = useState<'dashboard' | 'create' | 'voice' | 'planner' | 'booking' | 'navigation' | 'expenses' | 'memories' | 'profile'>('dashboard');
   const [isOnline, setIsOnline] = useState(navigator.onLine);
 
   useEffect(() => {
@@ -22,6 +23,7 @@ const AppContent: React.FC = () => {
     const handleOffline = () => setIsOnline(false);
     const handleNavigateToCreate = () => setActiveView('create');
     const handleNavigateToPlanner = () => setActiveView('planner');
+    const handleNavigateToVoice = () => setActiveView('voice');
     const handleNavigateToBooking = () => setActiveView('booking');
     const handleNavigateToNavigation = () => setActiveView('navigation');
     const handleNavigateToExpenses = () => setActiveView('expenses');
@@ -31,6 +33,7 @@ const AppContent: React.FC = () => {
     window.addEventListener('offline', handleOffline);
     window.addEventListener('navigate-to-create', handleNavigateToCreate);
     window.addEventListener('navigate-to-planner', handleNavigateToPlanner);
+    window.addEventListener('navigate-to-voice', handleNavigateToVoice);
     window.addEventListener('navigate-to-booking', handleNavigateToBooking);
     window.addEventListener('navigate-to-navigation', handleNavigateToNavigation);
     window.addEventListener('navigate-to-expenses', handleNavigateToExpenses);
@@ -41,6 +44,7 @@ const AppContent: React.FC = () => {
       window.removeEventListener('offline', handleOffline);
       window.removeEventListener('navigate-to-create', handleNavigateToCreate);
       window.removeEventListener('navigate-to-planner', handleNavigateToPlanner);
+      window.removeEventListener('navigate-to-voice', handleNavigateToVoice);
       window.removeEventListener('navigate-to-booking', handleNavigateToBooking);
       window.removeEventListener('navigate-to-navigation', handleNavigateToNavigation);
       window.removeEventListener('navigate-to-expenses', handleNavigateToExpenses);
@@ -65,6 +69,7 @@ const AppContent: React.FC = () => {
       <main className={`${!isOnline ? 'pt-20' : 'pt-16'}`}>
         {activeView === 'dashboard' && <Dashboard />}
         {activeView === 'create' && <TripCreator />}
+        {activeView === 'voice' && <VoiceTripPlanner />}
         {activeView === 'planner' && <TripPlanner />}
         {activeView === 'booking' && <BookingHub />}
         {activeView === 'navigation' && <NavigationMap />}
