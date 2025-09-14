@@ -1,6 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
 import { Database } from './database.types';
-import { databaseSetup } from './database-setup';
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
@@ -37,36 +36,17 @@ const createSupabaseClient = () => {
       autoRefreshToken: true,
       persistSession: true,
       detectSessionInUrl: true
-    },
-    global: {
-      headers: {
-        'X-Client-Info': 'journai-travel-app'
-      }
     }
   });
 };
 
 export const supabase = createSupabaseClient() as any;
 
-// Initialize database on first connection
-let initializationPromise: Promise<any> | null = null;
-
-const ensureDatabaseInitialized = async () => {
-  if (!initializationPromise && supabaseUrl && supabaseAnonKey) {
-    initializationPromise = databaseSetup.initializeDatabase();
-  }
-  return initializationPromise;
-};
-
 // Helper functions for common operations
 export const getCurrentUser = async () => {
   if (!supabaseUrl || !supabaseAnonKey) {
     return null; // Return null in demo mode
   }
-  
-  // Ensure database is initialized
-  await ensureDatabaseInitialized();
-  
   const { data: { user }, error } = await supabase.auth.getUser();
   if (error) throw error;
   return user;
@@ -76,10 +56,6 @@ export const signUp = async (email: string, password: string, userData: any) => 
   if (!supabaseUrl || !supabaseAnonKey) {
     return { user: { id: '1', email, created_at: new Date().toISOString() } };
   }
-  
-  // Ensure database is initialized
-  await ensureDatabaseInitialized();
-  
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
@@ -95,10 +71,6 @@ export const signIn = async (email: string, password: string) => {
   if (!supabaseUrl || !supabaseAnonKey) {
     return { user: { id: '1', email, created_at: new Date().toISOString() } };
   }
-  
-  // Ensure database is initialized
-  await ensureDatabaseInitialized();
-  
   const { data, error } = await supabase.auth.signInWithPassword({
     email,
     password
@@ -120,10 +92,6 @@ export const createTrip = async (tripData: any) => {
   if (!supabaseUrl || !supabaseAnonKey) {
     return { ...tripData, id: Date.now().toString() }; // Mock response
   }
-  
-  // Ensure database is initialized
-  await ensureDatabaseInitialized();
-  
   const user = await getCurrentUser();
   if (!user) throw new Error('User not authenticated');
 
@@ -144,10 +112,6 @@ export const getUserTrips = async () => {
   if (!supabaseUrl || !supabaseAnonKey) {
     return []; // Mock empty response
   }
-  
-  // Ensure database is initialized
-  await ensureDatabaseInitialized();
-  
   const user = await getCurrentUser();
   if (!user) throw new Error('User not authenticated');
 
@@ -177,10 +141,6 @@ export const createBooking = async (bookingData: any) => {
   if (!supabaseUrl || !supabaseAnonKey) {
     return { ...bookingData, id: Date.now().toString() }; // Mock response
   }
-  
-  // Ensure database is initialized
-  await ensureDatabaseInitialized();
-  
   const user = await getCurrentUser();
   if (!user) throw new Error('User not authenticated');
 
@@ -202,10 +162,6 @@ export const createExpense = async (expenseData: any) => {
   if (!supabaseUrl || !supabaseAnonKey) {
     return { ...expenseData, id: Date.now().toString() }; // Mock response
   }
-  
-  // Ensure database is initialized
-  await ensureDatabaseInitialized();
-  
   const { data, error } = await supabase
     .from('expense_shares')
     .insert(expenseData)
@@ -220,10 +176,6 @@ export const getTripExpenses = async (tripId: string) => {
   if (!supabaseUrl || !supabaseAnonKey) {
     return []; // Mock empty response
   }
-  
-  // Ensure database is initialized
-  await ensureDatabaseInitialized();
-  
   const { data, error } = await supabase
     .from('expense_shares')
     .select('*')
@@ -239,10 +191,6 @@ export const getUserNotifications = async () => {
   if (!supabaseUrl || !supabaseAnonKey) {
     return []; // Mock empty response
   }
-  
-  // Ensure database is initialized
-  await ensureDatabaseInitialized();
-  
   const user = await getCurrentUser();
   if (!user) throw new Error('User not authenticated');
 
@@ -261,10 +209,6 @@ export const markNotificationAsRead = async (notificationId: string) => {
   if (!supabaseUrl || !supabaseAnonKey) {
     return; // No-op in demo mode
   }
-  
-  // Ensure database is initialized
-  await ensureDatabaseInitialized();
-  
   const { error } = await supabase
     .from('notifications')
     .update({ 
@@ -281,10 +225,6 @@ export const searchLocations = async (query: string) => {
   if (!supabaseUrl || !supabaseAnonKey) {
     return []; // Mock empty response
   }
-  
-  // Ensure database is initialized
-  await ensureDatabaseInitialized();
-  
   const { data, error } = await supabase
     .from('locations')
     .select('*')
@@ -299,10 +239,6 @@ export const createLocation = async (locationData: any) => {
   if (!supabaseUrl || !supabaseAnonKey) {
     return { ...locationData, id: Date.now().toString() }; // Mock response
   }
-  
-  // Ensure database is initialized
-  await ensureDatabaseInitialized();
-  
   const { data, error } = await supabase
     .from('locations')
     .insert(locationData)
