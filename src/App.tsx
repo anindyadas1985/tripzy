@@ -19,6 +19,8 @@ const AppContent: React.FC = () => {
   const [isOnline, setIsOnline] = useState(navigator.onLine);
 
   useEffect(() => {
+    console.log('AppContent mounted, isAuthenticated:', isAuthenticated);
+    
     const handleOnline = () => setIsOnline(true);
     const handleOffline = () => setIsOnline(false);
     const handleNavigateToCreate = () => setActiveView('create');
@@ -52,10 +54,14 @@ const AppContent: React.FC = () => {
     };
   }, []);
 
+  console.log('Rendering AppContent, activeView:', activeView);
+
   if (!isAuthenticated) {
+    console.log('User not authenticated, showing AuthPage');
     return <AuthPage />;
   }
 
+  console.log('User authenticated, showing main app');
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
       {!isOnline && (
@@ -81,7 +87,9 @@ const AppContent: React.FC = () => {
   );
 };
 
-function App() {
+const App: React.FC = () => {
+  console.log('App component rendering');
+  
   return (
     <AuthProvider>
       <TripProvider>
@@ -89,6 +97,6 @@ function App() {
       </TripProvider>
     </AuthProvider>
   );
-}
+};
 
 export default App;

@@ -26,7 +26,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     vendor: null
   });
 
+  useEffect(() => {
+    console.log('AuthProvider mounted, authState:', authState);
+  }, [authState]);
+
   const login = async (email: string, password: string, userType: 'traveler' | 'vendor'): Promise<boolean> => {
+    console.log('Login attempt:', { email, userType });
     try {
       const { user } = await signIn(email, password);
       
@@ -44,6 +49,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             createdAt: new Date(user.created_at)
           };
           
+          console.log('Setting traveler user:', mockUser);
           setAuthState({
             isAuthenticated: true,
             user: mockUser,
@@ -68,6 +74,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             createdAt: new Date(user.created_at)
           };
           
+          console.log('Setting vendor user:', mockVendor);
           setAuthState({
             isAuthenticated: true,
             user: null,
@@ -83,6 +90,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
     
     // Demo mode fallback
+    console.log('Using demo mode fallback');
     if (userType === 'traveler') {
       const mockUser: User = {
         id: '1',
