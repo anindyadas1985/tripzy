@@ -6,7 +6,7 @@ import { BudgetOverview } from './BudgetOverview';
 import { QuickActions } from './QuickActions';
 import { TripTimeline } from './TripTimeline';
 import { useTripContext } from '../contexts/TripContext';
-import { Plus, MapPin, Calendar, Plane } from 'lucide-react';
+import { Plus, MapPin, Calendar, Plane, Mic } from 'lucide-react';
 
 export const Dashboard: React.FC = () => {
   const { trips, activeTrip, setActiveTrip } = useTripContext();
