@@ -338,7 +338,8 @@ export const VoiceTripPlanner: React.FC = () => {
           </div>
           <div>
             <h1 className="text-3xl font-bold text-gray-900">Voice Trip Planner</h1>
-            <p className="text-gray-600">Speak your travel dreams, and we'll create the perfect itinerary</p>
+            <h1 className="text-3xl font-bold text-gray-900">Speak & Go</h1>
+            <p className="text-gray-600">Just speak your travel dreams, and we'll create the perfect itinerary</p>
           </div>
         </div>
 

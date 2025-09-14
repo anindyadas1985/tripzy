@@ -12,7 +12,7 @@ export const QuickActions: React.FC = () => {
     },
     {
       icon: Mic,
-      title: 'Voice Plan',
+      title: 'Speak & Go',
       description: 'Speak your travel plans',
       color: 'from-purple-500 to-pink-600',
       action: () => window.dispatchEvent(new CustomEvent('navigate-to-voice'))
