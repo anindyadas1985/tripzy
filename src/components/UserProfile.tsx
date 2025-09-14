@@ -19,7 +19,7 @@ export const UserProfile: React.FC = () => {
     email: 'alex.johnson@email.com',
     phone: '+1 (555) 123-4567',
     preferences: {
-      currency: 'USD',
+      currency: 'INR',
       language: 'English',
       notifications: true,
       newsletter: true
@@ -43,7 +43,7 @@ export const UserProfile: React.FC = () => {
     paymentMethods: [
       {
         id: '1',
-        type: 'credit' as const,
+        type: 'credit',
         last4: '4242',
         brand: 'Visa',
         expiryMonth: 12,
@@ -52,7 +52,7 @@ export const UserProfile: React.FC = () => {
       },
       {
         id: '2',
-        type: 'credit' as const,
+        type: 'credit',
         last4: '8888',
         brand: 'Mastercard',
         expiryMonth: 8,
@@ -229,7 +229,7 @@ export const UserProfile: React.FC = () => {
                   <Globe className="w-5 h-5 text-gray-400" />
                   <div>
                     <div className="font-medium text-gray-900">Currency</div>
-                    <div className="text-sm text-gray-600">USD - US Dollar</div>
+                    <div className="text-sm text-gray-600">INR - Indian Rupee</div>
                   </div>
                 </div>
                 <button className="text-sky-600 hover:text-sky-700 font-medium">

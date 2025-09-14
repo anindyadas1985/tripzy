@@ -89,7 +89,7 @@ export const BudgetOverview: React.FC = () => {
                   />
                 </div>
                 <span className="text-sm font-medium text-gray-900 w-16 text-right">
-                  ${category.amount.toLocaleString()}
+                  ₹{category.amount.toLocaleString()}
                 </span>
               </div>
             </div>

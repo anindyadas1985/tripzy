@@ -13,7 +13,7 @@ export const OptimizationPanel: React.FC = () => {
     {
       icon: DollarSign,
       title: 'Budget Optimization',
-      description: 'Found $340 in savings',
+      description: 'Found ₹25,000 in savings',
       status: 'applied',
       color: 'green'
     },
