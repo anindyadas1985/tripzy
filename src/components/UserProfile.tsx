@@ -19,6 +19,7 @@ export const UserProfile: React.FC = () => {
     email: 'alex.johnson@email.com',
     phone: '+1 (555) 123-4567',
     // Mock user profile data will be loaded here
+    preferences: {
       newsletter: true
     },
     loyaltyPrograms: [
