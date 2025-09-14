@@ -79,7 +79,7 @@ export const TripCard: React.FC<TripCardProps> = ({ trip, featured = false }) =>
               <span>Budget</span>
             </div>
             <span className="font-medium">
-              ${trip.spent.toLocaleString()} / ${trip.budget.toLocaleString()}
+              ₹{trip.spent.toLocaleString()} / ₹{trip.budget.toLocaleString()}
             </span>
           </div>
           

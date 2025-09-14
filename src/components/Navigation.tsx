@@ -3,8 +3,8 @@ import { Plane, Map, Calendar, Home, Bell, User, Plus, Receipt, Book, Mic } from
 import { useAuth } from '../contexts/AuthContext';
 
 interface NavigationProps {
-  activeView: 'dashboard' | 'create' | 'voice' | 'planner' | 'booking' | 'navigation' | 'expenses' | 'memories' | 'profile';
-  setActiveView: (view: 'dashboard' | 'create' | 'voice' | 'planner' | 'booking' | 'navigation' | 'expenses' | 'memories' | 'profile') => void;
+  activeView: string;
+  setActiveView: (view: string) => void;
 }
 
 export const Navigation: React.FC<NavigationProps> = ({ activeView, setActiveView }) => {
