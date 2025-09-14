@@ -194,7 +194,7 @@ export const ItineraryBuilder: React.FC<ItineraryBuilderProps> = ({ filters }) =
             <div className="flex items-center justify-between">
               <span className="font-medium text-gray-900">Total Cost</span>
               <span className="text-lg font-bold text-gray-900">
-                ₹{itinerary.reduce((sum, item) => sum + item.cost, 0)}
+                ${itinerary.reduce((sum, item) => sum + item.cost, 0)}
               </span>
             </div>
           </div>

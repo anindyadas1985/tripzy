@@ -341,7 +341,7 @@ export const TripCreator: React.FC = () => {
                   <span>Time-optimized</span>
                 </div>
                 <div className="flex items-center space-x-1">
-                  <span className="text-sm">₹</span>
+                  <DollarSign className="w-4 h-4" />
                   <span>Budget-aware</span>
                 </div>
                 <div className="flex items-center space-x-1">

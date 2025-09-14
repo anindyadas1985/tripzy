@@ -13,7 +13,7 @@ import { TripMemoryBook } from './components/TripMemoryBook';
 import { VoiceTripPlanner } from './components/VoiceTripPlanner';
 import { TripProvider } from './contexts/TripContext';
 
-function AppContent() {
+const AppContent: React.FC = () => {
   const { isAuthenticated } = useAuth();
   const [activeView, setActiveView] = useState<'dashboard' | 'create' | 'voice' | 'planner' | 'booking' | 'navigation' | 'expenses' | 'memories' | 'profile'>('dashboard');
   const [isOnline, setIsOnline] = useState(navigator.onLine);
@@ -79,7 +79,7 @@ function AppContent() {
       </main>
     </div>
   );
-}
+};
 
 function App() {
   return (
