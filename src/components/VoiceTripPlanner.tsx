@@ -48,7 +48,7 @@ export const VoiceTripPlanner: React.FC = () => {
       recognitionRef.current.interimResults = true;
       recognitionRef.current.lang = 'en-US';
 
-      recognitionRef.current.onresult = (event: SpeechRecognitionEvent) => {
+      recognitionRef.current.onresult = (event: any) => {
         let finalTranscript = '';
         let interimTranscript = '';
 
@@ -68,7 +68,7 @@ export const VoiceTripPlanner: React.FC = () => {
         }));
       };
 
-      recognitionRef.current.onerror = (event: SpeechRecognitionErrorEvent) => {
+      recognitionRef.current.onerror = (event: any) => {
         console.error('Speech recognition error:', event.error);
         setTranscript(prev => ({ ...prev, isListening: false }));
       };
