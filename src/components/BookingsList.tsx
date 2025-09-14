@@ -111,7 +111,7 @@ export const BookingsList: React.FC = () => {
 
                     <div className="text-right">
                       <div className="text-lg font-semibold text-gray-900">
-                        ${booking.cost.toLocaleString()}
+                        ₹{booking.cost.toLocaleString()}
                       </div>
                     </div>
                   </div>
