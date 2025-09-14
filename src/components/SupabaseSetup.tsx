@@ -92,7 +92,7 @@ export const SupabaseSetup: React.FC = () => {
           <Database className="w-8 h-8 text-white" />
         </div>
         <h1 className="text-3xl font-bold text-gray-900 mb-2">Supabase Setup</h1>
-        <p className="text-gray-600">Configure your database to enable all Tripzy features</p>
+        <p className="text-gray-600">Configure your database to enable all Journai features</p>
       </div>
 
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">

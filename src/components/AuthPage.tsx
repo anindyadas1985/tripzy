@@ -119,7 +119,7 @@ export const AuthPage: React.FC = () => {
             </div>
             <div>
               <h1 className="text-4xl font-bold bg-gradient-to-r from-sky-600 to-blue-600 bg-clip-text text-transparent">
-                Tripzy
+                Journai
               </h1>
               <p className="text-gray-600 text-sm">Plan. Book. Go.</p>
             </div>

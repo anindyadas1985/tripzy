@@ -1,4 +1,4 @@
-# Tripzy - Travel Orchestration Platform
+# Journai - Travel Orchestration Platform
 
 A comprehensive travel planning and management platform built with React, TypeScript, and Supabase.
 
@@ -32,7 +32,7 @@ The application uses Supabase with the following core tables:
 
 ```bash
 git clone <repository-url>
-cd tripzy
+cd journai
 npm install
 ```
 

@@ -34,7 +34,7 @@ export const Navigation: React.FC<NavigationProps> = ({ activeView, setActiveVie
             </div>
             <div>
               <span className="text-2xl font-bold bg-gradient-to-r from-sky-600 to-blue-600 bg-clip-text text-transparent">
-                Tripzy
+                Journai
               </span>
               <div className="text-xs text-gray-500 -mt-1">
                 {user ? `Welcome, ${user.name}` : vendor ? `${vendor.businessName}` : 'Plan. Book. Go.'}
