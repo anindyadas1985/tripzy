@@ -41,7 +41,7 @@ export const UserProfile: React.FC = () => {
     paymentMethods: [
       {
         id: '1',
-        type: 'credit' as const,
+        type: 'credit',
         last4: '4242',
         brand: 'Visa',
         expiryMonth: 12,
@@ -50,7 +50,7 @@ export const UserProfile: React.FC = () => {
       },
       {
         id: '2',
-        type: 'credit' as const,
+        type: 'credit',
         last4: '8888',
         brand: 'Mastercard',
         expiryMonth: 8,
