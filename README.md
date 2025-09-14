@@ -46,6 +46,11 @@ npm install
 ```env
 VITE_SUPABASE_URL=https://your-project.supabase.co
 VITE_SUPABASE_ANON_KEY=your-anon-key-here
+
+# Admin Console (optional)
+VITE_ADMIN_ENABLED=true
+VITE_ADMIN_DEBUG=true
+VITE_ADMIN_EMAILS=admin@journai.com
 ```
 
 ### 3. Run the Application
@@ -79,6 +84,36 @@ npm run dev
 - **JSONB Support**: Flexible metadata storage
 - **Full-text Search**: Location and trip search capabilities
 - **Audit Trails**: Created/updated timestamps on all records
+
+## Admin Console
+
+The application includes a hidden administrative console that can be enabled during build time:
+
+### Configuration
+
+Set environment variables to control admin access:
+
+```env
+VITE_ADMIN_ENABLED=true          # Enable/disable admin console
+VITE_ADMIN_DEBUG=true            # Enable debug mode
+VITE_ADMIN_DB_ACCESS=true        # Enable database admin features
+VITE_ADMIN_EMAILS=admin@journai.com,super@journai.com  # Admin user emails
+```
+
+### Features
+
+- **User Management**: View and manage user accounts
+- **System Analytics**: Monitor usage and performance
+- **Health Monitoring**: Track system status and uptime
+- **Database Administration**: Advanced database operations (restricted)
+- **Real-time Stats**: Live system metrics and activity
+
+### Access Control
+
+- Only users with emails listed in `VITE_ADMIN_EMAILS` can access
+- Admin tab is hidden from regular users
+- Features can be individually enabled/disabled
+- Automatic detection in development mode
 
 ## Contributing
 

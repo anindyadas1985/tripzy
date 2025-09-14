@@ -1,14 +1,16 @@
 import React from 'react';
 import { Plane, Map, Calendar, Home, Bell, User, Plus, Receipt, Book, Mic } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import { canAccessAdmin } from '../config/admin';
 
 interface NavigationProps {
-  activeView: 'dashboard' | 'create' | 'voice' | 'planner' | 'booking' | 'navigation' | 'expenses' | 'memories' | 'profile';
-  setActiveView: (view: 'dashboard' | 'create' | 'voice' | 'planner' | 'booking' | 'navigation' | 'expenses' | 'memories' | 'profile') => void;
+  activeView: 'dashboard' | 'create' | 'voice' | 'planner' | 'booking' | 'navigation' | 'expenses' | 'memories' | 'profile' | 'admin';
+  setActiveView: (view: 'dashboard' | 'create' | 'voice' | 'planner' | 'booking' | 'navigation' | 'expenses' | 'memories' | 'profile' | 'admin') => void;
 }
 
 export const Navigation: React.FC<NavigationProps> = ({ activeView, setActiveView }) => {
   const { logout, user, vendor } = useAuth();
+  const showAdmin = canAccessAdmin(user || vendor);
   
   const navItems = [
     { id: 'dashboard' as const, label: 'Dashboard', icon: Home },
@@ -79,6 +81,20 @@ export const Navigation: React.FC<NavigationProps> = ({ activeView, setActiveVie
             >
               <User className="w-5 h-5" />
             </button>
+            
+            {showAdmin && (
+              <button 
+                onClick={() => setActiveView('admin')}
+                className={`p-2.5 rounded-xl transition-colors ${
+                  activeView === 'admin' 
+                    ? 'bg-red-100 text-red-700' 
+                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+                }`}
+                title="Admin Console"
+              >
+                <span className="text-sm font-bold">A</span>
+              </button>
+            )}
             
             <button 
               onClick={handleLogout}

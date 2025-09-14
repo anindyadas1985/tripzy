@@ -11,11 +11,13 @@ import { UserProfile } from './components/UserProfile';
 import { ExpenseSharing } from './components/ExpenseSharing';
 import { TripMemoryBook } from './components/TripMemoryBook';
 import { VoiceTripPlanner } from './components/VoiceTripPlanner';
+import { AdminConsole } from './components/AdminConsole';
 import { TripProvider } from './contexts/TripContext';
+import { canAccessAdmin } from './config/admin';
 
 const AppContent: React.FC = () => {
-  const { isAuthenticated } = useAuth();
-  const [activeView, setActiveView] = useState<'dashboard' | 'create' | 'voice' | 'planner' | 'booking' | 'navigation' | 'expenses' | 'memories' | 'profile'>('dashboard');
+  const { isAuthenticated, user, vendor } = useAuth();
+  const [activeView, setActiveView] = useState<'dashboard' | 'create' | 'voice' | 'planner' | 'booking' | 'navigation' | 'expenses' | 'memories' | 'profile' | 'admin'>('dashboard');
   const [isOnline, setIsOnline] = useState(navigator.onLine);
 
   useEffect(() => {
@@ -82,6 +84,7 @@ const AppContent: React.FC = () => {
         {activeView === 'expenses' && <ExpenseSharing />}
         {activeView === 'memories' && <TripMemoryBook />}
         {activeView === 'profile' && <UserProfile />}
+        {activeView === 'admin' && canAccessAdmin(user || vendor) && <AdminConsole />}
       </main>
     </div>
   );

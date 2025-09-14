@@ -7,4 +7,8 @@ export default defineConfig({
   optimizeDeps: {
     exclude: ['lucide-react'],
   },
+  define: {
+    // Ensure admin config is available at build time
+    __ADMIN_ENABLED__: JSON.stringify(process.env.VITE_ADMIN_ENABLED === 'true'),
+  },
 });
