@@ -123,7 +123,7 @@ export const SearchForm: React.FC<SearchFormProps> = ({ onSearch }) => {
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Budget (USD)
-            <label className="block text-sm font-medium text-gray-700 mb-2">Budget (INR)</label>
+            </label>
             <div className="relative">
               <span className="absolute left-3 top-3 text-gray-400 font-medium">₹</span>
               <input
