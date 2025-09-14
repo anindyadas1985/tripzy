@@ -12,7 +12,6 @@ import { ExpenseSharing } from './components/ExpenseSharing';
 import { TripMemoryBook } from './components/TripMemoryBook';
 import { VoiceTripPlanner } from './components/VoiceTripPlanner';
 import { TripProvider } from './contexts/TripContext';
-import { DatabaseStatus } from './components/DatabaseStatus';
 
 const AppContent: React.FC = () => {
   const { isAuthenticated } = useAuth();
@@ -84,9 +83,6 @@ const AppContent: React.FC = () => {
         {activeView === 'memories' && <TripMemoryBook />}
         {activeView === 'profile' && <UserProfile />}
       </main>
-      
-      {/* Database Status Widget */}
-      <DatabaseStatus />
     </div>
   );
 };
