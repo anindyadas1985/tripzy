@@ -125,13 +125,13 @@ export const SearchForm: React.FC<SearchFormProps> = ({ onSearch }) => {
               Budget (USD)
             </label>
             <div className="relative">
-              <span className="absolute left-3 top-3 text-gray-400 font-medium">₹</span>
+              <DollarSign className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
               <input
                 type="number"
                 value={budget}
                 onChange={(e) => setBudget(e.target.value)}
                 placeholder="Maximum budget"
-                className="w-full pl-8 pr-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-transparent outline-none"
+                className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-transparent outline-none"
               />
             </div>
           </div>

@@ -215,7 +215,7 @@ export const FlightSearch: React.FC = () => {
 
                 <div className="text-right ml-6">
                   <div className="text-2xl font-bold text-gray-900 mb-1">
-                    ₹{flight.price}
+                    ${flight.price}
                   </div>
                   <button className="bg-sky-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-sky-700 transition-colors">
                     Select

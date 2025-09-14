@@ -112,7 +112,7 @@ export const TripTimeline: React.FC<TripTimelineProps> = ({ trip }) => {
                           </span>
                           
                           <span className="text-sm font-medium text-gray-900">
-                            ₹{item.cost}
+                            ${item.cost}
                           </span>
                         </div>
                       </div>
