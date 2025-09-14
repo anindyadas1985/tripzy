@@ -29,13 +29,22 @@ export const Dashboard: React.FC = () => {
           <p className="text-gray-600 mb-8 max-w-md mx-auto">
             Create your first trip and let our AI generate the perfect itinerary for you.
           </p>
-          <button 
-            onClick={() => window.dispatchEvent(new CustomEvent('navigate-to-create'))}
-            className="inline-flex items-center space-x-2 px-8 py-4 bg-gradient-to-r from-sky-600 to-blue-600 text-white font-semibold rounded-xl hover:from-sky-700 hover:to-blue-700 transition-all duration-200 transform hover:scale-105 shadow-lg shadow-sky-500/25"
-          >
-            <Plus className="w-5 h-5" />
-            <span>Create Your First Trip</span>
-          </button>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <button 
+              onClick={() => window.dispatchEvent(new CustomEvent('navigate-to-voice'))}
+              className="inline-flex items-center space-x-2 px-8 py-4 bg-gradient-to-r from-sky-600 to-blue-600 text-white font-semibold rounded-xl hover:from-sky-700 hover:to-blue-700 transition-all duration-200 transform hover:scale-105 shadow-lg shadow-sky-500/25"
+            >
+              <Mic className="w-5 h-5" />
+              <span>Speak & Go</span>
+            </button>
+            <button 
+              onClick={() => window.dispatchEvent(new CustomEvent('navigate-to-create'))}
+              className="inline-flex items-center space-x-2 px-8 py-4 bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-semibold rounded-xl hover:from-purple-700 hover:to-indigo-700 transition-all duration-200 transform hover:scale-105 shadow-lg shadow-purple-500/25"
+            >
+              <Plus className="w-5 h-5" />
+              <span>Create Your First Trip</span>
+            </button>
+          </div>
         </div>
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
