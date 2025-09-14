@@ -14,7 +14,7 @@ export const QuickActions: React.FC = () => {
       icon: Mic,
       title: 'Speak & Go',
       description: 'Speak your travel plans',
-      color: 'from-purple-500 to-pink-600',
+      color: 'from-sky-500 to-blue-600',
       action: () => window.dispatchEvent(new CustomEvent('navigate-to-voice'))
     },
     {

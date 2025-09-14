@@ -333,7 +333,7 @@ export const VoiceTripPlanner: React.FC = () => {
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="mb-8">
         <div className="flex items-center space-x-3 mb-4">
-          <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-600 rounded-xl flex items-center justify-center">
+          <div className="w-12 h-12 bg-gradient-to-br from-sky-500 to-blue-600 rounded-xl flex items-center justify-center">
             <Mic className="w-6 h-6 text-white" />
           </div>
           <div>
@@ -344,7 +344,7 @@ export const VoiceTripPlanner: React.FC = () => {
         </div>
 
         {/* Example prompts */}
-        <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl p-6 mb-8">
+        <div className="bg-gradient-to-r from-sky-50 to-blue-50 rounded-xl p-6 mb-8">
           <h3 className="font-semibold text-gray-900 mb-3">💡 Try saying something like:</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm text-gray-700">
             <div className="bg-white/60 rounded-lg p-3">
@@ -374,8 +374,8 @@ export const VoiceTripPlanner: React.FC = () => {
               onClick={transcript.isListening ? stopListening : startListening}
               className={`w-24 h-24 rounded-full flex items-center justify-center transition-all duration-300 transform hover:scale-105 ${
                 transcript.isListening
-                  ? 'bg-gradient-to-r from-red-500 to-pink-500 shadow-lg shadow-red-500/25 animate-pulse'
-                  : 'bg-gradient-to-r from-purple-500 to-pink-500 shadow-lg shadow-purple-500/25'
+                  ? 'bg-gradient-to-r from-red-500 to-orange-500 shadow-lg shadow-red-500/25 animate-pulse'
+                  : 'bg-gradient-to-r from-sky-500 to-blue-600 shadow-lg shadow-sky-500/25'
               }`}
             >
               {transcript.isListening ? (
@@ -421,7 +421,7 @@ export const VoiceTripPlanner: React.FC = () => {
             <button
               onClick={generateItinerary}
               disabled={!transcript.text.trim() || isProcessing}
-              className="flex-1 flex items-center justify-center space-x-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold rounded-xl hover:from-purple-700 hover:to-pink-700 transition-all duration-200 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+              className="flex-1 flex items-center justify-center space-x-2 px-6 py-3 bg-gradient-to-r from-sky-600 to-blue-600 text-white font-semibold rounded-xl hover:from-sky-700 hover:to-blue-700 transition-all duration-200 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
             >
               <Sparkles className="w-5 h-5" />
               <span>{isProcessing ? 'Processing...' : 'Generate Itinerary'}</span>
@@ -442,7 +442,7 @@ export const VoiceTripPlanner: React.FC = () => {
 
           {isProcessing && (
             <div className="text-center py-12">
-              <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center mx-auto mb-4 animate-spin">
+              <div className="w-12 h-12 bg-gradient-to-r from-sky-500 to-blue-600 rounded-full flex items-center justify-center mx-auto mb-4 animate-spin">
                 <Sparkles className="w-6 h-6 text-white" />
               </div>
               <p className="text-gray-600">Analyzing your travel preferences...</p>
@@ -452,12 +452,12 @@ export const VoiceTripPlanner: React.FC = () => {
           {parsedData && !isProcessing && (
             <div className="space-y-6">
               {/* Parsed Information */}
-              <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg p-4">
+              <div className="bg-gradient-to-r from-sky-50 to-blue-50 rounded-lg p-4">
                 <h3 className="font-semibold text-gray-900 mb-3">📋 Extracted Information:</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
                   {parsedData.destination && (
                     <div className="flex items-center space-x-2">
-                      <MapPin className="w-4 h-4 text-purple-600" />
+                      <MapPin className="w-4 h-4 text-sky-600" />
                       <span><strong>Destination:</strong> {parsedData.destination}</span>
                     </div>
                   )}
@@ -487,7 +487,7 @@ export const VoiceTripPlanner: React.FC = () => {
                   )}
                   {parsedData.style && (
                     <div className="flex items-center space-x-2">
-                      <Clock className="w-4 h-4 text-purple-600" />
+                      <Clock className="w-4 h-4 text-sky-600" />
                       <span><strong>Style:</strong> {parsedData.style}</span>
                     </div>
                   )}
@@ -498,7 +498,7 @@ export const VoiceTripPlanner: React.FC = () => {
                     <strong className="text-sm">Interests:</strong>
                     <div className="flex flex-wrap gap-2 mt-1">
                       {parsedData.interests.map((interest, index) => (
-                        <span key={index} className="px-2 py-1 bg-purple-100 text-purple-800 text-xs rounded-full">
+                        <span key={index} className="px-2 py-1 bg-sky-100 text-sky-800 text-xs rounded-full">
                           {interest}
                         </span>
                       ))}
@@ -518,7 +518,7 @@ export const VoiceTripPlanner: React.FC = () => {
                         <div className="space-y-2">
                           {day.activities.map((activity: any, index: number) => (
                             <div key={index} className="flex items-start space-x-3 text-sm">
-                              <span className="text-purple-600 font-medium">{activity.time}</span>
+                              <span className="text-sky-600 font-medium">{activity.time}</span>
                               <div>
                                 <div className="text-gray-900">{activity.activity}</div>
                                 <div className="text-gray-500">{activity.location} • {activity.duration}</div>
