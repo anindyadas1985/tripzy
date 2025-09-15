@@ -36,12 +36,27 @@ cd journai
 npm install
 ```
 
-### 2. Supabase Setup
+### 2. Automated Database Setup
+
+#### Option A: Automated Setup (Recommended)
+
+```bash
+# Run the automated setup script
+npm run setup:gcp
+```
+
+This script will:
+- Set up Supabase project (local or remote)
+- Create Google Cloud SQL instance (if configured)
+- Run all database migrations
+- Generate environment configuration files
+- Set up all required tables and relationships
+
+#### Option B: Manual Setup
 
 1. Create a new project at [supabase.com](https://supabase.com)
-2. Go to SQL Editor and run the migration from `supabase/migrations/create_travel_schema.sql`
-3. Get your project URL and anon key from Settings → API
-4. Create a `.env` file:
+2. Get your project URL and anon key from Settings → API
+3. Create a `.env` file:
 
 ```env
 VITE_SUPABASE_URL=https://your-project.supabase.co
@@ -57,6 +72,54 @@ VITE_ADMIN_EMAILS=admin@journai.com
 
 ```bash
 npm run dev
+```
+
+**Note**: The database tables will be created automatically on first run. No manual SQL execution required!
+
+## GCP Deployment
+
+### Prerequisites
+
+1. Install Google Cloud CLI: https://cloud.google.com/sdk/docs/install
+2. Install Supabase CLI: `npm install -g supabase`
+3. Set up your GCP project and enable billing
+
+### Deployment Steps
+
+```bash
+# 1. Setup database and environment
+npm run setup:gcp
+
+# 2. Build the application
+npm run build
+
+# 3. Deploy to Google App Engine
+npm run deploy:gcp
+```
+
+### Environment Variables for Production
+
+Set these in your Cloud Build triggers or App Engine environment:
+
+```bash
+VITE_SUPABASE_URL=https://your-project.supabase.co
+VITE_SUPABASE_ANON_KEY=your-supabase-anon-key
+VITE_ADMIN_ENABLED=false  # Disable admin in production
+GCP_PROJECT_ID=your-gcp-project-id
+SUPABASE_PROJECT_ID=your-supabase-project-id
+```
+
+### Database Management Commands
+
+```bash
+# Run database migrations
+npm run db:migrate
+
+# Reset database (development only)
+npm run db:reset
+
+# Setup database from scratch
+npm run setup:database
 ```
 
 ## Architecture
@@ -79,11 +142,14 @@ npm run dev
 
 ## Database Features
 
-- **Row Level Security**: Secure data access policies
+- **Automated Setup**: Zero-configuration database initialization
+- **Auto-Migration**: Tables created automatically on first run
 - **Real-time Subscriptions**: Live updates across all clients
+- **Row Level Security**: Secure data access policies
 - **JSONB Support**: Flexible metadata storage
 - **Full-text Search**: Location and trip search capabilities
 - **Audit Trails**: Created/updated timestamps on all records
+- **GCP Integration**: Seamless Google Cloud Platform deployment
 
 ## Admin Console
 

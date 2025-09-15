@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { AuthPage } from './components/AuthPage';
+import { DatabaseStatus } from './components/DatabaseStatus';
 import { Navigation } from './components/Navigation';
 import { Dashboard } from './components/Dashboard';
 import { TripCreator } from './components/TripCreator';
@@ -19,6 +20,7 @@ const AppContent: React.FC = () => {
   const { isAuthenticated, user, vendor } = useAuth();
   const [activeView, setActiveView] = useState<'dashboard' | 'create' | 'voice' | 'planner' | 'booking' | 'navigation' | 'expenses' | 'memories' | 'profile' | 'admin'>('dashboard');
   const [isOnline, setIsOnline] = useState(navigator.onLine);
+  const [isDatabaseReady, setIsDatabaseReady] = useState(false);
 
   useEffect(() => {
     console.log('AppContent mounted, isAuthenticated:', isAuthenticated);
@@ -60,12 +62,19 @@ const AppContent: React.FC = () => {
 
   if (!isAuthenticated) {
     console.log('User not authenticated, showing AuthPage');
-    return <AuthPage />;
+    return (
+      <div>
+        <DatabaseStatus onSetupComplete={() => setIsDatabaseReady(true)} />
+        <AuthPage />
+      </div>
+    );
   }
 
   console.log('User authenticated, showing main app');
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+      <DatabaseStatus onSetupComplete={() => setIsDatabaseReady(true)} />
+      
       {!isOnline && (
         <div className="bg-orange-500 text-white text-center py-2 text-sm font-medium">
           You're offline. Some features may be limited.

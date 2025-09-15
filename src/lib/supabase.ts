@@ -1,5 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
 import { Database } from './database.types';
+import { databaseSetup } from './database-setup';
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
@@ -42,8 +43,44 @@ const createSupabaseClient = () => {
 
 export const supabase = createSupabaseClient() as any;
 
+// Auto-initialize database on first connection
+let initializationPromise: Promise<void> | null = null;
+
+export const ensureDatabaseInitialized = async (): Promise<void> => {
+  if (initializationPromise) {
+    return initializationPromise;
+  }
+
+  if (!supabaseUrl || !supabaseAnonKey) {
+    console.log('🔧 Running in demo mode - skipping database initialization');
+    return Promise.resolve();
+  }
+
+  initializationPromise = (async () => {
+    try {
+      console.log('🚀 Initializing database...');
+      const result = await databaseSetup.initializeDatabase();
+      
+      if (result.success) {
+        console.log('✅ Database initialization completed');
+        if (result.tablesCreated.length > 0) {
+          console.log('📋 Tables created:', result.tablesCreated);
+        }
+      } else {
+        console.error('❌ Database initialization failed:', result.message);
+        console.error('Errors:', result.errors);
+      }
+    } catch (error) {
+      console.error('💥 Database initialization error:', error);
+    }
+  })();
+
+  return initializationPromise;
+};
+
 // Helper functions for common operations
 export const getCurrentUser = async () => {
+  await ensureDatabaseInitialized();
   if (!supabaseUrl || !supabaseAnonKey) {
     return null; // Return null in demo mode
   }
@@ -53,6 +90,7 @@ export const getCurrentUser = async () => {
 };
 
 export const signUp = async (email: string, password: string, userData: any) => {
+  await ensureDatabaseInitialized();
   if (!supabaseUrl || !supabaseAnonKey) {
     return { user: { id: '1', email, created_at: new Date().toISOString() } };
   }
@@ -68,6 +106,7 @@ export const signUp = async (email: string, password: string, userData: any) => 
 };
 
 export const signIn = async (email: string, password: string) => {
+  await ensureDatabaseInitialized();
   if (!supabaseUrl || !supabaseAnonKey) {
     return { user: { id: '1', email, created_at: new Date().toISOString() } };
   }
@@ -89,6 +128,7 @@ export const signOut = async () => {
 
 // Trip operations
 export const createTrip = async (tripData: any) => {
+  await ensureDatabaseInitialized();
   if (!supabaseUrl || !supabaseAnonKey) {
     return { ...tripData, id: Date.now().toString() }; // Mock response
   }
@@ -109,6 +149,7 @@ export const createTrip = async (tripData: any) => {
 };
 
 export const getUserTrips = async () => {
+  await ensureDatabaseInitialized();
   if (!supabaseUrl || !supabaseAnonKey) {
     return []; // Mock empty response
   }
@@ -138,6 +179,7 @@ export const getUserTrips = async () => {
 
 // Booking operations
 export const createBooking = async (bookingData: any) => {
+  await ensureDatabaseInitialized();
   if (!supabaseUrl || !supabaseAnonKey) {
     return { ...bookingData, id: Date.now().toString() }; // Mock response
   }
@@ -159,6 +201,7 @@ export const createBooking = async (bookingData: any) => {
 
 // Expense sharing operations
 export const createExpense = async (expenseData: any) => {
+  await ensureDatabaseInitialized();
   if (!supabaseUrl || !supabaseAnonKey) {
     return { ...expenseData, id: Date.now().toString() }; // Mock response
   }
@@ -173,6 +216,7 @@ export const createExpense = async (expenseData: any) => {
 };
 
 export const getTripExpenses = async (tripId: string) => {
+  await ensureDatabaseInitialized();
   if (!supabaseUrl || !supabaseAnonKey) {
     return []; // Mock empty response
   }
@@ -188,6 +232,7 @@ export const getTripExpenses = async (tripId: string) => {
 
 // Notification operations
 export const getUserNotifications = async () => {
+  await ensureDatabaseInitialized();
   if (!supabaseUrl || !supabaseAnonKey) {
     return []; // Mock empty response
   }
@@ -206,6 +251,7 @@ export const getUserNotifications = async () => {
 };
 
 export const markNotificationAsRead = async (notificationId: string) => {
+  await ensureDatabaseInitialized();
   if (!supabaseUrl || !supabaseAnonKey) {
     return; // No-op in demo mode
   }
@@ -222,6 +268,7 @@ export const markNotificationAsRead = async (notificationId: string) => {
 
 // Location operations
 export const searchLocations = async (query: string) => {
+  await ensureDatabaseInitialized();
   if (!supabaseUrl || !supabaseAnonKey) {
     return []; // Mock empty response
   }
@@ -236,6 +283,7 @@ export const searchLocations = async (query: string) => {
 };
 
 export const createLocation = async (locationData: any) => {
+  await ensureDatabaseInitialized();
   if (!supabaseUrl || !supabaseAnonKey) {
     return { ...locationData, id: Date.now().toString() }; // Mock response
   }

@@ -7,7 +7,12 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "setup:database": "node scripts/setup-gcp-database.js",
+    "setup:gcp": "npm run setup:database",
+    "deploy:gcp": "gcloud app deploy",
+    "db:migrate": "supabase db push",
+    "db:reset": "supabase db reset"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.57.4",

@@ -1,0 +1,46 @@
+# Google App Engine configuration for Journai Travel App
+runtime: nodejs18
+
+# Environment variables
+env_variables:
+  NODE_ENV: production
+  VITE_ADMIN_ENABLED: false
+  VITE_ADMIN_DEBUG: false
+
+# Automatic scaling configuration
+automatic_scaling:
+  min_instances: 1
+  max_instances: 10
+  target_cpu_utilization: 0.6
+
+# Resource allocation
+resources:
+  cpu: 1
+  memory_gb: 0.5
+  disk_size_gb: 10
+
+# Health check configuration
+readiness_check:
+  path: "/"
+  check_interval_sec: 5
+  timeout_sec: 4
+  failure_threshold: 2
+  success_threshold: 2
+
+liveness_check:
+  path: "/"
+  check_interval_sec: 30
+  timeout_sec: 4
+  failure_threshold: 4
+  success_threshold: 2
+
+# Static file handling
+handlers:
+- url: /assets
+  static_dir: dist/assets
+  secure: always
+
+- url: /.*
+  static_files: dist/index.html
+  upload: dist/index.html
+  secure: always
