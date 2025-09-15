@@ -9,6 +9,24 @@ const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 const createSupabaseClient = () => {
   if (!supabaseUrl || !supabaseAnonKey) {
     console.warn('Supabase environment variables not found. Running in demo mode.');
+    
+    // Create a chainable mock query builder
+    const createMockQueryBuilder = () => {
+      const mockBuilder = {
+        select: () => mockBuilder,
+        insert: () => ({ select: () => ({ single: () => ({ data: null, error: null }) }) }),
+        update: () => mockBuilder,
+        delete: () => mockBuilder,
+        eq: () => mockBuilder,
+        order: () => mockBuilder,
+        limit: () => ({ data: [], error: null }),
+        single: () => ({ data: null, error: null }),
+        data: [],
+        error: null
+      };
+      return mockBuilder;
+    };
+
     // Return a mock client for development
     return {
       auth: {
@@ -17,15 +35,8 @@ const createSupabaseClient = () => {
         signInWithPassword: () => Promise.resolve({ data: { user: null }, error: null }),
         signOut: () => Promise.resolve({ error: null })
       },
-      from: () => ({
-        select: () => ({ data: [], error: null }),
-        insert: () => ({ select: () => ({ single: () => ({ data: null, error: null }) }) }),
-        update: () => ({ eq: () => ({ data: null, error: null }) }),
-        delete: () => ({ eq: () => ({ data: null, error: null }) }),
-        eq: () => ({ data: [], error: null }),
-        order: () => ({ data: [], error: null }),
-        limit: () => ({ data: [], error: null })
-      }),
+      from: () => createMockQueryBuilder(),
+      rpc: () => Promise.resolve({ data: [], error: null }),
       channel: () => ({
         on: () => ({ subscribe: () => ({ unsubscribe: () => {} }) })
       })
