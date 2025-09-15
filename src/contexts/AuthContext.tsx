@@ -1,9 +1,10 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { supabase, signIn, signUp, signOut } from '../lib/supabase';
+import { supabase, signIn, signUp, signOut, signInWithGoogle, handleOAuthCallback } from '../lib/supabase';
 import { User, Vendor, AuthState } from '../types';
 
 interface AuthContextType extends AuthState {
   login: (email: string, password: string, userType: 'traveler' | 'vendor') => Promise<boolean>;
+  loginWithGoogle: () => Promise<boolean>;
   registerUser: (userData: Omit<User, 'id' | 'isVerified' | 'createdAt'>) => Promise<boolean>;
   registerVendor: (vendorData: Omit<Vendor, 'id' | 'isVerified' | 'rating' | 'totalBookings' | 'createdAt'>) => Promise<boolean>;
   logout: () => void;
@@ -28,6 +29,34 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   useEffect(() => {
     console.log('AuthProvider mounted, authState:', authState);
+    
+    // Handle OAuth callback on page load
+    const handleAuthCallback = async () => {
+      try {
+        const session = await handleOAuthCallback();
+        if (session?.user) {
+          const mockUser: User = {
+            id: session.user.id,
+            name: session.user.user_metadata?.name || session.user.email?.split('@')[0] || 'Google User',
+            email: session.user.email || '',
+            phone: session.user.user_metadata?.phone || '',
+            userType: 'traveler',
+            isVerified: true,
+            createdAt: new Date(session.user.created_at)
+          };
+          
+          setAuthState({
+            isAuthenticated: true,
+            user: mockUser,
+            vendor: null
+          });
+        }
+      } catch (error) {
+        console.error('OAuth callback error:', error);
+      }
+    };
+    
+    handleAuthCallback();
   }, [authState]);
 
   const login = async (email: string, password: string, userType: 'traveler' | 'vendor'): Promise<boolean> => {
@@ -251,6 +280,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     <AuthContext.Provider value={{
       ...authState,
       login,
+      loginWithGoogle,
       registerUser,
       registerVendor,
       logout

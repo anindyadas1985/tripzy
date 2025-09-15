@@ -3,7 +3,7 @@ import { Plane, User, Building2, Mail, Lock, Phone, MapPin, FileText, Star, User
 import { useAuth } from '../contexts/AuthContext';
 
 export const AuthPage: React.FC = () => {
-  const { login, registerUser, registerVendor } = useAuth();
+  const { login, loginWithGoogle, registerUser, registerVendor } = useAuth();
   const [activeTab, setActiveTab] = useState<'login' | 'user-register' | 'vendor-register'>('login');
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({

@@ -137,6 +137,48 @@ export const signOut = async () => {
   if (error) throw error;
 };
 
+export const signInWithGoogle = async () => {
+  await ensureDatabaseInitialized();
+  if (!supabaseUrl || !supabaseAnonKey) {
+    // Mock Google login for demo mode
+    return { 
+      user: { 
+        id: '1', 
+        email: 'demo@gmail.com', 
+        user_metadata: { 
+          name: 'Demo User',
+          avatar_url: 'https://via.placeholder.com/150',
+          provider: 'google'
+        },
+        created_at: new Date().toISOString() 
+      } 
+    };
+  }
+  
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: 'google',
+    options: {
+      redirectTo: `${window.location.origin}`,
+      queryParams: {
+        access_type: 'offline',
+        prompt: 'consent',
+      }
+    }
+  });
+  
+  if (error) throw error;
+  return data;
+};
+
+export const handleOAuthCallback = async () => {
+  if (!supabaseUrl || !supabaseAnonKey) {
+    return null; // No-op in demo mode
+  }
+  
+  const { data, error } = await supabase.auth.getSession();
+  if (error) throw error;
+  return data.session;
+};
 // Trip operations
 export const createTrip = async (tripData: any) => {
   await ensureDatabaseInitialized();
