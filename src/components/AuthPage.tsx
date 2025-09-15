@@ -3,7 +3,7 @@ import { Plane, User, Building2, Mail, Lock, Phone, MapPin, FileText, Star, User
 import { useAuth } from '../contexts/AuthContext';
 
 export const AuthPage: React.FC = () => {
-  const { login, loginWithGoogle, registerUser, registerVendor } = useAuth();
+  const { login, registerUser, registerVendor } = useAuth();
   const [activeTab, setActiveTab] = useState<'login' | 'user-register' | 'vendor-register'>('login');
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
@@ -266,6 +266,13 @@ export const AuthPage: React.FC = () => {
                   </button>
                 </form>
 
+                {/* Note for vendors */}
+                <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                  <p className="text-sm text-blue-800">
+                    <strong>Note:</strong> Vendor accounts require manual verification. 
+                    You can also sign up with Google and upgrade to vendor status later.
+                  </p>
+                </div>
                 <div className="mt-6 text-center">
                   <p className="text-sm text-gray-600">
                     Demo credentials: any email/password combination

@@ -76,6 +76,18 @@ npm run dev
 
 **Note**: The database tables will be created automatically on first run. No manual SQL execution required!
 
+### 4. Configure Google OAuth (Optional)
+
+1. Go to your Supabase project dashboard
+2. Navigate to Authentication → Providers
+3. Enable Google provider
+4. Add your Google OAuth credentials:
+   - Client ID from Google Cloud Console
+   - Client Secret from Google Cloud Console
+5. Add authorized redirect URIs:
+   - `https://your-project.supabase.co/auth/v1/callback`
+   - `http://localhost:5173` (for development)
+
 ## GCP Deployment
 
 ### Prerequisites
