@@ -28,6 +28,28 @@ The application uses Supabase with the following core tables:
 
 ## Setup Instructions
 
+### Quick Start (Automated GCP Setup)
+
+For a complete automated setup on Google Cloud Platform:
+
+```bash
+# Clone and install
+git clone <repository-url>
+cd journai
+npm install
+
+# Run automated GCP infrastructure setup
+npm run setup:gcp
+
+# This will automatically:
+# ✅ Create GCP project and enable APIs
+# ✅ Set up App Engine with auto-scaling
+# ✅ Configure Cloud SQL database
+# ✅ Set up monitoring and alerting
+# ✅ Deploy the application
+# ✅ Configure SSL and custom domains
+```
+
 ### 1. Clone and Install
 
 ```bash
@@ -76,6 +98,30 @@ npm run dev
 
 **Note**: The database tables will be created automatically on first run. No manual SQL execution required!
 
+### 3. GCP Infrastructure Setup
+
+#### Option A: Automated Setup (Recommended)
+
+```bash
+# Interactive setup with all infrastructure
+npm run setup:gcp
+
+# Or use environment variables for non-interactive setup
+GCP_PROJECT_ID=your-project npm run setup:gcp
+```
+
+#### Option B: Terraform (Infrastructure as Code)
+
+```bash
+cd terraform
+cp terraform.tfvars.example terraform.tfvars
+# Edit terraform.tfvars with your values
+
+terraform init
+terraform plan
+terraform apply
+```
+
 ### 4. Configure Google OAuth (Optional)
 
 1. Go to your Supabase project dashboard
@@ -90,6 +136,25 @@ npm run dev
 
 ## GCP Deployment
 
+### Automated Deployment
+
+The easiest way to deploy to GCP:
+
+```bash
+# Complete infrastructure setup and deployment
+npm run setup:gcp
+```
+
+This single command will:
+- ✅ **Create GCP Project** with all required APIs
+- ✅ **Set up App Engine** with auto-scaling (0-20 instances)
+- ✅ **Configure Cloud SQL** with automated backups
+- ✅ **Set up Load Balancer** with global CDN
+- ✅ **Configure Monitoring** with alerts and dashboards
+- ✅ **Set up CI/CD** with Cloud Build
+- ✅ **Deploy Application** with health checks
+- ✅ **Configure SSL/TLS** with automatic certificates
+
 ### Prerequisites
 
 1. Install Google Cloud CLI: https://cloud.google.com/sdk/docs/install
@@ -98,9 +163,15 @@ npm run dev
 
 ### Deployment Steps
 
+#### Quick Deployment
+```bash
+npm run setup:gcp
+```
+
+#### Manual Deployment
 ```bash
 # 1. Setup database and environment
-npm run setup:gcp
+npm run setup:database
 
 # 2. Build the application
 npm run build
@@ -108,6 +179,35 @@ npm run build
 # 3. Deploy to Google App Engine
 npm run deploy:gcp
 ```
+
+### Auto-Scaling Configuration
+
+The application is configured with intelligent auto-scaling:
+
+- **Min Instances**: 0 (scales to zero when no traffic)
+- **Max Instances**: 20 (handles high traffic automatically)
+- **Idle Instances**: 1-3 (keeps warm instances for fast response)
+- **CPU Target**: 60% (scales up when CPU usage exceeds 60%)
+- **Latency Target**: 30ms (maintains low latency)
+- **Health Checks**: Every 30 seconds
+- **Load Balancer**: Global with CDN caching
+
+### Monitoring & Alerts
+
+Automatic monitoring includes:
+
+- **Application Health**: HTTP status, response time, error rates
+- **Infrastructure Health**: CPU, memory, disk usage
+- **Database Health**: Connection pool, query performance
+- **Custom Alerts**: High traffic, errors, downtime
+- **Dashboards**: Real-time metrics and logs
+
+### Cost Optimization
+
+- **Pay-per-use**: Only pay for actual usage
+- **Auto-scaling**: Scales down during low traffic
+- **CDN Caching**: Reduces server load and costs
+- **Efficient Resources**: Optimized instance sizes
 
 ### Environment Variables for Production
 
@@ -124,6 +224,9 @@ SUPABASE_PROJECT_ID=your-supabase-project-id
 ### Database Management Commands
 
 ```bash
+# Complete GCP setup
+npm run setup:gcp
+
 # Run database migrations
 npm run db:migrate
 
@@ -132,6 +235,12 @@ npm run db:reset
 
 # Setup database from scratch
 npm run setup:database
+
+# Health check
+npm run health:check
+
+# Production build and preview
+npm run start:prod
 ```
 
 ## Architecture

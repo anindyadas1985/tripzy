@@ -1,6 +1,9 @@
 # Google App Engine configuration for Journai Travel App
 runtime: nodejs18
 
+# Service configuration
+service: default
+
 # Environment variables
 env_variables:
   NODE_ENV: production
@@ -9,15 +12,26 @@ env_variables:
 
 # Automatic scaling configuration
 automatic_scaling:
-  min_instances: 1
-  max_instances: 10
+  min_instances: 0
+  max_instances: 20
+  min_idle_instances: 1
+  max_idle_instances: 3
+  min_pending_latency: 30ms
+  max_pending_latency: automatic
   target_cpu_utilization: 0.6
+  target_throughput_utilization: 0.6
 
 # Resource allocation
 resources:
   cpu: 1
-  memory_gb: 0.5
+  memory_gb: 1
   disk_size_gb: 10
+
+# Network settings
+network:
+  forwarded_ports:
+    - 8080
+  instance_tag: journai-app
 
 # Health check configuration
 readiness_check:
@@ -26,6 +40,7 @@ readiness_check:
   timeout_sec: 4
   failure_threshold: 2
   success_threshold: 2
+  app_start_timeout_sec: 300
 
 liveness_check:
   path: "/"
@@ -33,14 +48,27 @@ liveness_check:
   timeout_sec: 4
   failure_threshold: 4
   success_threshold: 2
+  initial_delay_sec: 30
 
 # Static file handling
 handlers:
+- url: /favicon.ico
+  static_files: dist/favicon.ico
+  upload: dist/favicon.ico
+  secure: always
+
 - url: /assets
   static_dir: dist/assets
   secure: always
+  expiration: 1d
+  http_headers:
+    Cache-Control: "public, max-age=86400"
+
+- url: /static
+  static_dir: dist/static
+  secure: always
+  expiration: 1d
 
 - url: /.*
   static_files: dist/index.html
   upload: dist/index.html
-  secure: always

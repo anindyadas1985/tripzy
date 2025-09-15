@@ -8,11 +8,15 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
+    "setup:gcp": "node scripts/gcp-setup.js",
+    "setup:gcp-full": "node scripts/gcp-setup.js --full",
     "setup:database": "node scripts/setup-gcp-database.js",
-    "setup:gcp": "npm run setup:database",
     "deploy:gcp": "gcloud app deploy",
+    "deploy:build": "npm run build && npm run deploy:gcp",
     "db:migrate": "supabase db push",
-    "db:reset": "supabase db reset"
+    "db:reset": "supabase db reset",
+    "health:check": "curl -f http://localhost:8080/health || exit 1",
+    "start:prod": "npm run build && npm run preview"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.57.4",

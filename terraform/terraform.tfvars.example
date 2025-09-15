@@ -1,0 +1,15 @@
+# Terraform variables for Journai Travel App
+# Copy this file to terraform.tfvars and update with your values
+
+# Required variables
+project_id = "your-gcp-project-id"
+region     = "us-central1"
+zone       = "us-central1-a"
+
+# Optional variables
+app_name    = "journai-app"
+environment = "prod"
+domain_name = ""  # Set to your custom domain if you have one
+
+# Example with custom domain:
+# domain_name = "journai.example.com"
