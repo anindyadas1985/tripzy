@@ -80,11 +80,7 @@ export const VoiceTripPlanner: React.FC = () => {
 
     return () => {
       if (recognitionRef.current) {
-        try {
         recognitionRef.current.stop();
-        } catch (error) {
-          // Ignore cleanup errors
-        }
       }
     };
   }, []);
