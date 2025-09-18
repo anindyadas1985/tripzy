@@ -32,37 +32,6 @@ export const TripCreator: React.FC = () => {
   const [showCustomBuilder, setShowCustomBuilder] = useState(false);
   const [builderStep, setBuilderStep] = useState<'flight' | 'hotel' | 'activities' | 'summary'>('flight');
   const [showFinalComparison, setShowFinalComparison] = useState(false);
-
-  const nextBuilderStep = () => {
-    if (builderStep === 'flight') setBuilderStep('hotel');
-    else if (builderStep === 'hotel') setBuilderStep('activities');
-    else if (builderStep === 'activities') {
-      // Calculate total cost for custom package
-      const flightCost = customPackage.flight ? customPackage.flight.price * formData.travelers : 0;
-      const hotelCost = customPackage.hotel ? customPackage.hotel.pricePerNight * 7 : 0;
-      const activitiesCost = customPackage.activities ? customPackage.activities.price : 0;
-      
-      setCustomPackage(prev => ({
-        ...prev,
-        totalCost: flightCost + hotelCost + activitiesCost
-      }));
-      
-      // Show final comparison instead of summary
-      setShowCustomBuilder(false);
-      setShowFinalComparison(true);
-    }
-  };
-
-  const prevBuilderStep = () => {
-    if (builderStep === 'hotel') setBuilderStep('flight');
-    else if (builderStep === 'activities') setBuilderStep('hotel');
-    else if (builderStep === 'summary') setBuilderStep('activities');
-  };
-
-  const skipBuilderStep = () => {
-    nextBuilderStep();
-  };
-
   // Check for voice data on component mount
   useEffect(() => {
     const voiceData = localStorage.getItem('voiceTripData');
@@ -732,7 +701,6 @@ export const TripCreator: React.FC = () => {
               {builderStep === 'flight' && 'Step 1: Select Flight'}
               {builderStep === 'hotel' && 'Step 2: Select Hotel'}
               {builderStep === 'activities' && 'Step 3: Select Activities'}
-              {builderStep === 'summary' && 'Step 4: Review & Book'}
             </span>
             <span className="text-sm text-gray-500">
               Total: ₹{customPackage.totalCost.toLocaleString()}
@@ -744,8 +712,7 @@ export const TripCreator: React.FC = () => {
               style={{ 
                 width: `${
                   builderStep === 'flight' ? 25 :
-                  builderStep === 'hotel' ? 50 :
-                  builderStep === 'activities' ? 75 : 100
+                  builderStep === 'hotel' ? 66 : 100
                 }%` 
               }}
             />
@@ -776,7 +743,7 @@ export const TripCreator: React.FC = () => {
             </div>
 
             <div className="flex space-x-3">
-              {builderStep !== 'summary' && (
+              {builderStep !== 'activities' && (
                 <button
                   onClick={skipBuilderStep}
                   className="px-6 py-3 text-gray-500 hover:text-gray-700 transition-colors"
@@ -784,15 +751,244 @@ export const TripCreator: React.FC = () => {
                   Skip (Optional)
                 </button>
               )}
-              {builderStep !== 'summary' && (
-                <button
-                  onClick={nextBuilderStep}
-                  className="px-8 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold rounded-xl hover:from-purple-700 hover:to-pink-700 transition-all duration-200 transform hover:scale-105"
-                >
-                  Next
-                </button>
-              )}
+              <button
+                onClick={nextBuilderStep}
+                className="px-8 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold rounded-xl hover:from-purple-700 hover:to-pink-700 transition-all duration-200 transform hover:scale-105"
+              >
+                {builderStep === 'activities' ? 'Compare Packages' : 'Next'}
+              </button>
             </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Show final comparison between AI and custom packages
+  if (showFinalComparison) {
+    const aiPackageTotal = 105000; // AI package total
+    const customPackageTotal = customPackage.totalCost;
+    
+    return (
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="mb-8 text-center">
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Choose Your Perfect Package</h1>
+          <p className="text-gray-600">Compare both packages and select the one that excites you most</p>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* AI Package */}
+          <div className="bg-white rounded-2xl shadow-lg border-2 border-sky-200 overflow-hidden">
+            <div className="bg-gradient-to-r from-sky-50 to-blue-50 p-6 border-b border-sky-200">
+              <div className="flex items-center justify-between mb-2">
+                <h2 className="text-2xl font-bold text-gray-900">AI Recommended</h2>
+                <span className="px-3 py-1 bg-sky-500 text-white text-sm font-medium rounded-full">
+                  Best Value
+                </span>
+              </div>
+              <p className="text-gray-600">Smart optimization for best deals</p>
+            </div>
+
+            <div className="p-6 space-y-4">
+              {/* AI Package Details */}
+              <div className="flex items-center justify-between p-4 bg-sky-50 rounded-lg">
+                <div className="flex items-center space-x-3">
+                  <div className="w-10 h-10 bg-sky-100 rounded-lg flex items-center justify-center">✈️</div>
+                  <div>
+                    <h3 className="font-semibold text-gray-900">Flight Package</h3>
+                    <p className="text-sm text-gray-600">Premium economy • 2 bags</p>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <div className="font-bold text-gray-900">₹45,000</div>
+                  <div className="text-sm text-green-600">Save ₹8,000</div>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between p-4 bg-sky-50 rounded-lg">
+                <div className="flex items-center space-x-3">
+                  <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">🏨</div>
+                  <div>
+                    <h3 className="font-semibold text-gray-900">Hotel Package</h3>
+                    <p className="text-sm text-gray-600">4-star • Breakfast included</p>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <div className="font-bold text-gray-900">₹42,000</div>
+                  <div className="text-sm text-green-600">Save ₹5,000</div>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between p-4 bg-sky-50 rounded-lg">
+                <div className="flex items-center space-x-3">
+                  <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center">🎭</div>
+                  <div>
+                    <h3 className="font-semibold text-gray-900">Activities Package</h3>
+                    <p className="text-sm text-gray-600">Curated experiences</p>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <div className="font-bold text-gray-900">₹18,000</div>
+                  <div className="text-sm text-green-600">Save ₹2,000</div>
+                </div>
+              </div>
+
+              <div className="border-t border-gray-200 pt-4">
+                <div className="flex items-center justify-between text-xl font-bold">
+                  <span>Total Package</span>
+                  <span className="text-sky-600">₹{aiPackageTotal.toLocaleString()}</span>
+                </div>
+                <p className="text-sm text-green-600 text-right">Total Savings: ₹15,000</p>
+              </div>
+            </div>
+
+            <div className="p-6 bg-gray-50 border-t border-gray-200">
+              <button
+                onClick={bookPackage}
+                className="w-full flex items-center justify-center space-x-2 px-6 py-4 bg-gradient-to-r from-sky-600 to-blue-600 text-white font-semibold rounded-xl hover:from-sky-700 hover:to-blue-700 transition-all duration-200 transform hover:scale-105"
+              >
+                <Sparkles className="w-5 h-5" />
+                <span>Select AI Package</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Custom Package */}
+          <div className="bg-white rounded-2xl shadow-lg border-2 border-purple-200 overflow-hidden">
+            <div className="bg-gradient-to-r from-purple-50 to-pink-50 p-6 border-b border-purple-200">
+              <div className="flex items-center justify-between mb-2">
+                <h2 className="text-2xl font-bold text-gray-900">Your Custom Package</h2>
+                <span className="px-3 py-1 bg-purple-500 text-white text-sm font-medium rounded-full">
+                  Your Choice
+                </span>
+              </div>
+              <p className="text-gray-600">Handpicked by you</p>
+            </div>
+
+            <div className="p-6 space-y-4">
+              {/* Custom Package Details */}
+              {customPackage.flight ? (
+                <div className="flex items-center justify-between p-4 bg-purple-50 rounded-lg">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">✈️</div>
+                    <div>
+                      <h3 className="font-semibold text-gray-900">{customPackage.flight.airline}</h3>
+                      <p className="text-sm text-gray-600">{customPackage.flight.class} • {customPackage.flight.duration}</p>
+                    </div>
+                  </div>
+                  <div className="font-bold text-gray-900">₹{(customPackage.flight.price * formData.travelers).toLocaleString()}</div>
+                </div>
+              ) : (
+                <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border-2 border-dashed border-gray-200">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center">✈️</div>
+                    <div>
+                      <h3 className="font-semibold text-gray-500">No Flight Selected</h3>
+                      <p className="text-sm text-gray-400">You'll book separately</p>
+                    </div>
+                  </div>
+                  <div className="font-bold text-gray-500">₹0</div>
+                </div>
+              )}
+
+              {customPackage.hotel ? (
+                <div className="flex items-center justify-between p-4 bg-purple-50 rounded-lg">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">🏨</div>
+                    <div>
+                      <h3 className="font-semibold text-gray-900">{customPackage.hotel.name}</h3>
+                      <p className="text-sm text-gray-600">{customPackage.hotel.rating}⭐ • 7 nights</p>
+                    </div>
+                  </div>
+                  <div className="font-bold text-gray-900">₹{(customPackage.hotel.pricePerNight * 7).toLocaleString()}</div>
+                </div>
+              ) : (
+                <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border-2 border-dashed border-gray-200">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center">🏨</div>
+                    <div>
+                      <h3 className="font-semibold text-gray-500">No Hotel Selected</h3>
+                      <p className="text-sm text-gray-400">You'll book separately</p>
+                    </div>
+                  </div>
+                  <div className="font-bold text-gray-500">₹0</div>
+                </div>
+              )}
+
+              {customPackage.activities ? (
+                <div className="flex items-center justify-between p-4 bg-purple-50 rounded-lg">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">🎭</div>
+                    <div>
+                      <h3 className="font-semibold text-gray-900">{customPackage.activities.name}</h3>
+                      <p className="text-sm text-gray-600">{customPackage.activities.activities.length} activities</p>
+                    </div>
+                  </div>
+                  <div className="font-bold text-gray-900">₹{customPackage.activities.price.toLocaleString()}</div>
+                </div>
+              ) : (
+                <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border-2 border-dashed border-gray-200">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center">🎭</div>
+                    <div>
+                      <h3 className="font-semibold text-gray-500">No Activities Selected</h3>
+                      <p className="text-sm text-gray-400">You'll explore independently</p>
+                    </div>
+                  </div>
+                  <div className="font-bold text-gray-500">₹0</div>
+                </div>
+              )}
+
+              <div className="border-t border-gray-200 pt-4">
+                <div className="flex items-center justify-between text-xl font-bold">
+                  <span>Total Package</span>
+                  <span className="text-purple-600">₹{customPackageTotal.toLocaleString()}</span>
+                </div>
+                {customPackageTotal < aiPackageTotal && (
+                  <p className="text-sm text-green-600 text-right">
+                    You save: ₹{(aiPackageTotal - customPackageTotal).toLocaleString()}
+                  </p>
+                )}
+                {customPackageTotal > aiPackageTotal && (
+                  <p className="text-sm text-orange-600 text-right">
+                    Premium choice: +₹{(customPackageTotal - aiPackageTotal).toLocaleString()}
+                  </p>
+                )}
+              </div>
+            </div>
+
+            <div className="p-6 bg-gray-50 border-t border-gray-200">
+              <button
+                onClick={bookPackage}
+                className="w-full flex items-center justify-center space-x-2 px-6 py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold rounded-xl hover:from-purple-700 hover:to-pink-700 transition-all duration-200 transform hover:scale-105"
+              >
+                <Check className="w-5 h-5" />
+                <span>Select Custom Package</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Additional Options */}
+        <div className="mt-8 text-center">
+          <div className="flex items-center justify-center space-x-4">
+            <button
+              onClick={() => {
+                setShowFinalComparison(false);
+                setShowCustomBuilder(true);
+                setBuilderStep('flight');
+              }}
+              className="px-6 py-3 text-purple-600 border border-purple-200 rounded-xl hover:bg-purple-50 transition-colors"
+            >
+              ← Modify Custom Package
+            </button>
+            
+            <button
+              onClick={() => window.dispatchEvent(new CustomEvent('navigate-to-booking'))}
+              className="px-6 py-3 text-gray-600 border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors"
+            >
+              Build From Scratch
+            </button>
           </div>
         </div>
       </div>
