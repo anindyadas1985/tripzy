@@ -66,55 +66,15 @@ export const FlightSearch: React.FC = () => {
     e.preventDefault();
     setIsSearching(true);
     
-    try {
-      setTimeout(() => {
-        setSearchResults(mockFlights);
-        setIsSearching(false);
-      }, 1500);
-    } catch (error) {
-      console.error('Flight search error:', error);
+    setTimeout(() => {
+      setSearchResults(mockFlights);
       setIsSearching(false);
-    }
+    }, 1500);
   };
 
-  const handleBookFlight = async (flight: Flight) => {
-    try {
-      // Create a booking record
-      const booking = {
-        id: Date.now().toString(),
-        tripId: 'current-trip',
-        type: 'flight' as const,
-        title: `${flight.departure.airport} to ${flight.arrival.airport}`,
-        provider: flight.airline,
-        confirmationCode: flight.flightNumber,
-        date: new Date(searchParams.departDate),
-        cost: flight.price,
-        status: 'confirmed' as const,
-        details: {
-          flightNumber: flight.flightNumber,
-          departure: flight.departure,
-          arrival: flight.arrival,
-          duration: flight.duration,
-          aircraft: flight.aircraft,
-          passengers: searchParams.passengers
-        }
-      };
-
-      // Store booking in localStorage for demo
-      const existingBookings = JSON.parse(localStorage.getItem('journai_bookings') || '[]');
-      existingBookings.push(booking);
-      localStorage.setItem('journai_bookings', JSON.stringify(existingBookings));
-
-      // Show success message
-      alert(`Flight booked successfully! Confirmation: ${booking.confirmationCode}`);
-      
-      // Navigate to bookings list
-      window.dispatchEvent(new CustomEvent('navigate-to-booking'));
-      
-    } catch (error) {
-      console.error('Flight booking error:', error);
-      alert('Booking failed. Please try again.');
-    }
+  const handleBookFlight = (flight: Flight) => {
+    // Handle flight booking logic here
+    console.log('Booking flight:', flight);
   };
 
   return (
@@ -262,7 +222,10 @@ export const FlightSearch: React.FC = () => {
                   <div className="text-2xl font-bold text-gray-900 mb-1">
                     ${flight.price}
                   </div>
-                  <button className="bg-sky-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-sky-700 transition-colors">
+                  <button 
+                    onClick={() => handleBookFlight(flight)}
+                    className="bg-sky-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-sky-700 transition-colors"
+                  >
                     Select
                   </button>
                 </div>

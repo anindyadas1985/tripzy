@@ -5,7 +5,20 @@ import { EmptyState } from './common/EmptyState';
 import { useTripContext } from '../contexts/TripContext';
 
 export const BookingsList: React.FC = () => {
-  const { bookings } = useTripContext();
+  const { bookings, setBookings } = useTripContext();
+
+  // Load bookings from localStorage on component mount
+  useEffect(() => {
+    try {
+      const storedBookings = localStorage.getItem('journai_bookings');
+      if (storedBookings) {
+        const parsedBookings = JSON.parse(storedBookings);
+        setBookings(parsedBookings);
+      }
+    } catch (error) {
+      console.error('Error loading bookings:', error);
+    }
+  }, [setBookings]);
 
   return (
     <div className="space-y-6">

@@ -27,14 +27,69 @@ const AppContent: React.FC = () => {
       console.log('AppContent mounted, isAuthenticated:', isAuthenticated);
     }
     
-    const handleOnline = () => setIsOnline(true);
-    const handleOffline = () => setIsOnline(false);
-    const handleNavigateToCreate = () => setActiveView('create');
-    const handleNavigateToVoice = () => setActiveView('voice');
-    const handleNavigateToBooking = () => setActiveView('booking');
-    const handleNavigateToNavigation = () => setActiveView('navigation');
-    const handleNavigateToExpenses = () => setActiveView('expenses');
-    const handleNavigateToMemories = () => setActiveView('memories');
+    const handleOnline = () => {
+      try {
+        setIsOnline(true);
+      } catch (error) {
+        console.error('Error setting online status:', error);
+      }
+    };
+    
+    const handleOffline = () => {
+      try {
+        setIsOnline(false);
+      } catch (error) {
+        console.error('Error setting offline status:', error);
+      }
+    };
+    
+    const handleNavigateToCreate = () => {
+      try {
+        setActiveView('create');
+      } catch (error) {
+        console.error('Navigation error:', error);
+      }
+    };
+    
+    const handleNavigateToVoice = () => {
+      try {
+        setActiveView('voice');
+      } catch (error) {
+        console.error('Navigation error:', error);
+      }
+    };
+    
+    const handleNavigateToBooking = () => {
+      try {
+        setActiveView('booking');
+      } catch (error) {
+        console.error('Navigation error:', error);
+      }
+    };
+    
+    const handleNavigateToNavigation = () => {
+      try {
+        setActiveView('navigation');
+      } catch (error) {
+        console.error('Navigation error:', error);
+      }
+    };
+    
+    const handleNavigateToExpenses = () => {
+      try {
+        setActiveView('expenses');
+      } catch (error) {
+        console.error('Navigation error:', error);
+      }
+    };
+    
+    const handleNavigateToMemories = () => {
+      try {
+        setActiveView('memories');
+      } catch (error) {
+        console.error('Navigation error:', error);
+      }
+    };
 
     window.addEventListener('online', handleOnline);
     window.addEventListener('offline', handleOffline);
