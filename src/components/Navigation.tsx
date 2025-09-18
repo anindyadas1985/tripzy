@@ -1,5 +1,5 @@
 import React from 'react';
-import { Map, Calendar, Home, Bell, User, Plus, Receipt, Book, Mic } from 'lucide-react';
+import { Map, Calendar, Home, Bell, User, Plus, Receipt, Book, Mic, Plane } from 'lucide-react';
 import { Header } from './layout/Header';
 import { useAuth } from '../contexts/AuthContext';
 import { canAccessAdmin } from '../config/admin';
