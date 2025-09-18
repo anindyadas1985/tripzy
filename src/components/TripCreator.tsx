@@ -15,11 +15,12 @@ export const TripCreator: React.FC = () => {
     budget: '',
     style: 'leisure' as 'leisure' | 'business' | 'family',
     pace: 'moderate' as 'relaxed' | 'moderate' | 'packed',
-    preferences: [] as string[]
+    preferences: [] as string[],
+    specialRequirements: ''
   });
 
   const [currentStep, setCurrentStep] = useState(1);
-  const totalSteps = 4;
+  const totalSteps = 5;
 
   const styleOptions = [
     {
@@ -107,7 +108,8 @@ export const TripCreator: React.FC = () => {
       budget: parseInt(formData.budget) || 0,
       style: formData.style,
       pace: formData.pace,
-      preferences: formData.preferences
+      preferences: formData.preferences,
+      specialRequirements: formData.specialRequirements
     });
 
     setActiveTrip(newTrip);

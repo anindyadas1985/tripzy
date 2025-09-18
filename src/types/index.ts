@@ -16,6 +16,7 @@ export interface Trip {
   preferences: string[];
   shareCode?: string;
   isShared: boolean;
+  specialRequirements?: string;
 }
 
 export interface ItineraryItem {
