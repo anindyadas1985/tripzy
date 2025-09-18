@@ -678,6 +678,89 @@ export const TripCreator: React.FC = () => {
     }
   };
 
+  // Show custom builder if active
+  if (showCustomBuilder) {
+    return (
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Build Your Custom Package</h1>
+          <p className="text-gray-600">Select individual components for your perfect trip</p>
+        </div>
+
+        {/* Progress Bar */}
+        <div className="mb-8">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-sm font-medium text-gray-700">
+              {builderStep === 'flight' && 'Step 1: Select Flight'}
+              {builderStep === 'hotel' && 'Step 2: Select Hotel'}
+              {builderStep === 'activities' && 'Step 3: Select Activities'}
+              {builderStep === 'summary' && 'Step 4: Review & Book'}
+            </span>
+            <span className="text-sm text-gray-500">
+              Total: ₹{customPackage.totalCost.toLocaleString()}
+            </span>
+          </div>
+          <div className="w-full bg-gray-200 rounded-full h-2">
+            <div 
+              className="bg-gradient-to-r from-purple-500 to-pink-600 h-2 rounded-full transition-all duration-300"
+              style={{ 
+                width: `${
+                  builderStep === 'flight' ? 25 :
+                  builderStep === 'hotel' ? 50 :
+                  builderStep === 'activities' ? 75 : 100
+                }%` 
+              }}
+            />
+          </div>
+        </div>
+
+        {/* Custom Builder Content */}
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
+          {renderCustomBuilder()}
+
+          {/* Navigation Buttons */}
+          <div className="flex items-center justify-between pt-8 mt-8 border-t border-gray-200">
+            <div className="flex space-x-3">
+              <button
+                onClick={() => setShowCustomBuilder(false)}
+                className="px-6 py-3 text-gray-600 border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors"
+              >
+                Back to Packages
+              </button>
+              {builderStep !== 'flight' && (
+                <button
+                  onClick={prevBuilderStep}
+                  className="px-6 py-3 text-gray-600 border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors"
+                >
+                  Previous
+                </button>
+              )}
+            </div>
+
+            <div className="flex space-x-3">
+              {builderStep !== 'summary' && (
+                <button
+                  onClick={skipBuilderStep}
+                  className="px-6 py-3 text-gray-500 hover:text-gray-700 transition-colors"
+                >
+                  Skip (Optional)
+                </button>
+              )}
+              {builderStep !== 'summary' && (
+                <button
+                  onClick={nextBuilderStep}
+                  className="px-8 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold rounded-xl hover:from-purple-700 hover:to-pink-700 transition-all duration-200 transform hover:scale-105"
+                >
+                  Next
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="mb-8">
