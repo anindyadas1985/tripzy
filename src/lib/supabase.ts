@@ -1,5 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
-import { Database } from './database.types';
+import type { Database } from './database.types';
 import { databaseSetup } from './database-setup';
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
@@ -8,7 +8,9 @@ const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 // Create a mock client if environment variables are not provided (for development)
 const createSupabaseClient = () => {
   if (!supabaseUrl || !supabaseAnonKey) {
-    console.warn('Supabase environment variables not found. Running in demo mode.');
+    if (import.meta.env.DEV) {
+      console.warn('Supabase environment variables not found. Running in demo mode.');
+    }
     
     // Create a chainable mock query builder
     const createMockQueryBuilder = () => {

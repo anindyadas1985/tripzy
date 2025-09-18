@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
+import { ErrorBoundary } from './components/common/ErrorBoundary';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { AuthPage } from './components/AuthPage';
 import { DatabaseStatus } from './components/DatabaseStatus';
 import Navigation from './components/Navigation';
 import { Dashboard } from './components/Dashboard';
 import { TripCreator } from './components/TripCreator';
-import { TripPlanner } from './components/TripPlanner';
 import { BookingHub } from './components/BookingHub';
 import { NavigationMap } from './components/NavigationMap';
 import { UserProfile } from './components/UserProfile';
@@ -23,12 +23,13 @@ const AppContent: React.FC = () => {
   const [isDatabaseReady, setIsDatabaseReady] = useState(false);
 
   useEffect(() => {
-    console.log('AppContent mounted, isAuthenticated:', isAuthenticated);
+    if (import.meta.env.DEV) {
+      console.log('AppContent mounted, isAuthenticated:', isAuthenticated);
+    }
     
     const handleOnline = () => setIsOnline(true);
     const handleOffline = () => setIsOnline(false);
     const handleNavigateToCreate = () => setActiveView('create');
-    const handleNavigateToPlanner = () => setActiveView('planner');
     const handleNavigateToVoice = () => setActiveView('voice');
     const handleNavigateToBooking = () => setActiveView('booking');
     const handleNavigateToNavigation = () => setActiveView('navigation');
@@ -38,7 +39,6 @@ const AppContent: React.FC = () => {
     window.addEventListener('online', handleOnline);
     window.addEventListener('offline', handleOffline);
     window.addEventListener('navigate-to-create', handleNavigateToCreate);
-    window.addEventListener('navigate-to-planner', handleNavigateToPlanner);
     window.addEventListener('navigate-to-voice', handleNavigateToVoice);
     window.addEventListener('navigate-to-booking', handleNavigateToBooking);
     window.addEventListener('navigate-to-navigation', handleNavigateToNavigation);
@@ -49,7 +49,6 @@ const AppContent: React.FC = () => {
       window.removeEventListener('online', handleOnline);
       window.removeEventListener('offline', handleOffline);
       window.removeEventListener('navigate-to-create', handleNavigateToCreate);
-      window.removeEventListener('navigate-to-planner', handleNavigateToPlanner);
       window.removeEventListener('navigate-to-voice', handleNavigateToVoice);
       window.removeEventListener('navigate-to-booking', handleNavigateToBooking);
       window.removeEventListener('navigate-to-navigation', handleNavigateToNavigation);
@@ -58,10 +57,14 @@ const AppContent: React.FC = () => {
     };
   }, []);
 
-  console.log('Rendering AppContent, activeView:', activeView);
+  if (import.meta.env.DEV) {
+    console.log('Rendering AppContent, activeView:', activeView);
+  }
 
   if (!isAuthenticated) {
-    console.log('User not authenticated, showing AuthPage');
+    if (import.meta.env.DEV) {
+      console.log('User not authenticated, showing AuthPage');
+    }
     return (
       <div>
         <DatabaseStatus onSetupComplete={() => setIsDatabaseReady(true)} />
@@ -70,7 +73,9 @@ const AppContent: React.FC = () => {
     );
   }
 
-  console.log('User authenticated, showing main app');
+  if (import.meta.env.DEV) {
+    console.log('User authenticated, showing main app');
+  }
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex">
       <DatabaseStatus onSetupComplete={() => setIsDatabaseReady(true)} />
@@ -99,14 +104,18 @@ const AppContent: React.FC = () => {
 };
 
 const App: React.FC = () => {
-  console.log('App component rendering');
+  if (import.meta.env.DEV) {
+    console.log('App component rendering');
+  }
   
   return (
-    <AuthProvider>
-      <TripProvider>
-        <AppContent />
-      </TripProvider>
-    </AuthProvider>
+    <ErrorBoundary>
+      <AuthProvider>
+        <TripProvider>
+          <AppContent />
+        </TripProvider>
+      </AuthProvider>
+    </ErrorBoundary>
   );
 };
 
