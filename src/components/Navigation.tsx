@@ -1,5 +1,6 @@
 import React from 'react';
-import { Plane, Map, Calendar, Home, Bell, User, Plus, Receipt, Book, Mic } from 'lucide-react';
+import { Map, Calendar, Home, Bell, User, Plus, Receipt, Book, Mic } from 'lucide-react';
+import { Header } from './layout/Header';
 import { useAuth } from '../contexts/AuthContext';
 import { canAccessAdmin } from '../config/admin';
 
@@ -30,19 +31,7 @@ export const Navigation: React.FC<NavigationProps> = ({ activeView, setActiveVie
     <nav className="fixed top-0 left-0 right-0 bg-white/95 backdrop-blur-sm border-b border-gray-200 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-sky-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg">
-              <Plane className="w-6 h-6 text-white" />
-            </div>
-            <div>
-              <span className="text-2xl font-bold bg-gradient-to-r from-sky-600 to-blue-600 bg-clip-text text-transparent">
-                Journai
-              </span>
-              <div className="text-xs text-gray-500 -mt-1">
-                {user ? `Welcome, ${user.name}` : vendor ? `${vendor.businessName}` : 'Plan. Book. Go.'}
-              </div>
-            </div>
-          </div>
+          <Header user={user} vendor={vendor} />
 
           <div className="hidden md:flex items-center space-x-1">
             {navItems.map((item) => {
