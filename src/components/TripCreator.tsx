@@ -21,7 +21,7 @@ export const TripCreator: React.FC = () => {
   });
 
   const [currentStep, setCurrentStep] = useState(1);
-  const totalSteps = 7;
+  const totalSteps = 4;
 
   // Check for voice data on component mount
   useEffect(() => {
