@@ -1,57 +1,89 @@
 import React, { useState, useEffect } from 'react';
-import { MapPin, Calendar, Users, DollarSign, Heart, Briefcase, Baby, Zap, Sparkles, ArrowRight, Check } from 'lucide-react';
+import { MapPin, Calendar, Users, DollarSign, ArrowRight, ArrowLeft, Check, Sparkles, Plane, Building, Activity, Clock, Star, Wifi, Car, Coffee } from 'lucide-react';
 import { useTripContext } from '../contexts/TripContext';
 
+interface TripFormData {
+  destination: string;
+  origin: string;
+  startDate: string;
+  endDate: string;
+  travelers: number;
+  budget: number;
+  style: 'leisure' | 'business' | 'family';
+  pace: 'relaxed' | 'moderate' | 'packed';
+  interests: string[];
+  specialRequirements: string;
+  planningStyle: 'ai' | 'custom';
+}
+
+interface FlightOption {
+  id: string;
+  airline: string;
+  class: string;
+  price: number;
+  duration: string;
+  stops: number;
+}
+
+interface HotelOption {
+  id: string;
+  name: string;
+  stars: number;
+  price: number;
+  amenities: string[];
+  location: string;
+}
+
+interface ActivityPackage {
+  id: string;
+  name: string;
+  activities: string[];
+  duration: string;
+  price: number;
+}
+
+interface CustomPackage {
+  flight?: FlightOption;
+  hotel?: HotelOption;
+  activities?: ActivityPackage;
+  total: number;
+}
+
 export const TripCreator: React.FC = () => {
-  const { createTrip, setActiveTrip } = useTripContext();
-  const [isFromVoice, setIsFromVoice] = useState(false);
-  const [formData, setFormData] = useState({
-    title: '',
-    origin: '',
+  const { createTrip } = useTripContext();
+  const [currentStep, setCurrentStep] = useState(1);
+  const [showComparison, setShowComparison] = useState(false);
+  const [showCustomBuilder, setShowCustomBuilder] = useState(false);
+  const [builderStep, setBuilderStep] = useState(1);
+  const [customPackage, setCustomPackage] = useState<CustomPackage>({ total: 0 });
+  const [showFinalComparison, setShowFinalComparison] = useState(false);
+
+  const [formData, setFormData] = useState<TripFormData>({
     destination: '',
+    origin: '',
     startDate: '',
     endDate: '',
     travelers: 1,
-    budget: '',
-    style: 'leisure' as 'leisure' | 'business' | 'family',
-    pace: 'moderate' as 'relaxed' | 'moderate' | 'packed',
-    preferences: [] as string[],
-    specialRequirements: ''
+    budget: 50000,
+    style: 'leisure',
+    pace: 'moderate',
+    interests: [],
+    specialRequirements: '',
+    planningStyle: 'ai'
   });
 
-  const [currentStep, setCurrentStep] = useState(1);
-  const totalSteps = 5;
-
-  // Custom package builder state
-  const [customPackage, setCustomPackage] = useState({
-    flight: null as any,
-    hotel: null as any,
-    activities: null as any,
-    totalCost: 0
-  });
-  const [showCustomBuilder, setShowCustomBuilder] = useState(false);
-  const [builderStep, setBuilderStep] = useState<'flight' | 'hotel' | 'activities' | 'summary'>('flight');
-  const [showFinalComparison, setShowFinalComparison] = useState(false);
-  // Check for voice data on component mount
+  // Load voice data if available
   useEffect(() => {
     const voiceData = localStorage.getItem('voiceTripData');
     if (voiceData) {
       try {
-        const parsedVoiceData = JSON.parse(voiceData);
+        const parsed = JSON.parse(voiceData);
         setFormData(prev => ({
           ...prev,
-          title: parsedVoiceData.title || '',
-          origin: parsedVoiceData.origin || '',
-          destination: parsedVoiceData.destination || '',
-          startDate: parsedVoiceData.startDate ? new Date(parsedVoiceData.startDate).toISOString().split('T')[0] : '',
-          endDate: parsedVoiceData.endDate ? new Date(parsedVoiceData.endDate).toISOString().split('T')[0] : '',
-          travelers: parsedVoiceData.travelers || 1,
-          budget: parsedVoiceData.budget?.toString() || '',
-          style: parsedVoiceData.style || 'leisure',
-          pace: parsedVoiceData.pace || 'moderate',
-          preferences: parsedVoiceData.preferences || []
+          ...parsed,
+          startDate: parsed.startDate ? new Date(parsed.startDate).toISOString().split('T')[0] : '',
+          endDate: parsed.endDate ? new Date(parsed.endDate).toISOString().split('T')[0] : ''
         }));
-        setIsFromVoice(true);
         localStorage.removeItem('voiceTripData');
       } catch (error) {
         console.error('Error parsing voice data:', error);
@@ -59,163 +91,174 @@ export const TripCreator: React.FC = () => {
     }
   }, []);
 
-  const styleOptions = [
+  const totalSteps = 5;
+  const progressPercentage = (currentStep / totalSteps) * 100;
+
+  const interestOptions = [
+    'Cultural Sites', 'Food & Dining', 'Adventure Sports', 'Photography',
+    'Shopping', 'Nightlife', 'Nature & Parks', 'Museums', 'Architecture',
+    'Beaches', 'Mountains', 'History', 'Art', 'Music', 'Local Experiences'
+  ];
+
+  const flightOptions: FlightOption[] = [
     {
-      id: 'leisure' as const,
-      title: 'Leisure',
-      description: 'Relaxation & sightseeing',
-      icon: Heart,
-      color: 'from-pink-500 to-rose-500'
+      id: 'flight1',
+      airline: 'Air India',
+      class: 'Economy',
+      price: 35000,
+      duration: '8h 30m',
+      stops: 0
     },
     {
-      id: 'business' as const,
-      title: 'Business',
-      description: 'Meetings & conferences',
-      icon: Briefcase,
-      color: 'from-blue-500 to-indigo-500'
+      id: 'flight2',
+      airline: 'Emirates',
+      class: 'Economy',
+      price: 45000,
+      duration: '9h 15m',
+      stops: 1
     },
     {
-      id: 'family' as const,
-      title: 'Family',
-      description: 'Kid-friendly activities',
-      icon: Baby,
-      color: 'from-green-500 to-emerald-500'
+      id: 'flight3',
+      airline: 'Lufthansa',
+      class: 'Business',
+      price: 85000,
+      duration: '8h 45m',
+      stops: 0
     }
   ];
 
-  const paceOptions = [
+  const hotelOptions: HotelOption[] = [
     {
-      id: 'relaxed' as const,
-      title: 'Relaxed',
-      description: '2-3 activities/day',
-      icon: '🌅'
+      id: 'hotel1',
+      name: 'Budget Inn Central',
+      stars: 3,
+      price: 4000,
+      amenities: ['Free WiFi', 'Breakfast'],
+      location: 'City Center'
     },
     {
-      id: 'moderate' as const,
-      title: 'Moderate',
-      description: '4-5 activities/day',
-      icon: '⚖️'
+      id: 'hotel2',
+      name: 'Grand Plaza Hotel',
+      stars: 4,
+      price: 8000,
+      amenities: ['Free WiFi', 'Pool', 'Gym', 'Restaurant'],
+      location: 'Downtown'
     },
     {
-      id: 'packed' as const,
-      title: 'Packed',
-      description: '6+ activities/day',
-      icon: '⚡'
+      id: 'hotel3',
+      name: 'Luxury Palace Resort',
+      stars: 5,
+      price: 15000,
+      amenities: ['Free WiFi', 'Spa', 'Pool', 'Concierge', 'Room Service'],
+      location: 'Premium District'
     }
   ];
 
-  const preferenceOptions = [
-    'Cultural Sites', 'Museums', 'Food & Dining', 'Adventure Sports', 
-    'Relaxation & Spa', 'Photography', 'Shopping', 'Nightlife', 
-    'Nature & Parks', 'History', 'Art Galleries', 'Local Markets',
-    'Architecture', 'Music & Entertainment', 'Beaches', 'Mountains'
+  const activityPackages: ActivityPackage[] = [
+    {
+      id: 'activities1',
+      name: 'Essential Explorer',
+      activities: ['City Tour', 'Local Market Visit', 'Cultural Show'],
+      duration: '3 days',
+      price: 12000
+    },
+    {
+      id: 'activities2',
+      name: 'Cultural Immersion',
+      activities: ['Museum Tours', 'Historical Sites', 'Art Galleries', 'Local Workshops'],
+      duration: '4 days',
+      price: 18000
+    },
+    {
+      id: 'activities3',
+      name: 'Premium Experience',
+      activities: ['Private Tours', 'Fine Dining', 'VIP Access', 'Personal Guide'],
+      duration: '5 days',
+      price: 35000
+    }
   ];
 
-  const commonRequirements = [
-    'Wheelchair accessibility',
-    'Guide assistance',
-    'Vegetarian meals',
-    'Halal food',
-    'Child-friendly activities',
-    'Senior-friendly pace',
-    'Medical assistance',
-    'Language interpreter'
-  ];
+  const handleInputChange = (field: keyof TripFormData, value: any) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+  };
 
-  const togglePreference = (pref: string) => {
+  const toggleInterest = (interest: string) => {
     setFormData(prev => ({
       ...prev,
-      preferences: prev.preferences.includes(pref)
-        ? prev.preferences.filter(p => p !== pref)
-        : [...prev.preferences, pref]
+      interests: prev.interests.includes(interest)
+        ? prev.interests.filter(i => i !== interest)
+        : [...prev.interests, interest]
     }));
   };
 
-  const addRequirement = (req: string) => {
-    if (!formData.specialRequirements.includes(req)) {
-      setFormData(prev => ({
-        ...prev,
-        specialRequirements: prev.specialRequirements 
-          ? `${prev.specialRequirements}, ${req}` 
-          : req
-      }));
-    }
+  const addQuickRequirement = (requirement: string) => {
+    setFormData(prev => ({
+      ...prev,
+      specialRequirements: prev.specialRequirements 
+        ? `${prev.specialRequirements}, ${requirement}`
+        : requirement
+    }));
   };
 
-  const handleNext = () => {
+  const nextStep = () => {
     if (currentStep < totalSteps) {
       setCurrentStep(currentStep + 1);
     }
   };
 
-  const handleBack = () => {
+  const prevStep = () => {
     if (currentStep > 1) {
       setCurrentStep(currentStep - 1);
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    const newTrip = createTrip({
-      title: formData.title || `${formData.origin} to ${formData.destination}`,
-      origin: formData.origin,
-      destination: formData.destination,
-      startDate: new Date(formData.startDate),
-      endDate: new Date(formData.endDate),
-      travelers: formData.travelers,
-      budget: parseInt(formData.budget) || 0,
-      style: formData.style,
-      pace: formData.pace,
-      preferences: formData.preferences,
-      specialRequirements: formData.specialRequirements
-    });
-
-    setActiveTrip(newTrip);
-    
-    if (isFromVoice) {
-      setCurrentStep(5); // Go directly to AI package for voice users
+  const handlePlanningStyleSelect = (style: 'ai' | 'custom') => {
+    setFormData(prev => ({ ...prev, planningStyle: style }));
+    if (style === 'ai') {
+      setShowComparison(true);
     } else {
-      setCurrentStep(4); // Go to planning style selection
+      setShowCustomBuilder(true);
     }
   };
 
-  const selectAIPackage = () => {
-    setCurrentStep(5);
+  const selectFlight = (flight: FlightOption) => {
+    const flightCost = flight.price * formData.travelers;
+    setCustomPackage(prev => ({
+      ...prev,
+      flight,
+      total: prev.total - (prev.flight ? prev.flight.price * formData.travelers : 0) + flightCost
+    }));
   };
 
-  const selectCustomBuilder = () => {
-    window.dispatchEvent(new CustomEvent('navigate-to-booking'));
+  const selectHotel = (hotel: HotelOption) => {
+    const hotelCost = hotel.price * 7; // 7 nights
+    setCustomPackage(prev => ({
+      ...prev,
+      hotel,
+      total: prev.total - (prev.hotel ? prev.hotel.price * 7 : 0) + hotelCost
+    }));
   };
 
-  const bookPackage = () => {
-    // In a real app, this would process the booking
-    alert('Package booked successfully! You will receive confirmation details shortly.');
-    // Reset all states and go to dashboard
-    setCurrentStep(1);
-    setShowCustomBuilder(false);
-    setShowFinalComparison(false);
-    setTimeout(() => {
-      window.dispatchEvent(new CustomEvent('navigate-to-dashboard'));
-    }, 1000);
-  };
-
-  const customizePackage = () => {
-    setShowCustomBuilder(true);
-    setBuilderStep('flight');
-  };
-
-  const prevBuilderStep = () => {
-    if (builderStep === 'hotel') setBuilderStep('flight');
-    else if (builderStep === 'activities') setBuilderStep('hotel');
+  const selectActivities = (activities: ActivityPackage) => {
+    setCustomPackage(prev => ({
+      ...prev,
+      activities,
+      total: prev.total - (prev.activities ? prev.activities.price : 0) + activities.price
+    }));
   };
 
   const nextBuilderStep = () => {
-    if (builderStep === 'flight') setBuilderStep('hotel');
-    else if (builderStep === 'hotel') setBuilderStep('activities');
-    else if (builderStep === 'activities') {
-      setShowCustomBuilder(false);
+    if (builderStep < 3) {
+      setBuilderStep(builderStep + 1);
+    } else {
       setShowFinalComparison(true);
+      setShowCustomBuilder(false);
+    }
+  };
+
+  const prevBuilderStep = () => {
+    if (builderStep > 1) {
+      setBuilderStep(builderStep - 1);
     }
   };
 
@@ -223,357 +266,119 @@ export const TripCreator: React.FC = () => {
     nextBuilderStep();
   };
 
-  const renderCustomBuilder = () => {
-    const flightOptions = [
-      {
-        id: 1,
-        airline: 'Air India',
-        class: 'Economy',
-        duration: '2h 30m',
-        price: 15000,
-        departure: '08:00',
-        arrival: '10:30'
-      },
-      {
-        id: 2,
-        airline: 'IndiGo',
-        class: 'Economy',
-        duration: '2h 45m',
-        price: 12000,
-        departure: '14:00',
-        arrival: '16:45'
-      },
-      {
-        id: 3,
-        airline: 'Vistara',
-        class: 'Business',
-        duration: '2h 20m',
-        price: 25000,
-        departure: '18:00',
-        arrival: '20:20'
-      }
-    ];
-
-    const hotelOptions = [
-      {
-        id: 1,
-        name: 'Budget Inn',
-        rating: 3,
-        pricePerNight: 3000,
-        amenities: ['Free WiFi', 'Breakfast'],
-        location: 'City Center'
-      },
-      {
-        id: 2,
-        name: 'Comfort Hotel',
-        rating: 4,
-        pricePerNight: 6000,
-        amenities: ['Free WiFi', 'Breakfast', 'Pool', 'Gym'],
-        location: 'Business District'
-      },
-      {
-        id: 3,
-        name: 'Luxury Resort',
-        rating: 5,
-        pricePerNight: 12000,
-        amenities: ['Free WiFi', 'Breakfast', 'Pool', 'Spa', 'Room Service'],
-        location: 'Premium Location'
-      }
-    ];
-
-    const activityOptions = [
-      {
-        id: 1,
-        name: 'Essential Package',
-        price: 8000,
-        activities: ['City Tour', 'Museum Visit', 'Local Market']
-      },
-      {
-        id: 2,
-        name: 'Cultural Package',
-        price: 15000,
-        activities: ['Heritage Walk', 'Cultural Show', 'Art Gallery', 'Cooking Class']
-      },
-      {
-        id: 3,
-        name: 'Premium Package',
-        price: 25000,
-        activities: ['Private Guide', 'VIP Tours', 'Fine Dining', 'Exclusive Access']
-      }
-    ];
-
-    const selectFlight = (flight: any) => {
-      setCustomPackage(prev => ({
-        ...prev,
-        flight,
-        totalCost: prev.totalCost - (prev.flight?.price * formData.travelers || 0) + (flight.price * formData.travelers)
-      }));
-    };
-
-    const selectHotel = (hotel: any) => {
-      setCustomPackage(prev => ({
-        ...prev,
-        hotel,
-        totalCost: prev.totalCost - (prev.hotel?.pricePerNight * 7 || 0) + (hotel.pricePerNight * 7)
-      }));
-    };
-
-    const selectActivities = (activities: any) => {
-      setCustomPackage(prev => ({
-        ...prev,
-        activities,
-        totalCost: prev.totalCost - (prev.activities?.price || 0) + activities.price
-      }));
-    };
-
-    switch (builderStep) {
-      case 'flight':
-        return (
-          <div className="space-y-6">
-            <div className="text-center mb-8">
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">Select Your Flight</h2>
-              <p className="text-gray-600">Choose your preferred flight option (Optional)</p>
-            </div>
-
-            <div className="space-y-4">
-              {flightOptions.map((flight) => (
-                <button
-                  key={flight.id}
-                  onClick={() => selectFlight(flight)}
-                  className={`w-full p-6 rounded-xl border-2 transition-all duration-200 text-left ${
-                    customPackage.flight?.id === flight.id
-                      ? 'border-purple-500 bg-purple-50 shadow-lg'
-                      : 'border-gray-200 hover:border-gray-300 hover:shadow-md'
-                  }`}
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-4">
-                      <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
-                        ✈️
-                      </div>
-                      <div>
-                        <h3 className="font-semibold text-gray-900">{flight.airline}</h3>
-                        <p className="text-sm text-gray-600">{flight.class} • {flight.duration}</p>
-                        <p className="text-sm text-gray-500">{flight.departure} - {flight.arrival}</p>
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <div className="text-xl font-bold text-gray-900">₹{(flight.price * formData.travelers).toLocaleString()}</div>
-                      <div className="text-sm text-gray-500">for {formData.travelers} traveler{formData.travelers > 1 ? 's' : ''}</div>
-                    </div>
-                  </div>
-                </button>
-              ))}
-            </div>
-          </div>
-        );
-
-      case 'hotel':
-        return (
-          <div className="space-y-6">
-            <div className="text-center mb-8">
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">Select Your Hotel</h2>
-              <p className="text-gray-600">Choose your accommodation (Optional)</p>
-            </div>
-
-            <div className="space-y-4">
-              {hotelOptions.map((hotel) => (
-                <button
-                  key={hotel.id}
-                  onClick={() => selectHotel(hotel)}
-                  className={`w-full p-6 rounded-xl border-2 transition-all duration-200 text-left ${
-                    customPackage.hotel?.id === hotel.id
-                      ? 'border-purple-500 bg-purple-50 shadow-lg'
-                      : 'border-gray-200 hover:border-gray-300 hover:shadow-md'
-                  }`}
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-4">
-                      <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
-                        🏨
-                      </div>
-                      <div>
-                        <h3 className="font-semibold text-gray-900">{hotel.name}</h3>
-                        <p className="text-sm text-gray-600">{'⭐'.repeat(hotel.rating)} • {hotel.location}</p>
-                        <p className="text-sm text-gray-500">{hotel.amenities.join(', ')}</p>
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <div className="text-xl font-bold text-gray-900">₹{(hotel.pricePerNight * 7).toLocaleString()}</div>
-                      <div className="text-sm text-gray-500">for 7 nights</div>
-                    </div>
-                  </div>
-                </button>
-              ))}
-            </div>
-          </div>
-        );
-
-      case 'activities':
-        return (
-          <div className="space-y-6">
-            <div className="text-center mb-8">
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">Select Activities</h2>
-              <p className="text-gray-600">Choose your experience package (Optional)</p>
-            </div>
-
-            <div className="space-y-4">
-              {activityOptions.map((activity) => (
-                <button
-                  key={activity.id}
-                  onClick={() => selectActivities(activity)}
-                  className={`w-full p-6 rounded-xl border-2 transition-all duration-200 text-left ${
-                    customPackage.activities?.id === activity.id
-                      ? 'border-purple-500 bg-purple-50 shadow-lg'
-                      : 'border-gray-200 hover:border-gray-300 hover:shadow-md'
-                  }`}
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-4">
-                      <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
-                        🎭
-                      </div>
-                      <div>
-                        <h3 className="font-semibold text-gray-900">{activity.name}</h3>
-                        <p className="text-sm text-gray-600">{activity.activities.length} activities included</p>
-                        <p className="text-sm text-gray-500">{activity.activities.join(', ')}</p>
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <div className="text-xl font-bold text-gray-900">₹{activity.price.toLocaleString()}</div>
-                      <div className="text-sm text-gray-500">total package</div>
-                    </div>
-                  </div>
-                </button>
-              ))}
-            </div>
-          </div>
-        );
-
-      default:
-        return null;
-    }
+  const handleCustomizePackage = () => {
+    setShowComparison(false);
+    setShowCustomBuilder(true);
+    setBuilderStep(1);
+    setCustomPackage({ total: 0 });
   };
 
-  const renderStep = () => {
+  const handleBookPackage = (packageType: 'ai' | 'custom') => {
+    const tripData = {
+      ...formData,
+      startDate: new Date(formData.startDate),
+      endDate: new Date(formData.endDate),
+      packageType,
+      customPackage: packageType === 'custom' ? customPackage : undefined
+    };
+    
+    const newTrip = createTrip(tripData);
+    window.dispatchEvent(new CustomEvent('navigate-to-booking'));
+  };
+
+  const renderStepContent = () => {
     switch (currentStep) {
       case 1:
         return (
           <div className="space-y-6">
             <div className="text-center mb-8">
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">Where are you going?</h2>
-              <p className="text-gray-600">Tell us about your trip basics</p>
-              {isFromVoice && (
-                <div className="mt-3 px-4 py-2 bg-sky-100 text-sky-800 rounded-lg inline-block">
-                  ✨ Pre-filled from your voice input
-                </div>
-              )}
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">Trip Basics</h2>
+              <p className="text-gray-600">Let's start with the essentials</p>
             </div>
 
-            <div className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Trip Title (Optional)</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <MapPin className="w-4 h-4 inline mr-1" />
+                  From (Origin)
+                </label>
                 <input
                   type="text"
-                  value={formData.title}
-                  onChange={(e) => setFormData({...formData, title: e.target.value})}
-                  placeholder="e.g., European Adventure, Business Trip to Tokyo"
+                  value={formData.origin}
+                  onChange={(e) => handleInputChange('origin', e.target.value)}
+                  placeholder="Delhi, India"
                   className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-transparent outline-none"
                 />
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">From</label>
-                  <div className="relative">
-                    <MapPin className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
-                    <input
-                      type="text"
-                      value={formData.origin}
-                      onChange={(e) => setFormData({...formData, origin: e.target.value})}
-                      placeholder="Origin city"
-                      className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-transparent outline-none"
-                      required
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">To</label>
-                  <div className="relative">
-                    <MapPin className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
-                    <input
-                      type="text"
-                      value={formData.destination}
-                      onChange={(e) => setFormData({...formData, destination: e.target.value})}
-                      placeholder="Destination city"
-                      className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-transparent outline-none"
-                      required
-                    />
-                  </div>
-                </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <MapPin className="w-4 h-4 inline mr-1" />
+                  To (Destination)
+                </label>
+                <input
+                  type="text"
+                  value={formData.destination}
+                  onChange={(e) => handleInputChange('destination', e.target.value)}
+                  placeholder="Paris, France"
+                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-transparent outline-none"
+                />
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Departure Date</label>
-                  <div className="relative">
-                    <Calendar className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
-                    <input
-                      type="date"
-                      value={formData.startDate}
-                      onChange={(e) => setFormData({...formData, startDate: e.target.value})}
-                      className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-transparent outline-none"
-                      required
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Return Date</label>
-                  <div className="relative">
-                    <Calendar className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
-                    <input
-                      type="date"
-                      value={formData.endDate}
-                      onChange={(e) => setFormData({...formData, endDate: e.target.value})}
-                      className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-transparent outline-none"
-                      required
-                    />
-                  </div>
-                </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <Calendar className="w-4 h-4 inline mr-1" />
+                  Start Date
+                </label>
+                <input
+                  type="date"
+                  value={formData.startDate}
+                  onChange={(e) => handleInputChange('startDate', e.target.value)}
+                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-transparent outline-none"
+                />
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Travelers</label>
-                  <div className="relative">
-                    <Users className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
-                    <select
-                      value={formData.travelers}
-                      onChange={(e) => setFormData({...formData, travelers: parseInt(e.target.value)})}
-                      className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-transparent outline-none appearance-none bg-white"
-                    >
-                      {[1, 2, 3, 4, 5, 6, 7, 8].map(num => (
-                        <option key={num} value={num}>{num} {num === 1 ? 'Traveler' : 'Travelers'}</option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <Calendar className="w-4 h-4 inline mr-1" />
+                  End Date
+                </label>
+                <input
+                  type="date"
+                  value={formData.endDate}
+                  onChange={(e) => handleInputChange('endDate', e.target.value)}
+                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-transparent outline-none"
+                />
+              </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Budget (₹)</label>
-                  <div className="relative">
-                    <DollarSign className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
-                    <input
-                      type="number"
-                      value={formData.budget}
-                      onChange={(e) => setFormData({...formData, budget: e.target.value})}
-                      placeholder="Total budget"
-                      className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-transparent outline-none"
-                    />
-                  </div>
-                </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <Users className="w-4 h-4 inline mr-1" />
+                  Number of Travelers
+                </label>
+                <select
+                  value={formData.travelers}
+                  onChange={(e) => handleInputChange('travelers', parseInt(e.target.value))}
+                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-transparent outline-none"
+                >
+                  {[1, 2, 3, 4, 5, 6, 7, 8].map(num => (
+                    <option key={num} value={num}>{num} {num === 1 ? 'Traveler' : 'Travelers'}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <DollarSign className="w-4 h-4 inline mr-1" />
+                  Budget (₹)
+                </label>
+                <input
+                  type="number"
+                  value={formData.budget}
+                  onChange={(e) => handleInputChange('budget', parseInt(e.target.value))}
+                  placeholder="50000"
+                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-transparent outline-none"
+                />
               </div>
             </div>
           </div>
@@ -581,85 +386,81 @@ export const TripCreator: React.FC = () => {
 
       case 2:
         return (
-          <div className="space-y-8">
+          <div className="space-y-6">
             <div className="text-center mb-8">
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">Tell us your preferences</h2>
-              <p className="text-gray-600">This helps us customize your perfect itinerary</p>
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">Travel Preferences</h2>
+              <p className="text-gray-600">Tell us about your travel style</p>
             </div>
 
-            {/* Travel Style */}
-            <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">What's your travel style?</h3>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {styleOptions.map((style) => {
-                  const Icon = style.icon;
-                  return (
+            <div className="space-y-8">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-4">Trip Style</label>
+                <div className="grid grid-cols-3 gap-4">
+                  {[
+                    { value: 'leisure', label: 'Leisure', icon: '🏖️', desc: 'Relaxation and fun' },
+                    { value: 'business', label: 'Business', icon: '💼', desc: 'Work and meetings' },
+                    { value: 'family', label: 'Family', icon: '👨‍👩‍👧‍👦', desc: 'Family-friendly activities' }
+                  ].map((style) => (
                     <button
-                      key={style.id}
-                      type="button"
-                      onClick={() => setFormData({...formData, style: style.id})}
-                      className={`p-4 rounded-xl border-2 transition-all duration-200 text-left ${
-                        formData.style === style.id
-                          ? 'border-sky-500 bg-sky-50 shadow-lg'
-                          : 'border-gray-200 hover:border-gray-300 hover:shadow-md'
+                      key={style.value}
+                      onClick={() => handleInputChange('style', style.value)}
+                      className={`p-4 rounded-xl border-2 transition-all text-center ${
+                        formData.style === style.value
+                          ? 'border-sky-500 bg-sky-50 text-sky-700'
+                          : 'border-gray-200 hover:border-gray-300'
                       }`}
                     >
-                      <div className={`w-10 h-10 rounded-lg bg-gradient-to-r ${style.color} flex items-center justify-center mb-3`}>
-                        <Icon className="w-5 h-5 text-white" />
-                      </div>
-                      <h4 className="font-semibold text-gray-900 mb-1">{style.title}</h4>
-                      <p className="text-sm text-gray-600">{style.description}</p>
+                      <div className="text-2xl mb-2">{style.icon}</div>
+                      <div className="font-medium">{style.label}</div>
+                      <div className="text-xs text-gray-600 mt-1">{style.desc}</div>
                     </button>
-                  );
-                })}
+                  ))}
+                </div>
               </div>
-            </div>
 
-            {/* Preferred Pace */}
-            <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">What's your preferred pace?</h3>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {paceOptions.map((pace) => (
-                  <button
-                    key={pace.id}
-                    type="button"
-                    onClick={() => setFormData({...formData, pace: pace.id})}
-                    className={`p-4 rounded-xl border-2 transition-all duration-200 text-left ${
-                      formData.pace === pace.id
-                        ? 'border-sky-500 bg-sky-50 shadow-lg'
-                        : 'border-gray-200 hover:border-gray-300 hover:shadow-md'
-                    }`}
-                  >
-                    <div className="text-2xl mb-3">{pace.icon}</div>
-                    <h4 className="font-semibold text-gray-900 mb-1">{pace.title}</h4>
-                    <p className="text-sm text-gray-600">{pace.description}</p>
-                  </button>
-                ))}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-4">Travel Pace</label>
+                <div className="grid grid-cols-3 gap-4">
+                  {[
+                    { value: 'relaxed', label: 'Relaxed', icon: '🧘', desc: 'Take it slow' },
+                    { value: 'moderate', label: 'Moderate', icon: '🚶', desc: 'Balanced schedule' },
+                    { value: 'packed', label: 'Packed', icon: '🏃', desc: 'See everything' }
+                  ].map((pace) => (
+                    <button
+                      key={pace.value}
+                      onClick={() => handleInputChange('pace', pace.value)}
+                      className={`p-4 rounded-xl border-2 transition-all text-center ${
+                        formData.pace === pace.value
+                          ? 'border-sky-500 bg-sky-50 text-sky-700'
+                          : 'border-gray-200 hover:border-gray-300'
+                      }`}
+                    >
+                      <div className="text-2xl mb-2">{pace.icon}</div>
+                      <div className="font-medium">{pace.label}</div>
+                      <div className="text-xs text-gray-600 mt-1">{pace.desc}</div>
+                    </button>
+                  ))}
+                </div>
               </div>
-            </div>
 
-            {/* What Interests You */}
-            <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">What interests you?</h3>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                {preferenceOptions.map((pref) => (
-                  <button
-                    key={pref}
-                    type="button"
-                    onClick={() => togglePreference(pref)}
-                    className={`p-3 rounded-lg border-2 text-sm font-medium transition-all duration-200 ${
-                      formData.preferences.includes(pref)
-                        ? 'border-sky-500 bg-sky-50 text-sky-700'
-                        : 'border-gray-200 text-gray-700 hover:border-gray-300 hover:bg-gray-50'
-                    }`}
-                  >
-                    {pref}
-                  </button>
-                ))}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-4">Interests</label>
+                <div className="grid grid-cols-3 md:grid-cols-5 gap-3">
+                  {interestOptions.map((interest) => (
+                    <button
+                      key={interest}
+                      onClick={() => toggleInterest(interest)}
+                      className={`px-3 py-2 rounded-lg text-sm font-medium transition-all ${
+                        formData.interests.includes(interest)
+                          ? 'bg-sky-500 text-white'
+                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                      }`}
+                    >
+                      {interest}
+                    </button>
+                  ))}
+                </div>
               </div>
-              <p className="text-sm text-gray-500 mt-2">
-                Selected: {formData.preferences.length} preferences
-              </p>
             </div>
           </div>
         );
@@ -668,38 +469,44 @@ export const TripCreator: React.FC = () => {
         return (
           <div className="space-y-6">
             <div className="text-center mb-8">
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">Any special requirements?</h2>
-              <p className="text-gray-600">Help us make your trip accessible and comfortable</p>
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">Special Requirements</h2>
+              <p className="text-gray-600">Any specific needs or preferences?</p>
             </div>
 
-            <div className="space-y-4">
+            <div className="space-y-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Special Requirements or Accessibility Needs
-                </label>
-                <textarea
-                  value={formData.specialRequirements}
-                  onChange={(e) => setFormData({...formData, specialRequirements: e.target.value})}
-                  placeholder="e.g., Wheelchair accessible rooms, vegetarian meals, guide assistance, medical needs..."
-                  rows={4}
-                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-transparent outline-none resize-none"
-                />
-              </div>
-
-              <div>
-                <p className="text-sm font-medium text-gray-700 mb-3">Quick add common requirements:</p>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-                  {commonRequirements.map((req) => (
+                <label className="block text-sm font-medium text-gray-700 mb-4">Quick Add</label>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                  {[
+                    'Wheelchair accessible',
+                    'Vegetarian meals',
+                    'Pet-friendly',
+                    'WiFi required',
+                    'Airport pickup',
+                    'Travel insurance',
+                    'Local SIM card',
+                    'Currency exchange'
+                  ].map((req) => (
                     <button
                       key={req}
-                      type="button"
-                      onClick={() => addRequirement(req)}
-                      className="p-2 text-sm border border-gray-200 rounded-lg hover:border-sky-300 hover:bg-sky-50 transition-colors text-left"
+                      onClick={() => addQuickRequirement(req)}
+                      className="px-3 py-2 bg-gray-100 text-gray-700 rounded-lg text-sm hover:bg-gray-200 transition-colors"
                     >
                       + {req}
                     </button>
                   ))}
                 </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Additional Requirements</label>
+                <textarea
+                  value={formData.specialRequirements}
+                  onChange={(e) => handleInputChange('specialRequirements', e.target.value)}
+                  placeholder="Any other specific requirements or preferences..."
+                  rows={4}
+                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-transparent outline-none resize-none"
+                />
               </div>
             </div>
           </div>
@@ -709,88 +516,62 @@ export const TripCreator: React.FC = () => {
         return (
           <div className="space-y-6">
             <div className="text-center mb-8">
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">Choose your planning style</h2>
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">Planning Style</h2>
               <p className="text-gray-600">How would you like to plan your trip?</p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* AI Package Option */}
               <button
-                onClick={selectAIPackage}
-                className="p-8 rounded-2xl border-2 border-sky-200 bg-gradient-to-br from-sky-50 to-blue-50 hover:from-sky-100 hover:to-blue-100 transition-all duration-200 text-left group hover:shadow-lg"
+                onClick={() => handlePlanningStyleSelect('ai')}
+                className="p-8 border-2 border-gray-200 rounded-2xl hover:border-sky-500 hover:bg-sky-50 transition-all group"
               >
-                <div className="flex items-center space-x-3 mb-4">
-                  <div className="w-12 h-12 bg-gradient-to-r from-sky-500 to-blue-600 rounded-xl flex items-center justify-center">
-                    <Sparkles className="w-6 h-6 text-white" />
+                <div className="text-center">
+                  <div className="w-16 h-16 bg-gradient-to-r from-sky-500 to-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
+                    <Sparkles className="w-8 h-8 text-white" />
                   </div>
-                  <div>
-                    <h3 className="text-xl font-bold text-gray-900">AI-Curated Package</h3>
-                    <p className="text-sky-600 font-medium">Recommended ✨</p>
+                  <h3 className="text-xl font-bold text-gray-900 mb-2">AI Recommended</h3>
+                  <p className="text-gray-600 mb-4">Let our AI create the perfect itinerary based on your preferences</p>
+                  <div className="space-y-2 text-sm text-gray-500">
+                    <div className="flex items-center justify-center space-x-2">
+                      <Check className="w-4 h-4 text-green-500" />
+                      <span>Instant planning</span>
+                    </div>
+                    <div className="flex items-center justify-center space-x-2">
+                      <Check className="w-4 h-4 text-green-500" />
+                      <span>Best deals</span>
+                    </div>
+                    <div className="flex items-center justify-center space-x-2">
+                      <Check className="w-4 h-4 text-green-500" />
+                      <span>Optimized schedule</span>
+                    </div>
                   </div>
-                </div>
-                
-                <div className="space-y-3 mb-6">
-                  <div className="flex items-center space-x-2 text-sm text-gray-700">
-                    <Check className="w-4 h-4 text-green-600" />
-                    <span>Complete package in 2 minutes</span>
-                  </div>
-                  <div className="flex items-center space-x-2 text-sm text-gray-700">
-                    <Check className="w-4 h-4 text-green-600" />
-                    <span>Flights, hotels & activities included</span>
-                  </div>
-                  <div className="flex items-center space-x-2 text-sm text-gray-700">
-                    <Check className="w-4 h-4 text-green-600" />
-                    <span>Smart optimization & best deals</span>
-                  </div>
-                  <div className="flex items-center space-x-2 text-sm text-gray-700">
-                    <Check className="w-4 h-4 text-green-600" />
-                    <span>Based on your preferences</span>
-                  </div>
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600">Setup time: ~2 minutes</span>
-                  <ArrowRight className="w-5 h-5 text-sky-600 group-hover:translate-x-1 transition-transform" />
                 </div>
               </button>
 
-              {/* Custom Builder Option */}
               <button
-                onClick={selectCustomBuilder}
-                className="p-8 rounded-2xl border-2 border-gray-200 hover:border-gray-300 hover:shadow-lg transition-all duration-200 text-left group"
+                onClick={() => handlePlanningStyleSelect('custom')}
+                className="p-8 border-2 border-gray-200 rounded-2xl hover:border-purple-500 hover:bg-purple-50 transition-all group"
               >
-                <div className="flex items-center space-x-3 mb-4">
-                  <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-600 rounded-xl flex items-center justify-center">
-                    <Zap className="w-6 h-6 text-white" />
+                <div className="text-center">
+                  <div className="w-16 h-16 bg-gradient-to-r from-purple-500 to-pink-600 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
+                    <Users className="w-8 h-8 text-white" />
                   </div>
-                  <div>
-                    <h3 className="text-xl font-bold text-gray-900">Build Custom Itinerary</h3>
-                    <p className="text-gray-600">Full control</p>
+                  <h3 className="text-xl font-bold text-gray-900 mb-2">Custom Planning</h3>
+                  <p className="text-gray-600 mb-4">Build your trip step by step with full control</p>
+                  <div className="space-y-2 text-sm text-gray-500">
+                    <div className="flex items-center justify-center space-x-2">
+                      <Check className="w-4 h-4 text-green-500" />
+                      <span>Full control</span>
+                    </div>
+                    <div className="flex items-center justify-center space-x-2">
+                      <Check className="w-4 h-4 text-green-500" />
+                      <span>Flexible options</span>
+                    </div>
+                    <div className="flex items-center justify-center space-x-2">
+                      <Check className="w-4 h-4 text-green-500" />
+                      <span>Personal touch</span>
+                    </div>
                   </div>
-                </div>
-                
-                <div className="space-y-3 mb-6">
-                  <div className="flex items-center space-x-2 text-sm text-gray-700">
-                    <Check className="w-4 h-4 text-green-600" />
-                    <span>Handpick every detail</span>
-                  </div>
-                  <div className="flex items-center space-x-2 text-sm text-gray-700">
-                    <Check className="w-4 h-4 text-green-600" />
-                    <span>Compare all options yourself</span>
-                  </div>
-                  <div className="flex items-center space-x-2 text-sm text-gray-700">
-                    <Check className="w-4 h-4 text-green-600" />
-                    <span>Unlimited customization</span>
-                  </div>
-                  <div className="flex items-center space-x-2 text-sm text-gray-700">
-                    <Check className="w-4 h-4 text-green-600" />
-                    <span>Build at your own pace</span>
-                  </div>
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600">Setup time: ~15-30 minutes</span>
-                  <ArrowRight className="w-5 h-5 text-purple-600 group-hover:translate-x-1 transition-transform" />
                 </div>
               </button>
             </div>
@@ -801,131 +582,75 @@ export const TripCreator: React.FC = () => {
         return (
           <div className="space-y-6">
             <div className="text-center mb-8">
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">Your AI-Curated Package</h2>
-              <p className="text-gray-600">We've created the perfect trip based on your preferences</p>
-              {isFromVoice && (
-                <div className="mt-3 px-4 py-2 bg-sky-100 text-sky-800 rounded-lg inline-block">
-                  🎤 Generated from your voice input
-                </div>
-              )}
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">AI Generated Package</h2>
+              <p className="text-gray-600">Here's your personalized travel package</p>
             </div>
 
-            {/* Package Summary */}
-            <div className="bg-gradient-to-r from-sky-50 to-blue-50 rounded-2xl p-6 mb-6">
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-center">
+            <div className="bg-gradient-to-r from-sky-50 to-blue-50 rounded-2xl p-8">
+              <div className="flex items-center justify-between mb-6">
                 <div>
-                  <div className="text-2xl font-bold text-sky-600">7 Days</div>
-                  <div className="text-sm text-gray-600">Duration</div>
+                  <h3 className="text-2xl font-bold text-gray-900">{formData.origin} → {formData.destination}</h3>
+                  <p className="text-gray-600">{formData.travelers} travelers • 7 days</p>
                 </div>
-                <div>
-                  <div className="text-2xl font-bold text-green-600">₹{(parseInt(formData.budget) || 150000).toLocaleString()}</div>
-                  <div className="text-sm text-gray-600">Total Cost</div>
-                </div>
-                <div>
-                  <div className="text-2xl font-bold text-purple-600">₹15,000</div>
-                  <div className="text-sm text-gray-600">You Save</div>
-                </div>
-                <div>
-                  <div className="text-2xl font-bold text-orange-600">{formData.travelers}</div>
-                  <div className="text-sm text-gray-600">Travelers</div>
-                </div>
-              </div>
-            </div>
-
-            {/* Package Details */}
-            <div className="space-y-4">
-              {/* Flight Package */}
-              <div className="bg-white border border-gray-200 rounded-xl p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center space-x-3">
-                    <div className="w-10 h-10 bg-sky-100 rounded-lg flex items-center justify-center">
-                      ✈️
-                    </div>
-                    <div>
-                      <h3 className="font-semibold text-gray-900">Flight Package</h3>
-                      <p className="text-sm text-gray-600">{formData.origin} ↔ {formData.destination}</p>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <div className="text-lg font-bold text-gray-900">₹45,000</div>
-                    <div className="text-sm text-green-600">Save ₹8,000</div>
-                  </div>
-                </div>
-                <div className="text-sm text-gray-600">
-                  Round-trip flights • Premium economy • 2 checked bags included
+                <div className="text-right">
+                  <div className="text-3xl font-bold text-sky-600">₹{(105000).toLocaleString()}</div>
+                  <div className="text-sm text-gray-500 line-through">₹{(120000).toLocaleString()}</div>
+                  <div className="text-sm text-green-600 font-medium">Save ₹15,000</div>
                 </div>
               </div>
 
-              {/* Hotel Package */}
-              <div className="bg-white border border-gray-200 rounded-xl p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center space-x-3">
-                    <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
-                      🏨
-                    </div>
-                    <div>
-                      <h3 className="font-semibold text-gray-900">Hotel Package</h3>
-                      <p className="text-sm text-gray-600">Premium 4-star accommodation</p>
-                    </div>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div className="bg-white rounded-xl p-6">
+                  <div className="flex items-center space-x-3 mb-4">
+                    <Plane className="w-6 h-6 text-sky-600" />
+                    <h4 className="font-semibold text-gray-900">Flights</h4>
                   </div>
-                  <div className="text-right">
-                    <div className="text-lg font-bold text-gray-900">₹42,000</div>
-                    <div className="text-sm text-green-600">Save ₹5,000</div>
+                  <div className="space-y-2 text-sm text-gray-600">
+                    <div>Air India • Economy</div>
+                    <div>Direct flight • 8h 30m</div>
+                    <div className="font-medium text-gray-900">₹45,000 per person</div>
                   </div>
                 </div>
-                <div className="text-sm text-gray-600">
-                  7 nights • Breakfast included • Free WiFi • City center location
+
+                <div className="bg-white rounded-xl p-6">
+                  <div className="flex items-center space-x-3 mb-4">
+                    <Building className="w-6 h-6 text-green-600" />
+                    <h4 className="font-semibold text-gray-900">Hotel</h4>
+                  </div>
+                  <div className="space-y-2 text-sm text-gray-600">
+                    <div>Grand Plaza Hotel • 4★</div>
+                    <div>7 nights • City Center</div>
+                    <div className="font-medium text-gray-900">₹42,000 total</div>
+                  </div>
+                </div>
+
+                <div className="bg-white rounded-xl p-6">
+                  <div className="flex items-center space-x-3 mb-4">
+                    <Activity className="w-6 h-6 text-purple-600" />
+                    <h4 className="font-semibold text-gray-900">Activities</h4>
+                  </div>
+                  <div className="space-y-2 text-sm text-gray-600">
+                    <div>Cultural Immersion Package</div>
+                    <div>4 days of guided tours</div>
+                    <div className="font-medium text-gray-900">₹18,000 total</div>
+                  </div>
                 </div>
               </div>
 
-              {/* Activities Package */}
-              <div className="bg-white border border-gray-200 rounded-xl p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center space-x-3">
-                    <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center">
-                      🎭
-                    </div>
-                    <div>
-                      <h3 className="font-semibold text-gray-900">Activities Package</h3>
-                      <p className="text-sm text-gray-600">Curated experiences based on your interests</p>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <div className="text-lg font-bold text-gray-900">₹18,000</div>
-                    <div className="text-sm text-green-600">Save ₹2,000</div>
-                  </div>
-                </div>
-                <div className="text-sm text-gray-600">
-                  {formData.preferences.slice(0, 3).join(', ')} • Skip-the-line tickets • Local guide
-                </div>
+              <div className="flex space-x-4">
+                <button
+                  onClick={() => handleBookPackage('ai')}
+                  className="flex-1 bg-gradient-to-r from-sky-600 to-blue-600 text-white py-4 px-6 rounded-xl font-semibold hover:from-sky-700 hover:to-blue-700 transition-all duration-200 transform hover:scale-105"
+                >
+                  Book This Package
+                </button>
+                <button
+                  onClick={handleCustomizePackage}
+                  className="flex-1 bg-white text-sky-600 py-4 px-6 rounded-xl font-semibold border-2 border-sky-600 hover:bg-sky-50 transition-colors"
+                >
+                  Customize Package
+                </button>
               </div>
-            </div>
-
-            {/* Special Requirements */}
-            {formData.specialRequirements && (
-              <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
-                <h4 className="font-semibold text-blue-900 mb-2">Special Requirements Included:</h4>
-                <p className="text-sm text-blue-800">{formData.specialRequirements}</p>
-              </div>
-            )}
-
-            {/* Action Buttons */}
-            <div className="flex space-x-4 pt-6">
-              <button
-                onClick={bookPackage}
-                className="flex-1 flex items-center justify-center space-x-2 px-8 py-4 bg-gradient-to-r from-sky-600 to-blue-600 text-white font-semibold rounded-xl hover:from-sky-700 hover:to-blue-700 transition-all duration-200 transform hover:scale-105 shadow-lg shadow-sky-500/25"
-              >
-                <Sparkles className="w-5 h-5" />
-                <span>Book This Package</span>
-              </button>
-              
-              <button
-                onClick={customizePackage}
-                className="flex-1 flex items-center justify-center space-x-2 px-8 py-4 bg-white text-sky-600 font-semibold rounded-xl border-2 border-sky-200 hover:bg-sky-50 transition-all duration-200"
-              >
-                <Zap className="w-5 h-5" />
-                <span>Customize Package</span>
-              </button>
             </div>
           </div>
         );
@@ -935,309 +660,532 @@ export const TripCreator: React.FC = () => {
     }
   };
 
-  // Show custom builder if active
-  if (showCustomBuilder) {
+  const renderCustomBuilder = () => {
+    const builderProgress = (builderStep / 3) * 100;
+
     return (
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Build Your Custom Package</h1>
-          <p className="text-gray-600">Select individual components for your perfect trip</p>
+      <div className="space-y-6">
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h2 className="text-2xl font-bold text-gray-900">Build Your Package</h2>
+            <p className="text-gray-600">Step {builderStep} of 3 • Total: ₹{customPackage.total.toLocaleString()}</p>
+          </div>
+          <button
+            onClick={() => {
+              setShowCustomBuilder(false);
+              setShowComparison(true);
+            }}
+            className="text-gray-600 hover:text-gray-800"
+          >
+            ← Back to Comparison
+          </button>
         </div>
 
-        {/* Progress Bar */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-medium text-gray-700">
-              {builderStep === 'flight' && 'Step 1: Select Flight'}
-              {builderStep === 'hotel' && 'Step 2: Select Hotel'}
-              {builderStep === 'activities' && 'Step 3: Select Activities'}
-            </span>
-            <span className="text-sm text-gray-500">
-              Total: ₹{customPackage.totalCost.toLocaleString()}
-            </span>
-          </div>
-          <div className="w-full bg-gray-200 rounded-full h-2">
-            <div 
-              className="bg-gradient-to-r from-purple-500 to-pink-600 h-2 rounded-full transition-all duration-300"
-              style={{ 
-                width: `${
-                  builderStep === 'flight' ? 25 :
-                  builderStep === 'hotel' ? 66 : 100
-                }%` 
-              }}
-            />
-          </div>
+        <div className="w-full bg-gray-200 rounded-full h-2 mb-8">
+          <div 
+            className="bg-gradient-to-r from-purple-500 to-pink-600 h-2 rounded-full transition-all duration-300"
+            style={{ width: `${builderProgress}%` }}
+          />
         </div>
 
-        {/* Custom Builder Content */}
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
-          {renderCustomBuilder()}
-
-          {/* Navigation Buttons */}
-          <div className="flex items-center justify-between pt-8 mt-8 border-t border-gray-200">
-            <div className="flex space-x-3">
+        {builderStep === 1 && (
+          <div>
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-xl font-semibold text-gray-900">Select Flight (Optional)</h3>
               <button
-                onClick={() => setShowCustomBuilder(false)}
-                className="px-6 py-3 text-gray-600 border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors"
+                onClick={skipBuilderStep}
+                className="text-purple-600 hover:text-purple-700 font-medium"
               >
-                Back to Packages
+                Skip →
               </button>
-              {builderStep !== 'flight' && (
-                <button
-                  onClick={prevBuilderStep}
-                  className="px-6 py-3 text-gray-600 border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors"
-                >
-                  Previous
-                </button>
-              )}
             </div>
 
-            <div className="flex space-x-3">
-              {builderStep !== 'activities' && (
-                <button
-                  onClick={skipBuilderStep}
-                  className="px-6 py-3 text-gray-500 hover:text-gray-700 transition-colors"
+            <div className="grid grid-cols-1 gap-4">
+              {flightOptions.map((flight) => (
+                <div
+                  key={flight.id}
+                  onClick={() => selectFlight(flight)}
+                  className={`p-6 border-2 rounded-xl cursor-pointer transition-all ${
+                    customPackage.flight?.id === flight.id
+                      ? 'border-purple-500 bg-purple-50'
+                      : 'border-gray-200 hover:border-gray-300'
+                  }`}
                 >
-                  Skip (Optional)
-                </button>
-              )}
-              <button
-                onClick={nextBuilderStep}
-                className="px-8 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold rounded-xl hover:from-purple-700 hover:to-pink-700 transition-all duration-200 transform hover:scale-105"
-              >
-                {builderStep === 'activities' ? 'Compare Packages' : 'Next'}
-              </button>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h4 className="font-semibold text-gray-900">{flight.airline}</h4>
+                      <p className="text-gray-600">{flight.class} • {flight.duration} • {flight.stops === 0 ? 'Direct' : `${flight.stops} stop`}</p>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-xl font-bold text-gray-900">₹{(flight.price * formData.travelers).toLocaleString()}</div>
+                      <div className="text-sm text-gray-600">₹{flight.price.toLocaleString()} per person</div>
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
+        )}
+
+        {builderStep === 2 && (
+          <div>
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-xl font-semibold text-gray-900">Select Hotel (Optional)</h3>
+              <button
+                onClick={skipBuilderStep}
+                className="text-purple-600 hover:text-purple-700 font-medium"
+              >
+                Skip →
+              </button>
+            </div>
+
+            <div className="grid grid-cols-1 gap-4">
+              {hotelOptions.map((hotel) => (
+                <div
+                  key={hotel.id}
+                  onClick={() => selectHotel(hotel)}
+                  className={`p-6 border-2 rounded-xl cursor-pointer transition-all ${
+                    customPackage.hotel?.id === hotel.id
+                      ? 'border-purple-500 bg-purple-50'
+                      : 'border-gray-200 hover:border-gray-300'
+                  }`}
+                >
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h4 className="font-semibold text-gray-900">{hotel.name}</h4>
+                      <div className="flex items-center space-x-2 mb-2">
+                        {Array.from({ length: hotel.stars }, (_, i) => (
+                          <Star key={i} className="w-4 h-4 text-yellow-400 fill-current" />
+                        ))}
+                        <span className="text-gray-600">• {hotel.location}</span>
+                      </div>
+                      <div className="flex items-center space-x-2 text-sm text-gray-600">
+                        {hotel.amenities.map((amenity, index) => (
+                          <span key={index} className="flex items-center space-x-1">
+                            {amenity === 'Free WiFi' && <Wifi className="w-3 h-3" />}
+                            {amenity === 'Pool' && <span>🏊</span>}
+                            {amenity === 'Gym' && <span>💪</span>}
+                            {amenity === 'Restaurant' && <Coffee className="w-3 h-3" />}
+                            {amenity === 'Spa' && <span>🧖</span>}
+                            {amenity === 'Concierge' && <span>🛎️</span>}
+                            {amenity === 'Room Service' && <span>🍽️</span>}
+                            {amenity === 'Breakfast' && <span>🥐</span>}
+                            <span>{amenity}</span>
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-xl font-bold text-gray-900">₹{(hotel.price * 7).toLocaleString()}</div>
+                      <div className="text-sm text-gray-600">₹{hotel.price.toLocaleString()} per night</div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {builderStep === 3 && (
+          <div>
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-xl font-semibold text-gray-900">Select Activities (Optional)</h3>
+              <button
+                onClick={skipBuilderStep}
+                className="text-purple-600 hover:text-purple-700 font-medium"
+              >
+                Skip →
+              </button>
+            </div>
+
+            <div className="grid grid-cols-1 gap-4">
+              {activityPackages.map((pkg) => (
+                <div
+                  key={pkg.id}
+                  onClick={() => selectActivities(pkg)}
+                  className={`p-6 border-2 rounded-xl cursor-pointer transition-all ${
+                    customPackage.activities?.id === pkg.id
+                      ? 'border-purple-500 bg-purple-50'
+                      : 'border-gray-200 hover:border-gray-300'
+                  }`}
+                >
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h4 className="font-semibold text-gray-900">{pkg.name}</h4>
+                      <p className="text-gray-600 mb-2">{pkg.duration}</p>
+                      <div className="space-y-1">
+                        {pkg.activities.map((activity, index) => (
+                          <div key={index} className="text-sm text-gray-600">• {activity}</div>
+                        ))}
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-xl font-bold text-gray-900">₹{pkg.price.toLocaleString()}</div>
+                      <div className="text-sm text-gray-600">Total package</div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        <div className="flex items-center justify-between pt-6">
+          <button
+            onClick={prevBuilderStep}
+            disabled={builderStep === 1}
+            className="flex items-center space-x-2 px-6 py-3 text-gray-600 border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            <span>Previous</span>
+          </button>
+
+          <button
+            onClick={nextBuilderStep}
+            className="flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl font-semibold hover:from-purple-700 hover:to-pink-700 transition-all duration-200 transform hover:scale-105"
+          >
+            <span>{builderStep === 3 ? 'Complete Package' : 'Next'}</span>
+            <ArrowRight className="w-4 h-4" />
+          </button>
         </div>
       </div>
     );
-  }
+  };
 
-  // Show final comparison between AI and custom packages
-  if (showFinalComparison) {
-    const aiPackageTotal = 105000; // AI package total
-    const customPackageTotal = customPackage.totalCost;
-    
+  const renderFinalComparison = () => {
+    const aiPackageTotal = 105000;
+    const customTotal = customPackage.total;
+    const difference = customTotal - aiPackageTotal;
+
     return (
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="mb-8 text-center">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Choose Your Perfect Package</h1>
-          <p className="text-gray-600">Compare both packages and select the one that excites you most</p>
+      <div className="space-y-6">
+        <div className="text-center mb-8">
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">Choose Your Perfect Package</h2>
+          <p className="text-gray-600">Compare and select the package that excites you most</p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* AI Package */}
-          <div className="bg-white rounded-2xl shadow-lg border-2 border-sky-200 overflow-hidden">
-            <div className="bg-gradient-to-r from-sky-50 to-blue-50 p-6 border-b border-sky-200">
-              <div className="flex items-center justify-between mb-2">
-                <h2 className="text-2xl font-bold text-gray-900">AI Recommended</h2>
-                <span className="px-3 py-1 bg-sky-500 text-white text-sm font-medium rounded-full">
-                  Best Value
-                </span>
+          <div className="bg-gradient-to-r from-sky-50 to-blue-50 rounded-2xl p-6 border-2 border-sky-200">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center space-x-2">
+                <Sparkles className="w-5 h-5 text-sky-600" />
+                <span className="px-3 py-1 bg-sky-100 text-sky-800 text-sm font-medium rounded-full">Best Value</span>
               </div>
-              <p className="text-gray-600">Smart optimization for best deals</p>
-            </div>
-
-            <div className="p-6 space-y-4">
-              {/* AI Package Details */}
-              <div className="flex items-center justify-between p-4 bg-sky-50 rounded-lg">
-                <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 bg-sky-100 rounded-lg flex items-center justify-center">✈️</div>
-                  <div>
-                    <h3 className="font-semibold text-gray-900">Flight Package</h3>
-                    <p className="text-sm text-gray-600">Premium economy • 2 bags</p>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <div className="font-bold text-gray-900">₹45,000</div>
-                  <div className="text-sm text-green-600">Save ₹8,000</div>
-                </div>
-              </div>
-
-              <div className="flex items-center justify-between p-4 bg-sky-50 rounded-lg">
-                <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">🏨</div>
-                  <div>
-                    <h3 className="font-semibold text-gray-900">Hotel Package</h3>
-                    <p className="text-sm text-gray-600">4-star • Breakfast included</p>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <div className="font-bold text-gray-900">₹42,000</div>
-                  <div className="text-sm text-green-600">Save ₹5,000</div>
-                </div>
-              </div>
-
-              <div className="flex items-center justify-between p-4 bg-sky-50 rounded-lg">
-                <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center">🎭</div>
-                  <div>
-                    <h3 className="font-semibold text-gray-900">Activities Package</h3>
-                    <p className="text-sm text-gray-600">Curated experiences</p>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <div className="font-bold text-gray-900">₹18,000</div>
-                  <div className="text-sm text-green-600">Save ₹2,000</div>
-                </div>
-              </div>
-
-              <div className="border-t border-gray-200 pt-4">
-                <div className="flex items-center justify-between text-xl font-bold">
-                  <span>Total Package</span>
-                  <span className="text-sky-600">₹{aiPackageTotal.toLocaleString()}</span>
-                </div>
-                <p className="text-sm text-green-600 text-right">Total Savings: ₹15,000</p>
+              <div className="text-right">
+                <div className="text-2xl font-bold text-sky-600">₹{aiPackageTotal.toLocaleString()}</div>
+                <div className="text-sm text-green-600">Save ₹15,000</div>
               </div>
             </div>
 
-            <div className="p-6 bg-gray-50 border-t border-gray-200">
-              <button
-                onClick={bookPackage}
-                className="w-full flex items-center justify-center space-x-2 px-6 py-4 bg-gradient-to-r from-sky-600 to-blue-600 text-white font-semibold rounded-xl hover:from-sky-700 hover:to-blue-700 transition-all duration-200 transform hover:scale-105"
-              >
-                <Sparkles className="w-5 h-5" />
-                <span>Select AI Package</span>
-              </button>
+            <h3 className="text-xl font-bold text-gray-900 mb-4">AI Recommended Package</h3>
+
+            <div className="space-y-4">
+              <div className="bg-white rounded-lg p-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h4 className="font-medium text-gray-900">Flight</h4>
+                    <p className="text-sm text-gray-600">Air India • Economy • Direct</p>
+                  </div>
+                  <div className="text-right">
+                    <div className="font-bold text-gray-900">₹45,000</div>
+                    <div className="text-xs text-green-600">Best deal</div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-white rounded-lg p-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h4 className="font-medium text-gray-900">Hotel</h4>
+                    <p className="text-sm text-gray-600">Grand Plaza • 4★ • 7 nights</p>
+                  </div>
+                  <div className="text-right">
+                    <div className="font-bold text-gray-900">₹42,000</div>
+                    <div className="text-xs text-green-600">Great value</div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-white rounded-lg p-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h4 className="font-medium text-gray-900">Activities</h4>
+                    <p className="text-sm text-gray-600">Cultural Immersion • 4 days</p>
+                  </div>
+                  <div className="text-right">
+                    <div className="font-bold text-gray-900">₹18,000</div>
+                    <div className="text-xs text-green-600">Curated</div>
+                  </div>
+                </div>
+              </div>
             </div>
+
+            <button
+              onClick={() => handleBookPackage('ai')}
+              className="w-full mt-6 bg-gradient-to-r from-sky-600 to-blue-600 text-white py-3 px-6 rounded-xl font-semibold hover:from-sky-700 hover:to-blue-700 transition-all duration-200 transform hover:scale-105"
+            >
+              Select AI Package
+            </button>
           </div>
 
           {/* Custom Package */}
-          <div className="bg-white rounded-2xl shadow-lg border-2 border-purple-200 overflow-hidden">
-            <div className="bg-gradient-to-r from-purple-50 to-pink-50 p-6 border-b border-purple-200">
-              <div className="flex items-center justify-between mb-2">
-                <h2 className="text-2xl font-bold text-gray-900">Your Custom Package</h2>
-                <span className="px-3 py-1 bg-purple-500 text-white text-sm font-medium rounded-full">
-                  Your Choice
-                </span>
+          <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-2xl p-6 border-2 border-purple-200">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center space-x-2">
+                <Users className="w-5 h-5 text-purple-600" />
+                <span className="px-3 py-1 bg-purple-100 text-purple-800 text-sm font-medium rounded-full">Your Choice</span>
               </div>
-              <p className="text-gray-600">Handpicked by you</p>
-            </div>
-
-            <div className="p-6 space-y-4">
-              {/* Custom Package Details */}
-              {customPackage.flight ? (
-                <div className="flex items-center justify-between p-4 bg-purple-50 rounded-lg">
-                  <div className="flex items-center space-x-3">
-                    <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">✈️</div>
-                    <div>
-                      <h3 className="font-semibold text-gray-900">{customPackage.flight.airline}</h3>
-                      <p className="text-sm text-gray-600">{customPackage.flight.class} • {customPackage.flight.duration}</p>
-                    </div>
-                  </div>
-                  <div className="font-bold text-gray-900">₹{(customPackage.flight.price * formData.travelers).toLocaleString()}</div>
+              <div className="text-right">
+                <div className="text-2xl font-bold text-purple-600">₹{customTotal.toLocaleString()}</div>
+                <div className={`text-sm ${difference > 0 ? 'text-orange-600' : 'text-green-600'}`}>
+                  {difference > 0 ? `+₹${difference.toLocaleString()} premium` : `Save ₹${Math.abs(difference).toLocaleString()}`}
                 </div>
-              ) : (
-                <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border-2 border-dashed border-gray-200">
-                  <div className="flex items-center space-x-3">
-                    <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center">✈️</div>
-                    <div>
-                      <h3 className="font-semibold text-gray-500">No Flight Selected</h3>
-                      <p className="text-sm text-gray-400">You'll book separately</p>
-                    </div>
-                  </div>
-                  <div className="font-bold text-gray-500">₹0</div>
-                </div>
-              )}
-
-              {customPackage.hotel ? (
-                <div className="flex items-center justify-between p-4 bg-purple-50 rounded-lg">
-                  <div className="flex items-center space-x-3">
-                    <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">🏨</div>
-                    <div>
-                      <h3 className="font-semibold text-gray-900">{customPackage.hotel.name}</h3>
-                      <p className="text-sm text-gray-600">{customPackage.hotel.rating}⭐ • 7 nights</p>
-                    </div>
-                  </div>
-                  <div className="font-bold text-gray-900">₹{(customPackage.hotel.pricePerNight * 7).toLocaleString()}</div>
-                </div>
-              ) : (
-                <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border-2 border-dashed border-gray-200">
-                  <div className="flex items-center space-x-3">
-                    <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center">🏨</div>
-                    <div>
-                      <h3 className="font-semibold text-gray-500">No Hotel Selected</h3>
-                      <p className="text-sm text-gray-400">You'll book separately</p>
-                    </div>
-                  </div>
-                  <div className="font-bold text-gray-500">₹0</div>
-                </div>
-              )}
-
-              {customPackage.activities ? (
-                <div className="flex items-center justify-between p-4 bg-purple-50 rounded-lg">
-                  <div className="flex items-center space-x-3">
-                    <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">🎭</div>
-                    <div>
-                      <h3 className="font-semibold text-gray-900">{customPackage.activities.name}</h3>
-                      <p className="text-sm text-gray-600">{customPackage.activities.activities.length} activities</p>
-                    </div>
-                  </div>
-                  <div className="font-bold text-gray-900">₹{customPackage.activities.price.toLocaleString()}</div>
-                </div>
-              ) : (
-                <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border-2 border-dashed border-gray-200">
-                  <div className="flex items-center space-x-3">
-                    <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center">🎭</div>
-                    <div>
-                      <h3 className="font-semibold text-gray-500">No Activities Selected</h3>
-                      <p className="text-sm text-gray-400">You'll explore independently</p>
-                    </div>
-                  </div>
-                  <div className="font-bold text-gray-500">₹0</div>
-                </div>
-              )}
-
-              <div className="border-t border-gray-200 pt-4">
-                <div className="flex items-center justify-between text-xl font-bold">
-                  <span>Total Package</span>
-                  <span className="text-purple-600">₹{customPackageTotal.toLocaleString()}</span>
-                </div>
-                {customPackageTotal < aiPackageTotal && (
-                  <p className="text-sm text-green-600 text-right">
-                    You save: ₹{(aiPackageTotal - customPackageTotal).toLocaleString()}
-                  </p>
-                )}
-                {customPackageTotal > aiPackageTotal && (
-                  <p className="text-sm text-orange-600 text-right">
-                    Premium choice: +₹{(customPackageTotal - aiPackageTotal).toLocaleString()}
-                  </p>
-                )}
               </div>
             </div>
 
-            <div className="p-6 bg-gray-50 border-t border-gray-200">
+            <h3 className="text-xl font-bold text-gray-900 mb-4">Your Custom Package</h3>
+
+            <div className="space-y-4">
+              <div className={`rounded-lg p-4 ${customPackage.flight ? 'bg-white' : 'bg-gray-50 border-2 border-dashed border-gray-200'}`}>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h4 className="font-medium text-gray-900">Flight</h4>
+                    <p className="text-sm text-gray-600">
+                      {customPackage.flight 
+                        ? `${customPackage.flight.airline} • ${customPackage.flight.class}`
+                        : 'No flight selected - You\'ll book separately'
+                      }
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    <div className="font-bold text-gray-900">
+                      {customPackage.flight ? `₹${(customPackage.flight.price * formData.travelers).toLocaleString()}` : '₹0'}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className={`rounded-lg p-4 ${customPackage.hotel ? 'bg-white' : 'bg-gray-50 border-2 border-dashed border-gray-200'}`}>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h4 className="font-medium text-gray-900">Hotel</h4>
+                    <p className="text-sm text-gray-600">
+                      {customPackage.hotel 
+                        ? `${customPackage.hotel.name} • ${customPackage.hotel.stars}★`
+                        : 'No hotel selected - You\'ll book separately'
+                      }
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    <div className="font-bold text-gray-900">
+                      {customPackage.hotel ? `₹${(customPackage.hotel.price * 7).toLocaleString()}` : '₹0'}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className={`rounded-lg p-4 ${customPackage.activities ? 'bg-white' : 'bg-gray-50 border-2 border-dashed border-gray-200'}`}>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h4 className="font-medium text-gray-900">Activities</h4>
+                    <p className="text-sm text-gray-600">
+                      {customPackage.activities 
+                        ? `${customPackage.activities.name} • ${customPackage.activities.duration}`
+                        : 'No activities selected - You\'ll book separately'
+                      }
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    <div className="font-bold text-gray-900">
+                      {customPackage.activities ? `₹${customPackage.activities.price.toLocaleString()}` : '₹0'}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex space-x-3 mt-6">
               <button
-                onClick={bookPackage}
-                className="w-full flex items-center justify-center space-x-2 px-6 py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold rounded-xl hover:from-purple-700 hover:to-pink-700 transition-all duration-200 transform hover:scale-105"
+                onClick={() => {
+                  setShowFinalComparison(false);
+                  setShowCustomBuilder(true);
+                }}
+                className="flex-1 bg-white text-purple-600 py-3 px-6 rounded-xl font-semibold border-2 border-purple-600 hover:bg-purple-50 transition-colors"
               >
-                <Check className="w-5 h-5" />
-                <span>Select Custom Package</span>
+                ← Modify Custom Package
+              </button>
+              <button
+                onClick={() => handleBookPackage('custom')}
+                className="flex-1 bg-gradient-to-r from-purple-600 to-pink-600 text-white py-3 px-6 rounded-xl font-semibold hover:from-purple-700 hover:to-pink-700 transition-all duration-200 transform hover:scale-105"
+              >
+                Select Custom Package
               </button>
             </div>
           </div>
         </div>
 
-        {/* Additional Options */}
-        <div className="mt-8 text-center">
-          <div className="flex items-center justify-center space-x-4">
-            <button
-              onClick={() => {
-                setShowFinalComparison(false);
-                setShowCustomBuilder(true);
-                setBuilderStep('flight');
-              }}
-              className="px-6 py-3 text-purple-600 border border-purple-200 rounded-xl hover:bg-purple-50 transition-colors"
-            >
-              ← Modify Custom Package
-            </button>
-            
+        <div className="text-center">
+          <button
+            onClick={() => window.dispatchEvent(new CustomEvent('navigate-to-booking'))}
+            className="text-gray-600 hover:text-gray-800 font-medium"
+          >
+            Or build from scratch in Booking Hub →
+          </button>
+        </div>
+      </div>
+    );
+  };
+
+  if (showFinalComparison) {
+    return (
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {renderFinalComparison()}
+      </div>
+    );
+  }
+
+  if (showCustomBuilder) {
+    return (
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {renderCustomBuilder()}
+      </div>
+    );
+  }
+
+  if (showComparison) {
+    return (
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="space-y-6">
+          <div className="text-center mb-8">
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">Choose Your Package</h2>
+            <p className="text-gray-600">AI recommended vs Premium custom options</p>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {/* AI Package */}
+            <div className="bg-gradient-to-r from-sky-50 to-blue-50 rounded-2xl p-8 border-2 border-sky-200">
+              <div className="flex items-center justify-between mb-6">
+                <span className="px-4 py-2 bg-sky-100 text-sky-800 text-sm font-medium rounded-full">Best Value</span>
+                <div className="text-right">
+                  <div className="text-3xl font-bold text-sky-600">₹105,000</div>
+                  <div className="text-sm text-green-600">Save ₹15,000</div>
+                </div>
+              </div>
+
+              <h3 className="text-2xl font-bold text-gray-900 mb-6">AI Recommended</h3>
+
+              <div className="space-y-4 mb-8">
+                <div className="bg-white rounded-lg p-4">
+                  <h4 className="font-semibold text-gray-900 mb-2">✈️ Smart Flight Package</h4>
+                  <p className="text-gray-600 text-sm">Economy class with best timing</p>
+                  <div className="text-lg font-bold text-gray-900 mt-2">₹45,000</div>
+                </div>
+
+                <div className="bg-white rounded-lg p-4">
+                  <h4 className="font-semibold text-gray-900 mb-2">🏨 Comfort Hotel Package</h4>
+                  <p className="text-gray-600 text-sm">4-star hotel in prime location</p>
+                  <div className="text-lg font-bold text-gray-900 mt-2">₹42,000</div>
+                </div>
+
+                <div className="bg-white rounded-lg p-4">
+                  <h4 className="font-semibold text-gray-900 mb-2">🎭 Cultural Experience Package</h4>
+                  <p className="text-gray-600 text-sm">Curated local experiences</p>
+                  <div className="text-lg font-bold text-gray-900 mt-2">₹18,000</div>
+                </div>
+              </div>
+
+              <div className="bg-white rounded-lg p-4 mb-6">
+                <h4 className="font-semibold text-gray-900 mb-3">Package Features</h4>
+                <div className="space-y-2 text-sm">
+                  <div className="flex items-center justify-between">
+                    <span>⚡ Setup Speed</span>
+                    <span className="text-green-600 font-medium">Instant</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span>💰 Value</span>
+                    <span className="text-green-600 font-medium">Best deals</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span>🎯 Customization</span>
+                    <span className="text-blue-600 font-medium">Smart defaults</span>
+                  </div>
+                </div>
+              </div>
+
+              <button
+                onClick={() => handleBookPackage('ai')}
+                className="w-full bg-gradient-to-r from-sky-600 to-blue-600 text-white py-4 px-6 rounded-xl font-semibold hover:from-sky-700 hover:to-blue-700 transition-all duration-200 transform hover:scale-105"
+              >
+                Select AI Package
+              </button>
+            </div>
+
+            {/* Custom Premium Package */}
+            <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-2xl p-8 border-2 border-purple-200">
+              <div className="flex items-center justify-between mb-6">
+                <span className="px-4 py-2 bg-purple-100 text-purple-800 text-sm font-medium rounded-full">Luxury</span>
+                <div className="text-right">
+                  <div className="text-3xl font-bold text-purple-600">₹185,000</div>
+                  <div className="text-sm text-orange-600">Premium experience</div>
+                </div>
+              </div>
+
+              <h3 className="text-2xl font-bold text-gray-900 mb-6">Custom Premium</h3>
+
+              <div className="space-y-4 mb-8">
+                <div className="bg-white rounded-lg p-4">
+                  <h4 className="font-semibold text-gray-900 mb-2">✈️ Premium Flight Package</h4>
+                  <p className="text-gray-600 text-sm">Business class with priority boarding</p>
+                  <div className="text-lg font-bold text-gray-900 mt-2">₹85,000</div>
+                </div>
+
+                <div className="bg-white rounded-lg p-4">
+                  <h4 className="font-semibold text-gray-900 mb-2">🏨 Luxury Hotel Package</h4>
+                  <p className="text-gray-600 text-sm">5-star suite with spa access</p>
+                  <div className="text-lg font-bold text-gray-900 mt-2">₹65,000</div>
+                </div>
+
+                <div className="bg-white rounded-lg p-4">
+                  <h4 className="font-semibold text-gray-900 mb-2">🎭 Premium Experience Package</h4>
+                  <p className="text-gray-600 text-sm">VIP tours with private guide</p>
+                  <div className="text-lg font-bold text-gray-900 mt-2">₹35,000</div>
+                </div>
+              </div>
+
+              <div className="bg-white rounded-lg p-4 mb-6">
+                <h4 className="font-semibold text-gray-900 mb-3">Package Features</h4>
+                <div className="space-y-2 text-sm">
+                  <div className="flex items-center justify-between">
+                    <span>⚡ Setup Speed</span>
+                    <span className="text-orange-600 font-medium">15-30 min</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span>💰 Value</span>
+                    <span className="text-purple-600 font-medium">Premium options</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span>🎯 Customization</span>
+                    <span className="text-green-600 font-medium">Full control</span>
+                  </div>
+                </div>
+              </div>
+
+              <button
+                onClick={handleCustomizePackage}
+                className="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white py-4 px-6 rounded-xl font-semibold hover:from-purple-700 hover:to-pink-700 transition-all duration-200 transform hover:scale-105"
+              >
+                Customize Package
+              </button>
+            </div>
+          </div>
+
+          <div className="text-center">
             <button
               onClick={() => window.dispatchEvent(new CustomEvent('navigate-to-booking'))}
-              className="px-6 py-3 text-gray-600 border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors"
+              className="text-gray-600 hover:text-gray-800 font-medium"
             >
-              Build From Scratch
+              Or build from scratch in Booking Hub →
             </button>
           </div>
         </div>
@@ -1248,58 +1196,47 @@ export const TripCreator: React.FC = () => {
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Create Your Trip</h1>
-        <p className="text-gray-600">Let's plan your perfect journey together</p>
-      </div>
-
-      {/* Progress Bar */}
-      <div className="mb-8">
-        <div className="flex items-center justify-between mb-2">
-          <span className="text-sm font-medium text-gray-700">Step {currentStep} of {totalSteps}</span>
-          <span className="text-sm text-gray-500">{Math.round((currentStep / totalSteps) * 100)}% complete</span>
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">Create Your Trip</h1>
+            <p className="text-gray-600">Let's plan your perfect adventure</p>
+          </div>
+          <div className="text-sm text-gray-500">
+            Step {currentStep} of {totalSteps}
+          </div>
         </div>
+
         <div className="w-full bg-gray-200 rounded-full h-2">
           <div 
             className="bg-gradient-to-r from-sky-500 to-blue-600 h-2 rounded-full transition-all duration-300"
-            style={{ width: `${(currentStep / totalSteps) * 100}%` }}
+            style={{ width: `${progressPercentage}%` }}
           />
         </div>
       </div>
 
-      {/* Form */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
-        <form onSubmit={handleSubmit}>
-          {renderStep()}
+      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-8">
+        {renderStepContent()}
 
-          {/* Navigation Buttons */}
-          <div className="flex items-center justify-between pt-8 mt-8 border-t border-gray-200">
+        {currentStep < 4 && (
+          <div className="flex items-center justify-between mt-8 pt-6 border-t border-gray-200">
             <button
-              type="button"
-              onClick={handleBack}
+              onClick={prevStep}
               disabled={currentStep === 1}
-              className="px-6 py-3 text-gray-600 border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex items-center space-x-2 px-6 py-3 text-gray-600 border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Back
+              <ArrowLeft className="w-4 h-4" />
+              <span>Previous</span>
             </button>
 
-            {currentStep < 3 ? (
-              <button
-                type="button"
-                onClick={handleNext}
-                className="px-8 py-3 bg-gradient-to-r from-sky-600 to-blue-600 text-white font-semibold rounded-xl hover:from-sky-700 hover:to-blue-700 transition-all duration-200 transform hover:scale-105"
-              >
-                Next
-              </button>
-            ) : currentStep === 3 ? (
-              <button
-                type="submit"
-                className="px-8 py-3 bg-gradient-to-r from-sky-600 to-blue-600 text-white font-semibold rounded-xl hover:from-sky-700 hover:to-blue-700 transition-all duration-200 transform hover:scale-105"
-              >
-                Continue to Planning
-              </button>
-            ) : null}
+            <button
+              onClick={nextStep}
+              className="flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-sky-600 to-blue-600 text-white rounded-xl font-semibold hover:from-sky-700 hover:to-blue-700 transition-all duration-200 transform hover:scale-105"
+            >
+              <span>Next</span>
+              <ArrowRight className="w-4 h-4" />
+            </button>
           </div>
-        </form>
+        )}
       </div>
     </div>
   );
