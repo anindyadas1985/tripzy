@@ -6,11 +6,17 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "build:clean": "rm -rf dist && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
+    "setup:gcp": "node scripts/gcp-setup.js",
+    "setup:gcp": "node scripts/gcp-setup.cjs",
+    "setup:gcp-full": "node scripts/gcp-setup.cjs --full",
+    "setup:database": "node scripts/setup-gcp-database.js",
+    "deploy:gcp": "gcloud app deploy",
+    "deploy:build": "npm run build && npm run deploy:gcp",
     "db:migrate": "supabase db push",
     "db:reset": "supabase db reset",
+    "health:check": "curl -f http://localhost:8080/health || exit 1",
     "start:prod": "npm run build && npm run preview"
   },
   "dependencies": {
@@ -31,7 +37,6 @@
     "globals": "^15.9.0",
     "postcss": "^8.4.35",
     "tailwindcss": "^3.4.1",
-    "terser": "^5.44.0",
     "typescript": "^5.5.3",
     "typescript-eslint": "^8.3.0",
     "vite": "^5.4.2"
