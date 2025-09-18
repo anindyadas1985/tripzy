@@ -383,6 +383,51 @@ export const TripCreator: React.FC = () => {
           </div>
         );
 
+      case 7:
+        return (
+          <div className="space-y-6">
+            <div className="text-center mb-8">
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">Build Your Custom Itinerary</h2>
+              <p className="text-gray-600">Start by searching for flights, then add hotels and activities</p>
+            </div>
+
+            <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl p-6">
+              <div className="flex items-center space-x-3 mb-4">
+                <span className="text-2xl">🚀</span>
+                <h3 className="text-lg font-semibold text-gray-900">Ready to Start Building!</h3>
+              </div>
+              <p className="text-gray-600 mb-4">
+                Your trip details have been saved. You'll now be taken to our booking hub where you can:
+              </p>
+              <ul className="space-y-2 text-sm text-gray-700 mb-6">
+                <li className="flex items-center space-x-2">
+                  <span className="w-2 h-2 bg-purple-500 rounded-full"></span>
+                  <span>Search and compare flights from multiple airlines</span>
+                </li>
+                <li className="flex items-center space-x-2">
+                  <span className="w-2 h-2 bg-purple-500 rounded-full"></span>
+                  <span>Browse hotels with real-time availability and pricing</span>
+                </li>
+                <li className="flex items-center space-x-2">
+                  <span className="w-2 h-2 bg-purple-500 rounded-full"></span>
+                  <span>Discover activities and experiences at your destination</span>
+                </li>
+                <li className="flex items-center space-x-2">
+                  <span className="w-2 h-2 bg-purple-500 rounded-full"></span>
+                  <span>Build your day-by-day itinerary</span>
+                </li>
+              </ul>
+              
+              <button
+                onClick={() => window.dispatchEvent(new CustomEvent('navigate-to-booking'))}
+                className="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white py-3 px-6 rounded-xl font-semibold hover:from-purple-700 hover:to-pink-700 transition-all duration-200 transform hover:scale-105"
+              >
+                Go to Booking Hub
+              </button>
+            </div>
+          </div>
+        );
+
       default:
         return null;
     }
