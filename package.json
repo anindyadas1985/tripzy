@@ -9,7 +9,6 @@
     "build:clean": "rm -rf dist && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "setup:gcp": "node scripts/gcp-setup.js",
     "setup:gcp": "node scripts/gcp-setup.cjs",
     "setup:gcp-full": "node scripts/gcp-setup.cjs --full",
     "setup:database": "node scripts/setup-gcp-database.js",
