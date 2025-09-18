@@ -90,6 +90,14 @@ const AppContent: React.FC = () => {
         console.error('Navigation error:', error);
       }
     };
+    
+    const handleNavigateToDashboard = () => {
+      try {
+        setActiveView('dashboard');
+      } catch (error) {
+        console.error('Navigation error:', error);
+      }
+    };
 
     window.addEventListener('online', handleOnline);
     window.addEventListener('offline', handleOffline);
@@ -99,6 +107,7 @@ const AppContent: React.FC = () => {
     window.addEventListener('navigate-to-navigation', handleNavigateToNavigation);
     window.addEventListener('navigate-to-expenses', handleNavigateToExpenses);
     window.addEventListener('navigate-to-memories', handleNavigateToMemories);
+    window.addEventListener('navigate-to-dashboard', handleNavigateToDashboard);
 
     return () => {
       window.removeEventListener('online', handleOnline);
@@ -109,6 +118,7 @@ const AppContent: React.FC = () => {
       window.removeEventListener('navigate-to-navigation', handleNavigateToNavigation);
       window.removeEventListener('navigate-to-expenses', handleNavigateToExpenses);
       window.removeEventListener('navigate-to-memories', handleNavigateToMemories);
+      window.removeEventListener('navigate-to-dashboard', handleNavigateToDashboard);
     };
   }, []);
 
