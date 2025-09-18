@@ -22,6 +22,15 @@ export const TripCreator: React.FC = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const totalSteps = 5;
 
+  // Custom package builder state
+  const [customPackage, setCustomPackage] = useState({
+    flight: null as any,
+    hotel: null as any,
+    activities: null as any,
+    totalCost: 0
+  });
+  const [showCustomBuilder, setShowCustomBuilder] = useState(false);
+  const [builderStep, setBuilderStep] = useState<'flight' | 'hotel' | 'activities' | 'summary'>('flight');
   // Check for voice data on component mount
   useEffect(() => {
     const voiceData = localStorage.getItem('voiceTripData');
@@ -185,7 +194,8 @@ export const TripCreator: React.FC = () => {
   };
 
   const customizePackage = () => {
-    window.dispatchEvent(new CustomEvent('navigate-to-booking'));
+    setShowCustomBuilder(true);
+    setBuilderStep('flight');
   };
 
   const renderStep = () => {
