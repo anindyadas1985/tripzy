@@ -5,6 +5,7 @@ import { SearchFilters } from '../types';
 
 export const TripCreator: React.FC = () => {
   const { createTrip, setActiveTrip } = useTripContext();
+  const [isFromVoice, setIsFromVoice] = useState(false);
   const [formData, setFormData] = useState({
     title: '',
     origin: '',
@@ -20,7 +21,35 @@ export const TripCreator: React.FC = () => {
   });
 
   const [currentStep, setCurrentStep] = useState(1);
-  const totalSteps = 6;
+  const totalSteps = 7;
+
+  // Check for voice data on component mount
+  useEffect(() => {
+    const voiceData = localStorage.getItem('voiceTripData');
+    if (voiceData) {
+      try {
+        const parsedVoiceData = JSON.parse(voiceData);
+        setFormData(prev => ({
+          ...prev,
+          title: parsedVoiceData.title || '',
+          origin: parsedVoiceData.origin || '',
+          destination: parsedVoiceData.destination || '',
+          startDate: parsedVoiceData.startDate ? new Date(parsedVoiceData.startDate).toISOString().split('T')[0] : '',
+          endDate: parsedVoiceData.endDate ? new Date(parsedVoiceData.endDate).toISOString().split('T')[0] : '',
+          travelers: parsedVoiceData.travelers || 1,
+          budget: parsedVoiceData.budget?.toString() || '',
+          style: parsedVoiceData.style || 'leisure',
+          pace: parsedVoiceData.pace || 'moderate',
+          preferences: parsedVoiceData.preferences || []
+        }));
+        setIsFromVoice(true);
+        // Clear the stored data
+        localStorage.removeItem('voiceTripData');
+      } catch (error) {
+        console.error('Error parsing voice data:', error);
+      }
+    }
+  }, []);
 
   const styleOptions = [
     {
@@ -114,8 +143,12 @@ export const TripCreator: React.FC = () => {
 
     setActiveTrip(newTrip);
     
-    // Move to package selection step
-    setCurrentStep(6);
+    // If from voice, go directly to AI package, otherwise show selection
+    if (isFromVoice) {
+      setCurrentStep(7); // Skip package selection, go to AI package
+    } else {
+      setCurrentStep(6); // Show package selection
+    }
   };
 
   const renderStep = () => {
