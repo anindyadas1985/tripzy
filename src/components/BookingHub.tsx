@@ -130,34 +130,25 @@ export const BookingHub: React.FC = () => {
           </div>
         </div>
 
-        {/* Tab Content */}
+        {/* Content */}
         <div className="p-6">
-          {isCustomizing && customizationData && (
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="font-semibold text-blue-900">
-                    {showCustomizationSummary ? 'Review Your Customization' : 'Customizing: ' + customizationData.packageTitle}
-                  </h3>
-                  <p className="text-blue-800 text-sm">
-                    {showCustomizationSummary 
-                      ? 'Review and confirm your selections' 
-                      : `Original cost: $${customizationData.originalCost} • ${selectedFlight ? '✓ Flight selected' : 'Select flight'} • ${selectedHotel ? '✓ Hotel selected' : 'Select hotel'}`
-                    }
-                  </p>
-                </div>
-                <button
-                  onClick={handleCancelCustomization}
-                  className="text-blue-600 hover:text-blue-800 font-medium"
-                >
-                  Cancel
-                </button>
-              </div>
-            </div>
+          {showCustomizationSummary ? (
+            renderCustomizationSummary()
+          ) : (
+            <>
+              {activeTab === 'flights' && <FlightSearch 
+                onFlightSelect={isCustomizing ? handleFlightSelect : undefined}
+                selectedFlight={selectedFlight}
+                isCustomizing={isCustomizing}
+              />}
+              {activeTab === 'hotels' && <HotelSearch 
+                onHotelSelect={isCustomizing ? handleHotelSelect : undefined}
+                selectedHotel={selectedHotel}
+                isCustomizing={isCustomizing}
+              />}
+              {activeTab === 'bookings' && <BookingsList />}
+            </>
           )}
-          {activeTab === 'flights' && <FlightSearch />}
-          {activeTab === 'hotels' && <HotelSearch />}
-          {activeTab === 'bookings' && <BookingsList />}
         </div>
       </div>
     </div>
