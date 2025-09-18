@@ -46,10 +46,46 @@ export const BookingHub: React.FC = () => {
 
         {/* Tab Content */}
         <div className="p-6">
-          {activeTab === 'flights' && <FlightSearch />}
-          {activeTab === 'hotels' && <HotelSearch />}
+          {activeTab === 'flights' && (
+            <FlightSearch 
+              onFlightSelect={isCustomizing ? handleFlightSelection : undefined}
+              selectedFlight={selectedFlight}
+              isCustomizing={isCustomizing}
+            />
+          )}
+          {activeTab === 'hotels' && (
+            <HotelSearch 
+              onHotelSelect={isCustomizing ? handleHotelSelection : undefined}
+              selectedHotel={selectedHotel}
+              isCustomizing={isCustomizing}
+            />
+          )}
           {activeTab === 'bookings' && <BookingsList />}
         </div>
+        
+        {/* Customization Confirmation */}
+        {isCustomizing && selectedFlight && selectedHotel && (
+          <div className="p-6 border-t border-gray-200 bg-green-50">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="font-semibold text-green-900 mb-1">Customization Complete!</h3>
+                <p className="text-sm text-green-800">
+                  Flight: {selectedFlight.airline} • Hotel: {selectedHotel.name}
+                </p>
+                <p className="text-sm text-green-700">
+                  New Total: ${selectedFlight.price + (selectedHotel.price * 7)}
+                </p>
+              </div>
+              <button
+                onClick={handleConfirmCustomization}
+                className="flex items-center space-x-2 px-6 py-3 bg-green-600 text-white font-semibold rounded-xl hover:bg-green-700 transition-colors"
+              >
+                <Check className="w-5 h-5" />
+                <span>Confirm Customization</span>
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

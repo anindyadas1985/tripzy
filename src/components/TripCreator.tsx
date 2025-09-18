@@ -80,7 +80,8 @@ export const TripCreator: React.FC = () => {
   const [isGeneratingPackage, setIsGeneratingPackage] = useState(false);
   const [aiPackages, setAiPackages] = useState<AIPackage[]>([]);
   const [selectedPackage, setSelectedPackage] = useState<AIPackage | null>(null);
-  const [showCustomization, setShowCustomization] = useState(false);
+  const [isCustomizing, setIsCustomizing] = useState(false);
+  const [customizedBookings, setCustomizedBookings] = useState<any[]>([]);
   const [isBooking, setIsBooking] = useState(false);
   
   // Show voice data indicator if available
@@ -348,7 +349,34 @@ export const TripCreator: React.FC = () => {
   };
 
   const handleCustomizePackage = () => {
-    setShowCustomization(true);
+    if (!selectedPackage) return;
+    
+    // Store the selected package data for customization
+    const customizationData = {
+      packageId: selectedPackage.id,
+      packageTitle: selectedPackage.title,
+      originalCost: selectedPackage.totalCost,
+      tripData: {
+        origin: formData.origin,
+        destination: formData.destination,
+        startDate: formData.startDate,
+        endDate: formData.endDate,
+        travelers: formData.travelers,
+        budget: formData.budget
+      },
+      currentSelections: {
+        flight: selectedPackage.flight,
+        hotel: selectedPackage.hotel,
+        activities: selectedPackage.activities
+      }
+    };
+    
+    // Store customization data in sessionStorage
+    sessionStorage.setItem('tripCustomizationData', JSON.stringify(customizationData));
+    
+    // Set customizing state and navigate to booking page
+    setIsCustomizing(true);
+    window.dispatchEvent(new CustomEvent('navigate-to-booking'));
   };
 
   const renderStars = (rating: number) => {
@@ -693,6 +721,11 @@ export const TripCreator: React.FC = () => {
                 {/* Itinerary Preview */}
                 <div className="mb-8 p-4 bg-purple-50 rounded-xl">
                   <h4 className="font-semibold text-purple-900 mb-3">Sample Itinerary</h4>
+                  {customizedBookings.length > 0 && (
+                    <div className="mb-3 p-2 bg-green-100 border border-green-200 rounded text-sm text-green-800">
+                      ✨ Package customized with your selections
+                    </div>
+                  )}
                   <div className="space-y-2">
                     {selectedPackage.itinerary.map((day) => (
                       <div key={day.day} className="text-sm text-gray-700">
@@ -702,14 +735,14 @@ export const TripCreator: React.FC = () => {
                   </div>
                 </div>
 
-                {!showCustomization ? (
+                {!isCustomizing ? (
                   <div className="flex space-x-4">
                     <button
                       onClick={handleCustomizePackage}
                       className="flex-1 flex items-center justify-center space-x-2 px-6 py-3 border-2 border-sky-600 text-sky-600 font-semibold rounded-xl hover:bg-sky-50 transition-colors"
                     >
                       <Edit3 className="w-5 h-5" />
-                      <span>Customize Package</span>
+                      <span>Customize Selections</span>
                     </button>
                     <button
                       onClick={handleBookPackage}
@@ -721,49 +754,13 @@ export const TripCreator: React.FC = () => {
                     </button>
                   </div>
                 ) : (
-                  <div className="space-y-4">
-                    <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-                      <h4 className="font-semibold text-yellow-900 mb-2">Customization Options</h4>
-                      <p className="text-sm text-yellow-800">
-                        You can modify flight times, hotel selection, and activities. Additional charges may apply for upgrades.
-                      </p>
-                    </div>
-                    
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <button className="p-3 border border-gray-200 rounded-lg text-left hover:bg-gray-50">
-                        <div className="font-medium text-gray-900">Change Flight</div>
-                        <div className="text-sm text-gray-600">Select different flight times or airlines</div>
-                      </button>
-                      <button className="p-3 border border-gray-200 rounded-lg text-left hover:bg-gray-50">
-                        <div className="font-medium text-gray-900">Upgrade Hotel</div>
-                        <div className="text-sm text-gray-600">Choose a different hotel or room type</div>
-                      </button>
-                      <button className="p-3 border border-gray-200 rounded-lg text-left hover:bg-gray-50">
-                        <div className="font-medium text-gray-900">Modify Activities</div>
-                        <div className="text-sm text-gray-600">Add or remove activities from your package</div>
-                      </button>
-                      <button className="p-3 border border-gray-200 rounded-lg text-left hover:bg-gray-50">
-                        <div className="font-medium text-gray-900">Add Services</div>
-                        <div className="text-sm text-gray-600">Airport transfers, travel insurance, etc.</div>
-                      </button>
-                    </div>
 
-                    <div className="flex space-x-4 pt-4">
-                      <button
-                        onClick={() => setShowCustomization(false)}
-                        className="flex-1 px-6 py-3 border border-gray-200 text-gray-600 font-medium rounded-xl hover:bg-gray-50 transition-colors"
-                      >
-                        Keep Original
-                      </button>
-                      <button
-                        onClick={handleBookPackage}
-                        disabled={isBooking}
-                        className="flex-1 flex items-center justify-center space-x-2 px-6 py-3 bg-gradient-to-r from-sky-600 to-blue-600 text-white font-semibold rounded-xl hover:from-sky-700 hover:to-blue-700 transition-all duration-200 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
-                      >
-                        <Check className="w-5 h-5" />
-                        <span>{isBooking ? 'Booking...' : 'Book with Changes'}</span>
-                      </button>
+                  <div className="text-center py-8">
+                    <div className="w-12 h-12 bg-gradient-to-r from-sky-500 to-blue-600 rounded-full flex items-center justify-center mx-auto mb-4 animate-spin">
+                      <Edit3 className="w-6 h-6 text-white" />
                     </div>
+                    <p className="text-gray-600">Redirecting to booking page for customization...</p>
+                    <p className="text-sm text-gray-500 mt-2">You'll return here after making your selections</p>
                   </div>
                 )}
               </div>

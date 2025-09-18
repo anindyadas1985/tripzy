@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Search, Plane, Clock, DollarSign, ArrowRight } from 'lucide-react';
+import { Search, Plane, Clock, DollarSign, ArrowRight, Check } from 'lucide-react';
 
 interface Flight {
   id: string;
@@ -13,7 +13,17 @@ interface Flight {
   aircraft: string;
 }
 
-export const FlightSearch: React.FC = () => {
+interface FlightSearchProps {
+  onFlightSelect?: (flight: Flight) => void;
+  selectedFlight?: Flight | null;
+  isCustomizing?: boolean;
+}
+
+export const FlightSearch: React.FC<FlightSearchProps> = ({ 
+  onFlightSelect, 
+  selectedFlight, 
+  isCustomizing = false 
+}) => {
   const [searchParams, setSearchParams] = useState({
     from: 'New York (JFK)',
     to: 'Paris (CDG)',
@@ -222,12 +232,32 @@ export const FlightSearch: React.FC = () => {
                   <div className="text-2xl font-bold text-gray-900 mb-1">
                     ${flight.price}
                   </div>
-                  <button 
-                    onClick={() => handleBookFlight(flight)}
-                    className="bg-sky-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-sky-700 transition-colors"
-                  >
-                    Select
-                  </button>
+                  {isCustomizing ? (
+                    <button 
+                      onClick={() => handleBookFlight(flight)}
+                      className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center space-x-1 ${
+                        selectedFlight?.id === flight.id
+                          ? 'bg-green-600 text-white'
+                          : 'bg-sky-600 text-white hover:bg-sky-700'
+                      }`}
+                    >
+                      {selectedFlight?.id === flight.id ? (
+                        <>
+                          <Check className="w-4 h-4" />
+                          <span>Selected</span>
+                        </>
+                      ) : (
+                        <span>Select</span>
+                      )}
+                    </button>
+                  ) : (
+                    <button 
+                      onClick={() => handleBookFlight(flight)}
+                      className="bg-sky-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-sky-700 transition-colors"
+                    >
+                      Select
+                    </button>
+                  )}
                 </div>
               </div>
             </div>

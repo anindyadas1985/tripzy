@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Search, Building, MapPin, Star, Wifi, Car, Coffee } from 'lucide-react';
+import { Search, Building, MapPin, Star, Wifi, Car, Coffee, Check } from 'lucide-react';
 
 interface Hotel {
   id: string;
@@ -14,7 +14,17 @@ interface Hotel {
   reviews: number;
 }
 
-export const HotelSearch: React.FC = () => {
+interface HotelSearchProps {
+  onHotelSelect?: (hotel: Hotel) => void;
+  selectedHotel?: Hotel | null;
+  isCustomizing?: boolean;
+}
+
+export const HotelSearch: React.FC<HotelSearchProps> = ({ 
+  onHotelSelect, 
+  selectedHotel, 
+  isCustomizing = false 
+}) => {
   const [searchParams, setSearchParams] = useState({
     destination: 'Paris, France',
     checkIn: '2025-03-15',
@@ -79,6 +89,11 @@ export const HotelSearch: React.FC = () => {
   };
 
   const handleBookHotel = async (hotel: Hotel) => {
+    if (isCustomizing && onHotelSelect) {
+      onHotelSelect(hotel);
+      return;
+    }
+    
     try {
       // Create a booking record
       const booking = {
@@ -276,12 +291,32 @@ export const HotelSearch: React.FC = () => {
                     <button className="text-sky-600 font-medium hover:text-sky-700">
                       View Details
                     </button>
-                    <button 
-                      onClick={() => handleBookHotel(hotel)}
-                      className="bg-sky-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-sky-700 transition-colors"
-                    >
-                      Book Now
-                    </button>
+                    {isCustomizing ? (
+                      <button 
+                        onClick={() => handleBookHotel(hotel)}
+                        className={`px-6 py-2 rounded-lg font-medium transition-colors flex items-center space-x-2 ${
+                          selectedHotel?.id === hotel.id
+                            ? 'bg-green-600 text-white'
+                            : 'bg-sky-600 text-white hover:bg-sky-700'
+                        }`}
+                      >
+                        {selectedHotel?.id === hotel.id ? (
+                          <>
+                            <Check className="w-4 h-4" />
+                            <span>Selected</span>
+                          </>
+                        ) : (
+                          <span>Select</span>
+                        )}
+                      </button>
+                    ) : (
+                      <button 
+                        onClick={() => handleBookHotel(hotel)}
+                        className="bg-sky-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-sky-700 transition-colors"
+                      >
+                        Book Now
+                      </button>
+                    )}
                   </div>
                 </div>
               </div>
