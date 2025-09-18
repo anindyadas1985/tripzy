@@ -66,10 +66,55 @@ export const FlightSearch: React.FC = () => {
     e.preventDefault();
     setIsSearching(true);
     
-    setTimeout(() => {
-      setSearchResults(mockFlights);
+    try {
+      setTimeout(() => {
+        setSearchResults(mockFlights);
+        setIsSearching(false);
+      }, 1500);
+    } catch (error) {
+      console.error('Flight search error:', error);
       setIsSearching(false);
-    }, 1500);
+    }
+  };
+
+  const handleBookFlight = async (flight: Flight) => {
+    try {
+      // Create a booking record
+      const booking = {
+        id: Date.now().toString(),
+        tripId: 'current-trip',
+        type: 'flight' as const,
+        title: `${flight.departure.airport} to ${flight.arrival.airport}`,
+        provider: flight.airline,
+        confirmationCode: flight.flightNumber,
+        date: new Date(searchParams.departDate),
+        cost: flight.price,
+        status: 'confirmed' as const,
+        details: {
+          flightNumber: flight.flightNumber,
+          departure: flight.departure,
+          arrival: flight.arrival,
+          duration: flight.duration,
+          aircraft: flight.aircraft,
+          passengers: searchParams.passengers
+        }
+      };
+
+      // Store booking in localStorage for demo
+      const existingBookings = JSON.parse(localStorage.getItem('journai_bookings') || '[]');
+      existingBookings.push(booking);
+      localStorage.setItem('journai_bookings', JSON.stringify(existingBookings));
+
+      // Show success message
+      alert(`Flight booked successfully! Confirmation: ${booking.confirmationCode}`);
+      
+      // Navigate to bookings list
+      window.dispatchEvent(new CustomEvent('navigate-to-booking'));
+      
+    } catch (error) {
+      console.error('Flight booking error:', error);
+      alert('Booking failed. Please try again.');
+    }
   };
 
   return (

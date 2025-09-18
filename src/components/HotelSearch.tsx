@@ -67,10 +67,56 @@ export const HotelSearch: React.FC = () => {
     e.preventDefault();
     setIsSearching(true);
     
-    setTimeout(() => {
-      setSearchResults(mockHotels);
+    try {
+      setTimeout(() => {
+        setSearchResults(mockHotels);
+        setIsSearching(false);
+      }, 1500);
+    } catch (error) {
+      console.error('Hotel search error:', error);
       setIsSearching(false);
-    }, 1500);
+    }
+  };
+
+  const handleBookHotel = async (hotel: Hotel) => {
+    try {
+      // Create a booking record
+      const booking = {
+        id: Date.now().toString(),
+        tripId: 'current-trip',
+        type: 'hotel' as const,
+        title: hotel.name,
+        provider: 'Booking.com',
+        confirmationCode: `BK${Math.random().toString(36).substr(2, 9).toUpperCase()}`,
+        date: new Date(),
+        cost: hotel.price,
+        status: 'confirmed' as const,
+        details: {
+          location: hotel.location,
+          rating: hotel.rating,
+          amenities: hotel.amenities.join(', '),
+          checkIn: searchParams.checkIn,
+          checkOut: searchParams.checkOut,
+          guests: searchParams.guests,
+          rooms: searchParams.rooms
+        }
+      };
+
+      // Store booking in localStorage for demo
+      const existingBookings = JSON.parse(localStorage.getItem('journai_bookings') || '[]');
+      existingBookings.push(booking);
+      localStorage.setItem('journai_bookings', JSON.stringify(existingBookings));
+
+      // Show success message
+      alert(`Hotel booked successfully! Confirmation: ${booking.confirmationCode}`);
+      
+      // Navigate to bookings list
+      window.dispatchEvent(new CustomEvent('navigate-to-booking'));
+      
+    } catch (error) {
+      console.error('Hotel booking error:', error);
+      alert('Booking failed. Please try again.');
+    }
   };
 
   const getAmenityIcon = (amenity: string) => {
@@ -230,7 +276,10 @@ export const HotelSearch: React.FC = () => {
                     <button className="text-sky-600 font-medium hover:text-sky-700">
                       View Details
                     </button>
-                    <button className="bg-sky-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-sky-700 transition-colors">
+                    <button 
+                      onClick={() => handleBookHotel(hotel)}
+                      className="bg-sky-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-sky-700 transition-colors"
+                    >
                       Book Now
                     </button>
                   </div>
