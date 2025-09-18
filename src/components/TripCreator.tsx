@@ -114,8 +114,8 @@ export const TripCreator: React.FC = () => {
     
     // Simulate AI itinerary generation
     setTimeout(() => {
-      // Navigate to planner to show generated itinerary
-      window.dispatchEvent(new CustomEvent('navigate-to-planner'));
+      // Navigate to booking hub to show search results
+      window.dispatchEvent(new CustomEvent('navigate-to-booking'));
     }, 1000);
   };
 
@@ -309,7 +309,7 @@ export const TripCreator: React.FC = () => {
               <p className="text-gray-600">Select all that apply to personalize your itinerary</p>
             </div>
 
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
               {preferenceOptions.map((pref) => (
                 <button
                   key={pref}
@@ -326,6 +326,37 @@ export const TripCreator: React.FC = () => {
               ))}
             </div>
 
+            {/* Search and Optimization Features */}
+            <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-2xl p-6 mt-8">
+              <div className="flex items-center space-x-3 mb-4">
+                <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
+                  <span className="text-white text-sm">🔍</span>
+                </div>
+                <h3 className="text-lg font-semibold text-gray-900">Smart Trip Planning</h3>
+              </div>
+              <p className="text-gray-600 mb-4">
+                Our AI will search for the best flights, hotels, and activities based on your preferences,
+                then optimize your itinerary for time, budget, and travel efficiency.
+              </p>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm text-gray-600">
+                <div className="flex items-center space-x-1">
+                  <span className="w-2 h-2 bg-purple-500 rounded-full"></span>
+                  <span>Flight Search</span>
+                </div>
+                <div className="flex items-center space-x-1">
+                  <span className="w-2 h-2 bg-pink-500 rounded-full"></span>
+                  <span>Hotel Booking</span>
+                </div>
+                <div className="flex items-center space-x-1">
+                  <span className="w-2 h-2 bg-purple-500 rounded-full"></span>
+                  <span>Activity Planning</span>
+                </div>
+                <div className="flex items-center space-x-1">
+                  <span className="w-2 h-2 bg-pink-500 rounded-full"></span>
+                  <span>Route Optimization</span>
+                </div>
+              </div>
+            </div>
             <div className="bg-gradient-to-r from-sky-50 to-blue-50 rounded-2xl p-6 mt-8">
               <div className="flex items-center space-x-3 mb-4">
                 <Zap className="w-6 h-6 text-sky-600" />

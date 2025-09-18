@@ -87,7 +87,6 @@ const AppContent: React.FC = () => {
         {activeView === 'dashboard' && <Dashboard />}
         {activeView === 'create' && <TripCreator />}
         {activeView === 'voice' && <VoiceTripPlanner />}
-        {activeView === 'planner' && <TripPlanner />}
         {activeView === 'booking' && <BookingHub />}
         {activeView === 'navigation' && <NavigationMap />}
         {activeView === 'expenses' && <ExpenseSharing />}

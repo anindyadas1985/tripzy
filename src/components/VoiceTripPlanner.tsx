@@ -309,9 +309,9 @@ export const VoiceTripPlanner: React.FC = () => {
     const newTrip = createTrip(tripData);
     setActiveTrip(newTrip);
     
-    // Navigate to planner
+    // Navigate to booking hub
     setTimeout(() => {
-      window.dispatchEvent(new CustomEvent('navigate-to-planner'));
+      window.dispatchEvent(new CustomEvent('navigate-to-booking'));
     }, 1000);
   };
 

@@ -16,7 +16,6 @@ export const Navigation: React.FC<NavigationProps> = ({ activeView, setActiveVie
     { id: 'dashboard' as const, label: 'Dashboard', icon: Home },
     { id: 'voice' as const, label: 'Speak & Go', icon: Mic },
     { id: 'create' as const, label: 'Create Trip', icon: Plus },
-    { id: 'planner' as const, label: 'Plan', icon: Calendar },
     { id: 'booking' as const, label: 'Book', icon: Plane },
     { id: 'navigation' as const, label: 'Navigate', icon: Map },
     { id: 'expenses' as const, label: 'Expenses', icon: Receipt },
