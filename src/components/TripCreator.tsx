@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { MapPin, Calendar, Users, DollarSign, Zap, Clock, Heart, Briefcase, Baby } from 'lucide-react';
 import { useTripContext } from '../contexts/TripContext';
 import { SearchFilters } from '../types';
