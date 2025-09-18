@@ -12,8 +12,11 @@ export const useSupabaseSubscription = <T extends keyof Tables>(
   const [data, setData] = useState<Tables[T]['Row'][]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isSubscribed, setIsSubscribed] = useState(false);
 
   useEffect(() => {
+    if (isSubscribed) return;
+    
     let query = supabase.from(table).select('*');
     
     if (filter) {
@@ -55,10 +58,13 @@ export const useSupabaseSubscription = <T extends keyof Tables>(
       )
       .subscribe();
 
+    setIsSubscribed(true);
+
     return () => {
+      setIsSubscribed(false);
       subscription.unsubscribe();
     };
-  }, [table, filter?.column, filter?.value]);
+  }, [table, filter?.column, filter?.value, isSubscribed]);
 
   return { data, loading, error };
 };

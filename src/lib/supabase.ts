@@ -56,26 +56,36 @@ export const supabase = createSupabaseClient() as any;
 
 // Auto-initialize database on first connection
 let initializationPromise: Promise<void> | null = null;
+let isInitializing = false;
 
 export const ensureDatabaseInitialized = async (): Promise<void> => {
   if (initializationPromise) {
     return initializationPromise;
   }
 
+  if (isInitializing) {
+    return new Promise((resolve) => {
+      const checkInterval = setInterval(() => {
+        if (!isInitializing) {
+          clearInterval(checkInterval);
+          resolve();
+        }
+      }, 100);
+    });
+  }
+
   if (!supabaseUrl || !supabaseAnonKey) {
-    console.log('🔧 Running in demo mode - skipping database initialization');
     return Promise.resolve();
   }
 
+  isInitializing = true;
   initializationPromise = (async () => {
     try {
-      console.log('🚀 Initializing database...');
       const result = await databaseSetup.initializeDatabase();
       
       if (result.success) {
-        console.log('✅ Database initialization completed');
         if (result.tablesCreated.length > 0) {
-          console.log('📋 Tables created:', result.tablesCreated);
+          // Tables created successfully
         }
       } else {
         console.error('❌ Database initialization failed:', result.message);
@@ -83,6 +93,8 @@ export const ensureDatabaseInitialized = async (): Promise<void> => {
       }
     } catch (error) {
       console.error('💥 Database initialization error:', error);
+    } finally {
+      isInitializing = false;
     }
   })();
 
