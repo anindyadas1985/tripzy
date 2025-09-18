@@ -185,7 +185,35 @@ export const TripCreator: React.FC = () => {
   };
 
   const customizePackage = () => {
-    window.dispatchEvent(new CustomEvent('navigate-to-booking'));
+    // Generate a custom package for comparison
+    const customPkg = {
+      flight: {
+        title: 'Premium Flight Package',
+        price: parseInt(formData.budget) * 0.4 || 50000,
+        originalPrice: (parseInt(formData.budget) * 0.4 || 50000) + 5000,
+        details: `${formData.origin} ↔ ${formData.destination} • Business class • Priority boarding`,
+        savings: 5000
+      },
+      hotel: {
+        title: 'Luxury Hotel Package',
+        price: parseInt(formData.budget) * 0.35 || 45000,
+        originalPrice: (parseInt(formData.budget) * 0.35 || 45000) + 8000,
+        details: '5-star luxury • Suite room • Spa access • Concierge service',
+        savings: 8000
+      },
+      activities: {
+        title: 'Premium Experience Package',
+        price: parseInt(formData.budget) * 0.25 || 25000,
+        originalPrice: (parseInt(formData.budget) * 0.25 || 25000) + 3000,
+        details: 'VIP tours • Private guide • Skip-the-line access • Fine dining',
+        savings: 3000
+      },
+      total: parseInt(formData.budget) || 120000,
+      totalSavings: 16000
+    };
+    
+    setCustomPackage(customPkg);
+    setShowComparison(true);
   };
 
   const renderStep = () => {
