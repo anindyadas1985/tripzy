@@ -1,10 +1,11 @@
 import React from 'react';
-import { TripCard } from './TripCard';
+import { TripCard } from './trip/TripCard';
 import { UpdatesFeed } from './UpdatesFeed';
 import { WeatherWidget } from './WeatherWidget';
-import { BudgetOverview } from './BudgetOverview';
+import { TripStats } from './trip/TripStats';
 import { QuickActions } from './QuickActions';
 import { TripTimeline } from './TripTimeline';
+import { EmptyState } from './common/EmptyState';
 import { useTripContext } from '../contexts/TripContext';
 import { Plus, MapPin, Calendar, Plane, Mic } from 'lucide-react';
 
@@ -12,6 +13,9 @@ export const Dashboard: React.FC = () => {
   const { trips, activeTrip, setActiveTrip } = useTripContext();
   const upcomingTrips = trips.filter(trip => trip.status === 'upcoming' || trip.status === 'planning');
   const activeTrips = trips.filter(trip => trip.status === 'active');
+  
+  const totalBudget = trips.reduce((sum, trip) => sum + trip.budget, 0);
+  const totalSpent = trips.reduce((sum, trip) => sum + trip.spent, 0);
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -21,31 +25,15 @@ export const Dashboard: React.FC = () => {
       </div>
 
       {trips.length === 0 ? (
-        <div className="text-center py-16">
-          <div className="w-24 h-24 mx-auto mb-6 bg-gradient-to-br from-sky-100 to-blue-100 rounded-full flex items-center justify-center">
-            <Plane className="w-12 h-12 text-sky-600" />
-          </div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">Ready for your next adventure?</h2>
-          <p className="text-gray-600 mb-8 max-w-md mx-auto">
-            Create your first trip and let our AI generate the perfect itinerary for you.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button 
-              onClick={() => window.dispatchEvent(new CustomEvent('navigate-to-voice'))}
-              className="inline-flex items-center space-x-2 px-8 py-4 bg-gradient-to-r from-sky-600 to-blue-600 text-white font-semibold rounded-xl hover:from-sky-700 hover:to-blue-700 transition-all duration-200 transform hover:scale-105 shadow-lg shadow-sky-500/25"
-            >
-              <Mic className="w-5 h-5" />
-              <span>Speak & Go</span>
-            </button>
-            <button 
-              onClick={() => window.dispatchEvent(new CustomEvent('navigate-to-create'))}
-              className="inline-flex items-center space-x-2 px-8 py-4 bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-semibold rounded-xl hover:from-purple-700 hover:to-indigo-700 transition-all duration-200 transform hover:scale-105 shadow-lg shadow-purple-500/25"
-            >
-              <Plus className="w-5 h-5" />
-              <span>Create Your First Trip</span>
-            </button>
-          </div>
-        </div>
+        <EmptyState
+          icon={Plane}
+          title="Ready for your next adventure?"
+          description="Create your first trip and let our AI generate the perfect itinerary for you."
+          action={{
+            label: "Create Your First Trip",
+            onClick: () => window.dispatchEvent(new CustomEvent('navigate-to-create'))
+          }}
+        />
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Main Content */}
@@ -83,7 +71,11 @@ export const Dashboard: React.FC = () => {
               {upcomingTrips.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {upcomingTrips.map((trip) => (
-                    <TripCard key={trip.id} trip={trip} />
+                    <TripCard 
+                      key={trip.id} 
+                      trip={trip} 
+                      onClick={() => setActiveTrip(trip)}
+                    />
                   ))}
                 </div>
               ) : (
@@ -105,8 +97,15 @@ export const Dashboard: React.FC = () => {
             {/* Trip Timeline */}
             {activeTrip && <TripTimeline trip={activeTrip} />}
 
-            {/* Budget Overview */}
-            {trips.length > 0 && <BudgetOverview />}
+            {/* Trip Statistics */}
+            {trips.length > 0 && (
+              <TripStats
+                totalBudget={totalBudget}
+                totalSpent={totalSpent}
+                totalTrips={trips.length}
+                activeTravelers={trips.reduce((sum, trip) => sum + trip.travelers, 0)}
+              />
+            )}
           </div>
 
           {/* Sidebar */}

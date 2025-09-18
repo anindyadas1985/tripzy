@@ -1,16 +1,14 @@
 import React from 'react';
 import { Calendar, MapPin, Users, DollarSign, Clock } from 'lucide-react';
-import { Trip } from '../types';
-import { useTripContext } from '../contexts/TripContext';
+import { Trip } from '../../types';
 
 interface TripCardProps {
   trip: Trip;
   featured?: boolean;
+  onClick?: () => void;
 }
 
-export const TripCard: React.FC<TripCardProps> = ({ trip, featured = false }) => {
-  const { setActiveTrip } = useTripContext();
-
+export const TripCard: React.FC<TripCardProps> = ({ trip, featured = false, onClick }) => {
   const formatDate = (date: Date) => {
     return date.toLocaleDateString('en-US', { 
       month: 'short', 
@@ -34,7 +32,7 @@ export const TripCard: React.FC<TripCardProps> = ({ trip, featured = false }) =>
       className={`bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-all duration-200 cursor-pointer ${
         featured ? 'ring-2 ring-sky-500/20' : ''
       }`}
-      onClick={() => setActiveTrip(trip)}
+      onClick={onClick}
     >
       <div className="relative h-48 overflow-hidden">
         <img 
