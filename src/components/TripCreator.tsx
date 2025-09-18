@@ -20,7 +20,7 @@ export const TripCreator: React.FC = () => {
   });
 
   const [currentStep, setCurrentStep] = useState(1);
-  const totalSteps = 5;
+  const totalSteps = 6;
 
   const styleOptions = [
     {
@@ -114,11 +114,8 @@ export const TripCreator: React.FC = () => {
 
     setActiveTrip(newTrip);
     
-    // Simulate AI itinerary generation
-    setTimeout(() => {
-      // Navigate to booking hub to show search results
-      window.dispatchEvent(new CustomEvent('navigate-to-booking'));
-    }, 1000);
+    // Move to package selection step
+    setCurrentStep(6);
   };
 
   const renderStep = () => {
