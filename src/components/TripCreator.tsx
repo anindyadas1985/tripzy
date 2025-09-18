@@ -59,22 +59,6 @@ export const TripCreator: React.FC = () => {
     return sessionStorage.getItem('voiceTripData') !== null;
   });
 
-  const [formData, setFormData] = useState({
-    title: '',
-    origin: '',
-    destination: '',
-    startDate: '',
-    endDate: '',
-    travelers: 1,
-    budget: '',
-    style: 'leisure' as 'leisure' | 'business' | 'family',
-    pace: 'moderate' as 'relaxed' | 'moderate' | 'packed',
-    preferences: [] as string[],
-    specialRequirements: ''
-  });
-
-  const [currentStep, setCurrentStep] = useState(1);
-
   const styleOptions = [
     {
       id: 'leisure' as const,
