@@ -32,6 +32,37 @@ export const TripCreator: React.FC = () => {
   const [showCustomBuilder, setShowCustomBuilder] = useState(false);
   const [builderStep, setBuilderStep] = useState<'flight' | 'hotel' | 'activities' | 'summary'>('flight');
   const [showFinalComparison, setShowFinalComparison] = useState(false);
+
+  const nextBuilderStep = () => {
+    if (builderStep === 'flight') setBuilderStep('hotel');
+    else if (builderStep === 'hotel') setBuilderStep('activities');
+    else if (builderStep === 'activities') {
+      // Calculate total cost for custom package
+      const flightCost = customPackage.flight ? customPackage.flight.price * formData.travelers : 0;
+      const hotelCost = customPackage.hotel ? customPackage.hotel.pricePerNight * 7 : 0;
+      const activitiesCost = customPackage.activities ? customPackage.activities.price : 0;
+      
+      setCustomPackage(prev => ({
+        ...prev,
+        totalCost: flightCost + hotelCost + activitiesCost
+      }));
+      
+      // Show final comparison instead of summary
+      setShowCustomBuilder(false);
+      setShowFinalComparison(true);
+    }
+  };
+
+  const prevBuilderStep = () => {
+    if (builderStep === 'hotel') setBuilderStep('flight');
+    else if (builderStep === 'activities') setBuilderStep('hotel');
+    else if (builderStep === 'summary') setBuilderStep('activities');
+  };
+
+  const skipBuilderStep = () => {
+    nextBuilderStep();
+  };
+
   // Check for voice data on component mount
   useEffect(() => {
     const voiceData = localStorage.getItem('voiceTripData');
