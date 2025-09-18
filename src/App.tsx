@@ -20,9 +20,10 @@ const AppContent: React.FC = () => {
   const [activeView, setActiveView] = useState<'dashboard' | 'create' | 'voice' | 'booking' | 'navigation' | 'expenses' | 'memories' | 'profile' | 'admin'>('dashboard');
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const [isDatabaseReady, setIsDatabaseReady] = useState(false);
+  const [isAppInitialized, setIsAppInitialized] = useState(false);
 
   useEffect(() => {
-    console.log('AppContent mounted, isAuthenticated:', isAuthenticated);
+    if (isAppInitialized) return;
     
     const handleOnline = () => setIsOnline(true);
     const handleOffline = () => setIsOnline(false);
@@ -42,6 +43,8 @@ const AppContent: React.FC = () => {
     window.addEventListener('navigate-to-expenses', handleNavigateToExpenses);
     window.addEventListener('navigate-to-memories', handleNavigateToMemories);
 
+    setIsAppInitialized(true);
+
     return () => {
       window.removeEventListener('online', handleOnline);
       window.removeEventListener('offline', handleOffline);
@@ -52,12 +55,22 @@ const AppContent: React.FC = () => {
       window.removeEventListener('navigate-to-expenses', handleNavigateToExpenses);
       window.removeEventListener('navigate-to-memories', handleNavigateToMemories);
     };
-  }, []);
+  }, [isAppInitialized]);
 
-  console.log('Rendering AppContent, activeView:', activeView);
+  if (!isAppInitialized) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-12 h-12 bg-gradient-to-r from-sky-500 to-blue-600 rounded-full flex items-center justify-center mx-auto mb-4 animate-spin">
+            <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full"></div>
+          </div>
+          <p className="text-gray-600">Loading Journai...</p>
+        </div>
+      </div>
+    );
+  }
 
   if (!isAuthenticated) {
-    console.log('User not authenticated, showing AuthPage');
     return (
       <div>
         <DatabaseStatus onSetupComplete={() => setIsDatabaseReady(true)} />
@@ -66,7 +79,6 @@ const AppContent: React.FC = () => {
     );
   }
 
-  console.log('User authenticated, showing main app');
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
       <DatabaseStatus onSetupComplete={() => setIsDatabaseReady(true)} />
