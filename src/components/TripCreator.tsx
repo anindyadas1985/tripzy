@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { MapPin, Calendar, Users, DollarSign, Zap, Clock, Heart, Briefcase, Baby, Plane, Building, Star, Check, Edit3 } from 'lucide-react';
+import { MapPin, Calendar, Users, DollarSign, Zap, Clock, Heart, Briefcase, Baby, Plane, Building, Star, Check, Edit3, ArrowRight, ArrowLeft } from 'lucide-react';
 import { useTripContext } from '../contexts/TripContext';
 
 interface AIPackage {
@@ -8,13 +8,16 @@ interface AIPackage {
   totalCost: number;
   savings: number;
   flight: {
+    id: string;
     airline: string;
+    flightNumber: string;
     departure: string;
     arrival: string;
     price: number;
     duration: string;
   };
   hotel: {
+    id: string;
     name: string;
     rating: number;
     price: number;
@@ -30,6 +33,31 @@ interface AIPackage {
     day: number;
     activities: string[];
   }>;
+}
+
+interface FlightOption {
+  id: string;
+  airline: string;
+  flightNumber: string;
+  departure: { time: string; airport: string; city: string };
+  arrival: { time: string; airport: string; city: string };
+  duration: string;
+  price: number;
+  stops: number;
+  aircraft: string;
+}
+
+interface HotelOption {
+  id: string;
+  name: string;
+  location: string;
+  rating: number;
+  price: number;
+  originalPrice?: number;
+  image: string;
+  amenities: string[];
+  distance: string;
+  reviews: number;
 }
 
 export const TripCreator: React.FC = () => {
@@ -81,7 +109,9 @@ export const TripCreator: React.FC = () => {
   const [aiPackages, setAiPackages] = useState<AIPackage[]>([]);
   const [selectedPackage, setSelectedPackage] = useState<AIPackage | null>(null);
   const [isCustomizing, setIsCustomizing] = useState(false);
-  const [customizedBookings, setCustomizedBookings] = useState<any[]>([]);
+  const [customizationStep, setCustomizationStep] = useState<'flight' | 'hotel' | 'summary'>('flight');
+  const [selectedFlight, setSelectedFlight] = useState<FlightOption | null>(null);
+  const [selectedHotel, setSelectedHotel] = useState<HotelOption | null>(null);
   const [isBooking, setIsBooking] = useState(false);
   
   // Show voice data indicator if available
@@ -141,6 +171,81 @@ export const TripCreator: React.FC = () => {
     'Architecture', 'Music & Entertainment', 'Beaches', 'Mountains'
   ];
 
+  // Mock flight options for customization
+  const mockFlightOptions: FlightOption[] = [
+    {
+      id: '1',
+      airline: 'Air France',
+      flightNumber: 'AF 007',
+      departure: { time: '08:00', airport: 'JFK', city: 'New York' },
+      arrival: { time: '21:30', airport: 'CDG', city: 'Paris' },
+      duration: '7h 30m',
+      price: 650,
+      stops: 0,
+      aircraft: 'Boeing 777'
+    },
+    {
+      id: '2',
+      airline: 'Delta',
+      flightNumber: 'DL 264',
+      departure: { time: '10:15', airport: 'JFK', city: 'New York' },
+      arrival: { time: '23:45', airport: 'CDG', city: 'Paris' },
+      duration: '7h 30m',
+      price: 620,
+      stops: 0,
+      aircraft: 'Airbus A330'
+    },
+    {
+      id: '3',
+      airline: 'Lufthansa',
+      flightNumber: 'LH 441',
+      departure: { time: '14:20', airport: 'JFK', city: 'New York' },
+      arrival: { time: '09:15+1', airport: 'CDG', city: 'Paris' },
+      duration: '9h 55m',
+      price: 580,
+      stops: 1,
+      aircraft: 'Airbus A340'
+    }
+  ];
+
+  // Mock hotel options for customization
+  const mockHotelOptions: HotelOption[] = [
+    {
+      id: '1',
+      name: 'Le Marais Boutique Hotel',
+      location: '4th Arrondissement, Paris',
+      rating: 4.8,
+      price: 180,
+      originalPrice: 220,
+      image: 'https://images.pexels.com/photos/164595/pexels-photo-164595.jpeg',
+      amenities: ['Free WiFi', 'Breakfast', 'Room Service', 'Spa'],
+      distance: '0.2 km from city center',
+      reviews: 1247
+    },
+    {
+      id: '2',
+      name: 'Grand Hotel Saint-Germain',
+      location: '6th Arrondissement, Paris',
+      rating: 4.6,
+      price: 250,
+      image: 'https://images.pexels.com/photos/271624/pexels-photo-271624.jpeg',
+      amenities: ['Free WiFi', 'Parking', 'Spa', 'Restaurant'],
+      distance: '0.5 km from city center',
+      reviews: 892
+    },
+    {
+      id: '3',
+      name: 'Hotel des Arts Montmartre',
+      location: '18th Arrondissement, Paris',
+      rating: 4.4,
+      price: 140,
+      image: 'https://images.pexels.com/photos/1134176/pexels-photo-1134176.jpeg',
+      amenities: ['Free WiFi', 'Breakfast', 'Concierge'],
+      distance: '1.2 km from city center',
+      reviews: 654
+    }
+  ];
+
   const togglePreference = (pref: string) => {
     setFormData(prev => ({
       ...prev,
@@ -171,13 +276,16 @@ export const TripCreator: React.FC = () => {
         totalCost: Math.round(budget * 0.95),
         savings: Math.round(budget * 0.15),
         flight: {
+          id: '1',
           airline: 'Air France',
+          flightNumber: 'AF 007',
           departure: '08:00 AM',
           arrival: '09:30 PM',
           price: Math.round(budget * 0.4),
           duration: '7h 30m'
         },
         hotel: {
+          id: '1',
           name: 'Le Marais Boutique Hotel',
           rating: 4.8,
           price: Math.round(budget * 0.35 / nights),
@@ -201,13 +309,16 @@ export const TripCreator: React.FC = () => {
         totalCost: Math.round(budget * 0.85),
         savings: Math.round(budget * 0.25),
         flight: {
+          id: '2',
           airline: 'Delta Airlines',
+          flightNumber: 'DL 264',
           departure: '10:15 AM',
           arrival: '11:45 PM',
           price: Math.round(budget * 0.35),
           duration: '7h 30m'
         },
         hotel: {
+          id: '2',
           name: 'Hotel des Arts Montmartre',
           rating: 4.4,
           price: Math.round(budget * 0.3 / nights),
@@ -231,13 +342,16 @@ export const TripCreator: React.FC = () => {
         totalCost: Math.round(budget * 0.75),
         savings: Math.round(budget * 0.35),
         flight: {
+          id: '3',
           airline: 'Lufthansa',
+          flightNumber: 'LH 441',
           departure: '02:20 PM',
           arrival: '09:15 AM+1',
           price: Math.round(budget * 0.3),
           duration: '9h 55m (1 stop)'
         },
         hotel: {
+          id: '3',
           name: 'Comfort Inn Central',
           rating: 4.0,
           price: Math.round(budget * 0.25 / nights),
@@ -264,11 +378,41 @@ export const TripCreator: React.FC = () => {
 
   const handlePackageSelection = (packageData: AIPackage) => {
     setSelectedPackage(packageData);
+    // Set initial selections based on package
+    const initialFlight = mockFlightOptions.find(f => f.id === packageData.flight.id) || mockFlightOptions[0];
+    const initialHotel = mockHotelOptions.find(h => h.id === packageData.hotel.id) || mockHotelOptions[0];
+    setSelectedFlight(initialFlight);
+    setSelectedHotel(initialHotel);
     setCurrentStep(3);
   };
 
+  const handleCustomizePackage = () => {
+    setIsCustomizing(true);
+    setCustomizationStep('flight');
+  };
+
+  const handleFlightSelect = (flight: FlightOption) => {
+    setSelectedFlight(flight);
+    setCustomizationStep('hotel');
+  };
+
+  const handleHotelSelect = (hotel: HotelOption) => {
+    setSelectedHotel(hotel);
+    setCustomizationStep('summary');
+  };
+
+  const calculateCustomizedCost = () => {
+    if (!selectedFlight || !selectedHotel || !selectedPackage) return 0;
+    
+    const flightCost = selectedFlight.price;
+    const hotelCost = selectedHotel.price * selectedPackage.hotel.nights;
+    const activitiesCost = selectedPackage.activities.reduce((sum, activity) => sum + activity.price, 0);
+    
+    return flightCost + hotelCost + activitiesCost;
+  };
+
   const handleBookPackage = async () => {
-    if (!selectedPackage) return;
+    if (!selectedPackage || !selectedFlight || !selectedHotel) return;
     
     setIsBooking(true);
     
@@ -282,15 +426,16 @@ export const TripCreator: React.FC = () => {
         tripId: 'current-trip',
         type: 'flight' as const,
         title: `${formData.origin} to ${formData.destination}`,
-        provider: selectedPackage.flight.airline,
+        provider: selectedFlight.airline,
         confirmationCode: `FL${Math.random().toString(36).substr(2, 9).toUpperCase()}`,
         date: new Date(formData.startDate),
-        cost: selectedPackage.flight.price,
+        cost: selectedFlight.price,
         status: 'confirmed' as const,
         details: {
-          departure: selectedPackage.flight.departure,
-          arrival: selectedPackage.flight.arrival,
-          duration: selectedPackage.flight.duration
+          departure: selectedFlight.departure.time,
+          arrival: selectedFlight.arrival.time,
+          duration: selectedFlight.duration,
+          flightNumber: selectedFlight.flightNumber
         }
       };
 
@@ -298,16 +443,16 @@ export const TripCreator: React.FC = () => {
         id: (Date.now() + 1).toString(),
         tripId: 'current-trip',
         type: 'hotel' as const,
-        title: selectedPackage.hotel.name,
+        title: selectedHotel.name,
         provider: 'Booking.com',
         confirmationCode: `HT${Math.random().toString(36).substr(2, 9).toUpperCase()}`,
         date: new Date(formData.startDate),
-        cost: selectedPackage.hotel.price * selectedPackage.hotel.nights,
+        cost: selectedHotel.price * selectedPackage.hotel.nights,
         status: 'confirmed' as const,
         details: {
-          rating: selectedPackage.hotel.rating,
+          rating: selectedHotel.rating,
           nights: selectedPackage.hotel.nights,
-          amenities: selectedPackage.hotel.amenities.join(', '),
+          amenities: selectedHotel.amenities.join(', '),
           checkIn: formData.startDate,
           checkOut: formData.endDate
         }
@@ -335,7 +480,9 @@ export const TripCreator: React.FC = () => {
 
       setActiveTrip(newTrip);
       
-      alert(`🎉 Trip booked successfully!\n\nFlight: ${flightBooking.confirmationCode}\nHotel: ${hotelBooking.confirmationCode}\n\nTotal Cost: $${selectedPackage.totalCost}`);
+      const totalCost = isCustomizing ? calculateCustomizedCost() : selectedPackage.totalCost;
+      
+      alert(`🎉 Trip booked successfully!\n\nFlight: ${flightBooking.confirmationCode}\nHotel: ${hotelBooking.confirmationCode}\n\nTotal Cost: $${totalCost}`);
       
       // Navigate to dashboard
       window.dispatchEvent(new CustomEvent('navigate-to-dashboard'));
@@ -348,37 +495,6 @@ export const TripCreator: React.FC = () => {
     }
   };
 
-  const handleCustomizePackage = () => {
-    if (!selectedPackage) return;
-    
-    // Store the selected package data for customization
-    const customizationData = {
-      packageId: selectedPackage.id,
-      packageTitle: selectedPackage.title,
-      originalCost: selectedPackage.totalCost,
-      tripData: {
-        origin: formData.origin,
-        destination: formData.destination,
-        startDate: formData.startDate,
-        endDate: formData.endDate,
-        travelers: formData.travelers,
-        budget: formData.budget
-      },
-      currentSelections: {
-        flight: selectedPackage.flight,
-        hotel: selectedPackage.hotel,
-        activities: selectedPackage.activities
-      }
-    };
-    
-    // Store customization data in sessionStorage
-    sessionStorage.setItem('tripCustomizationData', JSON.stringify(customizationData));
-    
-    // Set customizing state and navigate to booking page
-    setIsCustomizing(true);
-    window.dispatchEvent(new CustomEvent('navigate-to-booking'));
-  };
-
   const renderStars = (rating: number) => {
     return Array.from({ length: 5 }, (_, i) => (
       <Star
@@ -386,6 +502,306 @@ export const TripCreator: React.FC = () => {
         className={`w-4 h-4 ${i < Math.floor(rating) ? 'text-yellow-400 fill-current' : 'text-gray-300'}`}
       />
     ));
+  };
+
+  const renderCustomizationContent = () => {
+    if (customizationStep === 'flight') {
+      return (
+        <div className="space-y-6">
+          <div className="text-center mb-6">
+            <h3 className="text-xl font-bold text-gray-900 mb-2">Select Your Flight</h3>
+            <p className="text-gray-600">Choose from available flight options</p>
+          </div>
+
+          <div className="space-y-4">
+            {mockFlightOptions.map((flight) => (
+              <div key={flight.id} className={`border-2 rounded-lg p-4 cursor-pointer transition-all ${
+                selectedFlight?.id === flight.id 
+                  ? 'border-sky-500 bg-sky-50' 
+                  : 'border-gray-200 hover:border-gray-300'
+              }`} onClick={() => handleFlightSelect(flight)}>
+                <div className="flex items-center justify-between">
+                  <div className="flex-1">
+                    <div className="flex items-center space-x-4 mb-3">
+                      <div className="flex items-center space-x-2">
+                        <Plane className="w-4 h-4 text-gray-400" />
+                        <span className="font-medium text-gray-900">{flight.airline}</span>
+                        <span className="text-sm text-gray-500">{flight.flightNumber}</span>
+                      </div>
+                      
+                      {flight.stops === 0 && (
+                        <span className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">
+                          Non-stop
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="flex items-center space-x-6">
+                      <div className="text-center">
+                        <div className="text-xl font-bold text-gray-900">{flight.departure.time}</div>
+                        <div className="text-sm text-gray-600">{flight.departure.airport}</div>
+                      </div>
+
+                      <div className="flex-1 flex items-center justify-center">
+                        <div className="flex items-center space-x-2 text-gray-400">
+                          <div className="w-2 h-2 rounded-full bg-gray-400"></div>
+                          <div className="flex-1 h-px bg-gray-300"></div>
+                          <ArrowRight className="w-4 h-4" />
+                          <div className="flex-1 h-px bg-gray-300"></div>
+                          <div className="w-2 h-2 rounded-full bg-gray-400"></div>
+                        </div>
+                      </div>
+
+                      <div className="text-center">
+                        <div className="text-xl font-bold text-gray-900">{flight.arrival.time}</div>
+                        <div className="text-sm text-gray-600">{flight.arrival.airport}</div>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center space-x-4 mt-3 text-sm text-gray-600">
+                      <div className="flex items-center space-x-1">
+                        <Clock className="w-3 h-3" />
+                        <span>{flight.duration}</span>
+                      </div>
+                      <span>•</span>
+                      <span>{flight.aircraft}</span>
+                      {flight.stops > 0 && (
+                        <>
+                          <span>•</span>
+                          <span>{flight.stops} stop{flight.stops > 1 ? 's' : ''}</span>
+                        </>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="text-right ml-6">
+                    <div className="text-2xl font-bold text-gray-900 mb-1">
+                      ${flight.price}
+                    </div>
+                    {selectedFlight?.id === flight.id && (
+                      <div className="flex items-center space-x-1 text-green-600 text-sm font-medium">
+                        <Check className="w-4 h-4" />
+                        <span>Selected</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+    }
+
+    if (customizationStep === 'hotel') {
+      return (
+        <div className="space-y-6">
+          <div className="text-center mb-6">
+            <h3 className="text-xl font-bold text-gray-900 mb-2">Select Your Hotel</h3>
+            <p className="text-gray-600">Choose from available hotel options</p>
+          </div>
+
+          <div className="space-y-4">
+            {mockHotelOptions.map((hotel) => (
+              <div key={hotel.id} className={`border-2 rounded-lg overflow-hidden cursor-pointer transition-all ${
+                selectedHotel?.id === hotel.id 
+                  ? 'border-sky-500 bg-sky-50' 
+                  : 'border-gray-200 hover:border-gray-300'
+              }`} onClick={() => handleHotelSelect(hotel)}>
+                <div className="md:flex">
+                  <div className="md:w-1/3">
+                    <img 
+                      src={hotel.image} 
+                      alt={hotel.name}
+                      className="w-full h-48 md:h-full object-cover"
+                    />
+                  </div>
+                  
+                  <div className="md:w-2/3 p-6">
+                    <div className="flex justify-between items-start mb-2">
+                      <div>
+                        <h3 className="text-xl font-semibold text-gray-900 mb-1">{hotel.name}</h3>
+                        <div className="flex items-center space-x-1 mb-2">
+                          {renderStars(hotel.rating)}
+                          <span className="text-sm text-gray-600 ml-2">({hotel.reviews} reviews)</span>
+                        </div>
+                      </div>
+                      
+                      <div className="text-right">
+                        {hotel.originalPrice && (
+                          <div className="text-sm text-gray-400 line-through">
+                            ${hotel.originalPrice}/night
+                          </div>
+                        )}
+                        <div className="text-2xl font-bold text-gray-900">
+                          ${hotel.price}<span className="text-sm font-normal">/night</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center space-x-1 text-sm text-gray-600 mb-3">
+                      <MapPin className="w-4 h-4" />
+                      <span>{hotel.location}</span>
+                      <span>•</span>
+                      <span>{hotel.distance}</span>
+                    </div>
+
+                    <div className="flex flex-wrap gap-2 mb-4">
+                      {hotel.amenities.map((amenity, index) => (
+                        <span key={index} className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-full">
+                          {amenity}
+                        </span>
+                      ))}
+                    </div>
+
+                    {selectedHotel?.id === hotel.id && (
+                      <div className="flex items-center space-x-1 text-green-600 text-sm font-medium">
+                        <Check className="w-4 h-4" />
+                        <span>Selected</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+    }
+
+    if (customizationStep === 'summary') {
+      const customizedCost = calculateCustomizedCost();
+      const originalCost = selectedPackage?.totalCost || 0;
+      const costDifference = customizedCost - originalCost;
+
+      return (
+        <div className="space-y-6">
+          <div className="text-center mb-8">
+            <h3 className="text-2xl font-bold text-gray-900 mb-2">Customization Summary</h3>
+            <p className="text-gray-600">Review your customized selections before booking</p>
+          </div>
+
+          {/* Cost Comparison */}
+          <div className="bg-gradient-to-r from-sky-50 to-blue-50 rounded-xl p-6 mb-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
+              <div>
+                <div className="text-sm text-gray-600">Original Package</div>
+                <div className="text-2xl font-bold text-gray-900">${originalCost}</div>
+              </div>
+              <div>
+                <div className="text-sm text-gray-600">Your Selection</div>
+                <div className="text-2xl font-bold text-sky-600">${customizedCost}</div>
+              </div>
+              <div>
+                <div className="text-sm text-gray-600">Difference</div>
+                <div className={`text-2xl font-bold ${
+                  costDifference > 0 ? 'text-red-600' : costDifference < 0 ? 'text-green-600' : 'text-gray-600'
+                }`}>
+                  {costDifference > 0 ? '+' : ''}${costDifference}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Selected Flight */}
+          <div className="bg-white border border-gray-200 rounded-xl p-6">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center space-x-2">
+                <Plane className="w-5 h-5 text-blue-600" />
+                <h4 className="text-lg font-semibold text-gray-900">Selected Flight</h4>
+              </div>
+              <button 
+                onClick={() => setCustomizationStep('flight')}
+                className="text-sky-600 text-sm font-medium hover:text-sky-700"
+              >
+                Change Flight
+              </button>
+            </div>
+            
+            {selectedFlight && (
+              <div className="bg-blue-50 rounded-lg p-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <div className="font-semibold text-gray-900">{selectedFlight.airline} {selectedFlight.flightNumber}</div>
+                    <div className="text-sm text-gray-600">{selectedFlight.departure.time} - {selectedFlight.arrival.time}</div>
+                    <div className="text-sm text-gray-600">{selectedFlight.duration}</div>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-xl font-bold text-gray-900">${selectedFlight.price}</div>
+                    {selectedFlight.stops === 0 && (
+                      <span className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">Non-stop</span>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Selected Hotel */}
+          <div className="bg-white border border-gray-200 rounded-xl p-6">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center space-x-2">
+                <Building className="w-5 h-5 text-green-600" />
+                <h4 className="text-lg font-semibold text-gray-900">Selected Hotel</h4>
+              </div>
+              <button 
+                onClick={() => setCustomizationStep('hotel')}
+                className="text-sky-600 text-sm font-medium hover:text-sky-700"
+              >
+                Change Hotel
+              </button>
+            </div>
+            
+            {selectedHotel && (
+              <div className="bg-green-50 rounded-lg p-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <div className="font-semibold text-gray-900">{selectedHotel.name}</div>
+                    <div className="flex items-center space-x-1 mb-1">
+                      {renderStars(selectedHotel.rating)}
+                      <span className="text-sm text-gray-600 ml-1">({selectedHotel.reviews} reviews)</span>
+                    </div>
+                    <div className="text-sm text-gray-600">{selectedHotel.location}</div>
+                    <div className="text-sm text-gray-600">{selectedPackage?.hotel.nights} nights</div>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-xl font-bold text-gray-900">
+                      ${selectedHotel.price * (selectedPackage?.hotel.nights || 1)}
+                    </div>
+                    <div className="text-sm text-gray-600">${selectedHotel.price}/night</div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Trip Details Summary */}
+          <div className="bg-gray-50 rounded-xl p-6">
+            <h4 className="text-lg font-semibold text-gray-900 mb-4">Trip Details</h4>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+              <div>
+                <div className="text-gray-600">Route</div>
+                <div className="font-medium">{formData.origin} → {formData.destination}</div>
+              </div>
+              <div>
+                <div className="text-gray-600">Duration</div>
+                <div className="font-medium">{selectedPackage?.hotel.nights} nights</div>
+              </div>
+              <div>
+                <div className="text-gray-600">Travelers</div>
+                <div className="font-medium">{formData.travelers}</div>
+              </div>
+              <div>
+                <div className="text-gray-600">Style</div>
+                <div className="font-medium capitalize">{formData.style}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    return null;
   };
 
   const renderStep = () => {
@@ -582,6 +998,18 @@ export const TripCreator: React.FC = () => {
                   ))}
                 </div>
               </div>
+
+              {/* Generate AI Packages Button */}
+              <div className="text-center pt-6">
+                <button
+                  onClick={generateAIPackages}
+                  disabled={isGeneratingPackage || !formData.origin || !formData.destination || !formData.budget}
+                  className="px-8 py-4 bg-gradient-to-r from-sky-600 to-blue-600 text-white font-semibold rounded-xl hover:from-sky-700 hover:to-blue-700 transition-all duration-200 transform hover:scale-105 shadow-lg shadow-sky-500/25 flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                >
+                  <Zap className="w-5 h-5" />
+                  <span>{isGeneratingPackage ? 'Generating AI Packages...' : 'Generate AI Packages'}</span>
+                </button>
+              </div>
             </div>
           </div>
         );
@@ -610,7 +1038,7 @@ export const TripCreator: React.FC = () => {
                       <span className="font-semibold text-blue-900">Flight</span>
                     </div>
                     <div className="text-sm text-gray-700">
-                      <div>{pkg.flight.airline}</div>
+                      <div>{pkg.flight.airline} {pkg.flight.flightNumber}</div>
                       <div>{pkg.flight.departure} - {pkg.flight.arrival}</div>
                       <div>{pkg.flight.duration} • ${pkg.flight.price}</div>
                     </div>
@@ -664,6 +1092,89 @@ export const TripCreator: React.FC = () => {
         );
 
       case 3:
+        if (isCustomizing) {
+          return (
+            <div className="space-y-6">
+              {/* Customization Header */}
+              <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <div>
+                    <h2 className="text-2xl font-bold text-gray-900 mb-2">Customize Your Package</h2>
+                    <p className="text-gray-600">Select your preferred flight and hotel options</p>
+                  </div>
+                  <button
+                    onClick={() => setIsCustomizing(false)}
+                    className="px-4 py-2 text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+                  >
+                    Cancel Customization
+                  </button>
+                </div>
+
+                {/* Progress Steps */}
+                <div className="flex items-center space-x-4">
+                  <div className={`flex items-center space-x-2 px-3 py-1 rounded-full text-sm ${
+                    customizationStep === 'flight' ? 'bg-sky-100 text-sky-800' : 
+                    selectedFlight ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-600'
+                  }`}>
+                    <Plane className="w-4 h-4" />
+                    <span>Flight</span>
+                    {selectedFlight && <Check className="w-4 h-4" />}
+                  </div>
+                  <ArrowRight className="w-4 h-4 text-gray-400" />
+                  <div className={`flex items-center space-x-2 px-3 py-1 rounded-full text-sm ${
+                    customizationStep === 'hotel' ? 'bg-sky-100 text-sky-800' : 
+                    selectedHotel ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-600'
+                  }`}>
+                    <Building className="w-4 h-4" />
+                    <span>Hotel</span>
+                    {selectedHotel && <Check className="w-4 h-4" />}
+                  </div>
+                  <ArrowRight className="w-4 h-4 text-gray-400" />
+                  <div className={`flex items-center space-x-2 px-3 py-1 rounded-full text-sm ${
+                    customizationStep === 'summary' ? 'bg-sky-100 text-sky-800' : 'bg-gray-100 text-gray-600'
+                  }`}>
+                    <Check className="w-4 h-4" />
+                    <span>Summary</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Customization Content */}
+              {renderCustomizationContent()}
+
+              {/* Navigation Buttons */}
+              <div className="flex items-center justify-between pt-6 border-t border-gray-200">
+                <button
+                  onClick={() => {
+                    if (customizationStep === 'flight') {
+                      setIsCustomizing(false);
+                    } else if (customizationStep === 'hotel') {
+                      setCustomizationStep('flight');
+                    } else {
+                      setCustomizationStep('hotel');
+                    }
+                  }}
+                  className="flex items-center space-x-2 px-6 py-3 text-gray-600 font-medium rounded-xl hover:bg-gray-100 transition-colors"
+                >
+                  <ArrowLeft className="w-4 h-4" />
+                  <span>Back</span>
+                </button>
+
+                {customizationStep === 'summary' && (
+                  <button
+                    onClick={handleBookPackage}
+                    disabled={isBooking}
+                    className="flex items-center space-x-2 px-8 py-3 bg-gradient-to-r from-sky-600 to-blue-600 text-white font-semibold rounded-xl hover:from-sky-700 hover:to-blue-700 transition-all duration-200 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                  >
+                    <Check className="w-5 h-5" />
+                    <span>{isBooking ? 'Booking...' : 'Confirm & Book'}</span>
+                  </button>
+                )}
+              </div>
+            </div>
+          );
+        }
+
         return (
           <div className="space-y-6">
             <div className="text-center mb-8">
@@ -721,11 +1232,6 @@ export const TripCreator: React.FC = () => {
                 {/* Itinerary Preview */}
                 <div className="mb-8 p-4 bg-purple-50 rounded-xl">
                   <h4 className="font-semibold text-purple-900 mb-3">Sample Itinerary</h4>
-                  {customizedBookings.length > 0 && (
-                    <div className="mb-3 p-2 bg-green-100 border border-green-200 rounded text-sm text-green-800">
-                      ✨ Package customized with your selections
-                    </div>
-                  )}
                   <div className="space-y-2">
                     {selectedPackage.itinerary.map((day) => (
                       <div key={day.day} className="text-sm text-gray-700">
@@ -735,34 +1241,23 @@ export const TripCreator: React.FC = () => {
                   </div>
                 </div>
 
-                {!isCustomizing ? (
-                  <div className="flex space-x-4">
-                    <button
-                      onClick={handleCustomizePackage}
-                      className="flex-1 flex items-center justify-center space-x-2 px-6 py-3 border-2 border-sky-600 text-sky-600 font-semibold rounded-xl hover:bg-sky-50 transition-colors"
-                    >
-                      <Edit3 className="w-5 h-5" />
-                      <span>Customize Selections</span>
-                    </button>
-                    <button
-                      onClick={handleBookPackage}
-                      disabled={isBooking}
-                      className="flex-1 flex items-center justify-center space-x-2 px-6 py-3 bg-gradient-to-r from-sky-600 to-blue-600 text-white font-semibold rounded-xl hover:from-sky-700 hover:to-blue-700 transition-all duration-200 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
-                    >
-                      <Check className="w-5 h-5" />
-                      <span>{isBooking ? 'Booking...' : 'Confirm & Book'}</span>
-                    </button>
-                  </div>
-                ) : (
-
-                  <div className="text-center py-8">
-                    <div className="w-12 h-12 bg-gradient-to-r from-sky-500 to-blue-600 rounded-full flex items-center justify-center mx-auto mb-4 animate-spin">
-                      <Edit3 className="w-6 h-6 text-white" />
-                    </div>
-                    <p className="text-gray-600">Redirecting to booking page for customization...</p>
-                    <p className="text-sm text-gray-500 mt-2">You'll return here after making your selections</p>
-                  </div>
-                )}
+                <div className="flex space-x-4">
+                  <button
+                    onClick={handleCustomizePackage}
+                    className="flex-1 flex items-center justify-center space-x-2 px-6 py-3 border-2 border-sky-600 text-sky-600 font-semibold rounded-xl hover:bg-sky-50 transition-colors"
+                  >
+                    <Edit3 className="w-5 h-5" />
+                    <span>Customize Selections</span>
+                  </button>
+                  <button
+                    onClick={handleBookPackage}
+                    disabled={isBooking}
+                    className="flex-1 flex items-center justify-center space-x-2 px-6 py-3 bg-gradient-to-r from-sky-600 to-blue-600 text-white font-semibold rounded-xl hover:from-sky-700 hover:to-blue-700 transition-all duration-200 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                  >
+                    <Check className="w-5 h-5" />
+                    <span>{isBooking ? 'Booking...' : 'Confirm & Book'}</span>
+                  </button>
+                </div>
               </div>
             )}
           </div>
@@ -800,26 +1295,14 @@ export const TripCreator: React.FC = () => {
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
         {renderStep()}
 
-        {currentStep === 1 && (
-          <div className="flex items-center justify-center mt-8 pt-6 border-t border-gray-200">
-            <button
-              onClick={generateAIPackages}
-              disabled={isGeneratingPackage}
-              className="px-8 py-3 bg-gradient-to-r from-sky-600 to-blue-600 text-white font-semibold rounded-xl hover:from-sky-700 hover:to-blue-700 transition-all duration-200 transform hover:scale-105 shadow-lg shadow-sky-500/25 flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
-            >
-              <Zap className="w-5 h-5" />
-              <span>{isGeneratingPackage ? 'Generating AI Packages...' : 'Generate AI Packages'}</span>
-            </button>
-          </div>
-        )}
-
-        {currentStep > 1 && (
+        {currentStep > 1 && !isCustomizing && (
           <div className="flex items-center justify-between mt-8 pt-6 border-t border-gray-200">
             <button
               onClick={() => setCurrentStep(currentStep - 1)}
-              className="px-6 py-3 text-gray-600 font-medium rounded-xl hover:bg-gray-100 transition-colors"
+              className="flex items-center space-x-2 px-6 py-3 text-gray-600 font-medium rounded-xl hover:bg-gray-100 transition-colors"
             >
-              Back
+              <ArrowLeft className="w-4 h-4" />
+              <span>Back</span>
             </button>
           </div>
         )}
