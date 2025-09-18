@@ -499,7 +499,7 @@ export const TripCreator: React.FC = () => {
               Back
             </button>
 
-            {currentStep < totalSteps ? (
+            {currentStep < 3 ? (
               <button
                 type="button"
                 onClick={handleNext}
@@ -507,16 +507,15 @@ export const TripCreator: React.FC = () => {
               >
                 Next
               </button>
-            ) : currentStep === 5 ? (
+            ) : currentStep === 3 ? (
               <button
                 type="submit"
                 className="px-8 py-3 bg-gradient-to-r from-sky-600 to-blue-600 text-white font-semibold rounded-xl hover:from-sky-700 hover:to-blue-700 transition-all duration-200 transform hover:scale-105 shadow-lg shadow-sky-500/25 flex items-center space-x-2"
               >
                 <Zap className="w-5 h-5" />
-                <span>Generate Itinerary</span>
+                <span>Continue</span>
               </button>
             ) : null}
-            )}
           </div>
         </form>
       </div>
