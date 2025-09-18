@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Calendar } from 'lucide-react';
 import { BookingCard } from './booking/BookingCard';
 import { EmptyState } from './common/EmptyState';
