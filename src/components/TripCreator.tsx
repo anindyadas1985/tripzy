@@ -5,6 +5,60 @@ import { SearchFilters } from '../types';
 
 export const TripCreator: React.FC = () => {
   const { createTrip, setActiveTrip } = useTripContext();
+  
+  // Check for voice data from sessionStorage
+  const getInitialFormData = () => {
+    const voiceData = sessionStorage.getItem('voiceTripData');
+    if (voiceData) {
+      try {
+        const parsed = JSON.parse(voiceData);
+        // Clear the data after using it
+        sessionStorage.removeItem('voiceTripData');
+        return {
+          title: parsed.title || '',
+          origin: parsed.origin || '',
+          destination: parsed.destination || '',
+          startDate: parsed.startDate ? new Date(parsed.startDate).toISOString().split('T')[0] : '',
+          endDate: parsed.endDate ? new Date(parsed.endDate).toISOString().split('T')[0] : '',
+          travelers: parsed.travelers || 1,
+          budget: parsed.budget || '',
+          style: parsed.style || 'leisure',
+          pace: parsed.pace || 'moderate',
+          preferences: parsed.preferences || [],
+          specialRequirements: parsed.specialRequirements || ''
+        };
+      } catch (error) {
+        console.error('Error parsing voice data:', error);
+      }
+    }
+    return {
+      title: '',
+      origin: '',
+      destination: '',
+      startDate: '',
+      endDate: '',
+      travelers: 1,
+      budget: '',
+      style: 'leisure' as 'leisure' | 'business' | 'family',
+      pace: 'moderate' as 'relaxed' | 'moderate' | 'packed',
+      preferences: [] as string[],
+      specialRequirements: ''
+    };
+  };
+  
+  const [formData, setFormData] = useState(getInitialFormData());
+  const [currentStep, setCurrentStep] = useState(() => {
+    // If we have voice data, start from step 1, otherwise start from step 1
+    const voiceData = sessionStorage.getItem('voiceTripData');
+    return voiceData ? 1 : 1;
+  });
+  const totalSteps = 4; // Reduced from 6 to 4
+  
+  // Show voice data indicator if available
+  const [hasVoiceData] = useState(() => {
+    return sessionStorage.getItem('voiceTripData') !== null;
+  });
+
   const [formData, setFormData] = useState({
     title: '',
     origin: '',
@@ -20,7 +74,6 @@ export const TripCreator: React.FC = () => {
   });
 
   const [currentStep, setCurrentStep] = useState(1);
-  const totalSteps = 6;
 
   const styleOptions = [
     {
@@ -114,8 +167,8 @@ export const TripCreator: React.FC = () => {
 
     setActiveTrip(newTrip);
     
-    // Move to package selection step
-    setCurrentStep(6);
+    // Navigate to booking hub
+    window.dispatchEvent(new CustomEvent('navigate-to-booking'));
   };
 
   const renderStep = () => {
@@ -325,37 +378,6 @@ export const TripCreator: React.FC = () => {
               ))}
             </div>
 
-            {/* Search and Optimization Features */}
-            <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-2xl p-6 mt-8">
-              <div className="flex items-center space-x-3 mb-4">
-                <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
-                  <span className="text-white text-sm">🔍</span>
-                </div>
-                <h3 className="text-lg font-semibold text-gray-900">Smart Trip Planning</h3>
-              </div>
-              <p className="text-gray-600 mb-4">
-                Our AI will search for the best flights, hotels, and activities based on your preferences,
-                then optimize your itinerary for time, budget, and travel efficiency.
-              </p>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm text-gray-600">
-                <div className="flex items-center space-x-1">
-                  <span className="w-2 h-2 bg-purple-500 rounded-full"></span>
-                  <span>Flight Search</span>
-                </div>
-                <div className="flex items-center space-x-1">
-                  <span className="w-2 h-2 bg-pink-500 rounded-full"></span>
-                  <span>Hotel Booking</span>
-                </div>
-                <div className="flex items-center space-x-1">
-                  <span className="w-2 h-2 bg-purple-500 rounded-full"></span>
-                  <span>Activity Planning</span>
-                </div>
-                <div className="flex items-center space-x-1">
-                  <span className="w-2 h-2 bg-pink-500 rounded-full"></span>
-                  <span>Route Optimization</span>
-                </div>
-              </div>
-            </div>
             <div className="bg-gradient-to-r from-sky-50 to-blue-50 rounded-2xl p-6 mt-8">
               <div className="flex items-center space-x-3 mb-4">
                 <Zap className="w-6 h-6 text-sky-600" />
@@ -383,50 +405,6 @@ export const TripCreator: React.FC = () => {
           </div>
         );
 
-      case 7:
-        return (
-          <div className="space-y-6">
-            <div className="text-center mb-8">
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">Build Your Custom Itinerary</h2>
-              <p className="text-gray-600">Start by searching for flights, then add hotels and activities</p>
-            </div>
-
-            <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl p-6">
-              <div className="flex items-center space-x-3 mb-4">
-                <span className="text-2xl">🚀</span>
-                <h3 className="text-lg font-semibold text-gray-900">Ready to Start Building!</h3>
-              </div>
-              <p className="text-gray-600 mb-4">
-                Your trip details have been saved. You'll now be taken to our booking hub where you can:
-              </p>
-              <ul className="space-y-2 text-sm text-gray-700 mb-6">
-                <li className="flex items-center space-x-2">
-                  <span className="w-2 h-2 bg-purple-500 rounded-full"></span>
-                  <span>Search and compare flights from multiple airlines</span>
-                </li>
-                <li className="flex items-center space-x-2">
-                  <span className="w-2 h-2 bg-purple-500 rounded-full"></span>
-                  <span>Browse hotels with real-time availability and pricing</span>
-                </li>
-                <li className="flex items-center space-x-2">
-                  <span className="w-2 h-2 bg-purple-500 rounded-full"></span>
-                  <span>Discover activities and experiences at your destination</span>
-                </li>
-                <li className="flex items-center space-x-2">
-                  <span className="w-2 h-2 bg-purple-500 rounded-full"></span>
-                  <span>Build your day-by-day itinerary</span>
-                </li>
-              </ul>
-              
-              <button
-                onClick={() => window.dispatchEvent(new CustomEvent('navigate-to-booking'))}
-                className="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white py-3 px-6 rounded-xl font-semibold hover:from-purple-700 hover:to-pink-700 transition-all duration-200 transform hover:scale-105"
-              >
-                Go to Booking Hub
-              </button>
-            </div>
-          </div>
-        );
 
       default:
         return null;
@@ -438,6 +416,12 @@ export const TripCreator: React.FC = () => {
       <div className="mb-8">
         <div className="flex items-center justify-between mb-4">
           <h1 className="text-3xl font-bold text-gray-900">Create New Trip</h1>
+          {hasVoiceData && (
+            <div className="flex items-center space-x-2 px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm">
+              <Mic className="w-4 h-4" />
+              <span>Voice data loaded</span>
+            </div>
+          )}
           <div className="text-sm text-gray-500">
             Step {currentStep} of {totalSteps}
           </div>
@@ -480,7 +464,7 @@ export const TripCreator: React.FC = () => {
                 className="px-8 py-3 bg-gradient-to-r from-sky-600 to-blue-600 text-white font-semibold rounded-xl hover:from-sky-700 hover:to-blue-700 transition-all duration-200 transform hover:scale-105 shadow-lg shadow-sky-500/25 flex items-center space-x-2"
               >
                 <Zap className="w-5 h-5" />
-                <span>Generate Itinerary</span>
+                <span>Create Trip</span>
               </button>
             )}
           </div>

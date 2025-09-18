@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Mic, MicOff, Play, Pause, RotateCcw, Sparkles, MapPin, Calendar, Users, DollarSign, Clock } from 'lucide-react';
+import { Mic, MicOff, RotateCcw, Sparkles, MapPin, Calendar, Users, DollarSign, Clock, CheckCircle } from 'lucide-react';
 import { useTripContext } from '../contexts/TripContext';
 
 interface VoiceTranscript {
@@ -228,91 +228,39 @@ export const VoiceTripPlanner: React.FC = () => {
     const parsed = parseVoiceInput(transcript.text);
     setParsedData(parsed);
 
-    // Simulate AI processing delay
-    await new Promise(resolve => setTimeout(resolve, 2000));
-
-    // Generate mock itinerary based on parsed data
-    const mockItinerary = [
-      {
-        id: '1',
-        day: 1,
-        title: `Arrival in ${parsed.destination || 'Destination'}`,
-        activities: [
-          {
-            time: '10:00 AM',
-            activity: 'Airport pickup and hotel check-in',
-            location: 'Hotel',
-            duration: '2 hours'
-          },
-          {
-            time: '2:00 PM',
-            activity: 'Local area exploration and lunch',
-            location: 'City Center',
-            duration: '3 hours'
-          },
-          {
-            time: '7:00 PM',
-            activity: 'Welcome dinner at local restaurant',
-            location: 'Restaurant',
-            duration: '2 hours'
-          }
-        ]
-      },
-      {
-        id: '2',
-        day: 2,
-        title: 'City Sightseeing',
-        activities: [
-          {
-            time: '9:00 AM',
-            activity: 'Visit main attractions and landmarks',
-            location: 'Tourist Sites',
-            duration: '4 hours'
-          },
-          {
-            time: '2:00 PM',
-            activity: parsed.interests?.includes('Museums') ? 'Museum visit' : 'Cultural experience',
-            location: 'Cultural Site',
-            duration: '3 hours'
-          },
-          {
-            time: '7:00 PM',
-            activity: parsed.interests?.includes('Food') ? 'Food tour' : 'Local dining experience',
-            location: 'Local Area',
-            duration: '2 hours'
-          }
-        ]
-      }
-    ];
-
-    setGeneratedItinerary(mockItinerary);
-    setShowResults(true);
+    // Simulate brief processing delay
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
     setIsProcessing(false);
+    
+    // Navigate to Create Trip with prefilled data
+    createTripFromVoice();
   };
 
   const createTripFromVoice = () => {
-    if (!parsedData) return;
+    const parsed = parsedData || parseVoiceInput(transcript.text);
+    if (!parsed) return;
 
+    // Store parsed data in sessionStorage for Create Trip to use
     const tripData = {
-      title: `${parsedData.origin || 'My'} to ${parsedData.destination || 'Dream Destination'} Trip`,
-      origin: parsedData.origin || 'Your City',
-      destination: parsedData.destination || 'Dream Destination',
+      title: `${parsed.origin || 'My'} to ${parsed.destination || 'Dream Destination'} Trip`,
+      origin: parsed.origin || '',
+      destination: parsed.destination || '',
       startDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 1 week from now
       endDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000), // 2 weeks from now
-      travelers: parsedData.travelers || 1,
-      budget: parsedData.budget ? parseInt(parsedData.budget.replace(/[^\d]/g, '')) : 50000,
-      style: parsedData.style || 'leisure',
-      pace: parsedData.pace || 'moderate',
-      preferences: parsedData.interests || []
+      travelers: parsed.travelers || 1,
+      budget: parsed.budget ? parsed.budget.replace(/[^\d]/g, '') : '',
+      style: parsed.style || 'leisure',
+      pace: parsed.pace || 'moderate',
+      preferences: parsed.interests || [],
+      specialRequirements: transcript.text // Store original voice input
     };
 
-    const newTrip = createTrip(tripData);
-    setActiveTrip(newTrip);
+    // Store in sessionStorage for Create Trip component to pick up
+    sessionStorage.setItem('voiceTripData', JSON.stringify(tripData));
     
-    // Navigate to booking hub
-    setTimeout(() => {
-      window.dispatchEvent(new CustomEvent('navigate-to-booking'));
-    }, 1000);
+    // Navigate to Create Trip
+    window.dispatchEvent(new CustomEvent('navigate-to-create'));
   };
 
   if (!isSupported) {
@@ -424,7 +372,7 @@ export const VoiceTripPlanner: React.FC = () => {
               className="flex-1 flex items-center justify-center space-x-2 px-6 py-3 bg-gradient-to-r from-sky-600 to-blue-600 text-white font-semibold rounded-xl hover:from-sky-700 hover:to-blue-700 transition-all duration-200 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
             >
               <Sparkles className="w-5 h-5" />
-              <span>{isProcessing ? 'Processing...' : 'Generate Itinerary'}</span>
+              <span>{isProcessing ? 'Processing...' : 'Generate Trip'}</span>
             </button>
             
             <button
@@ -508,35 +456,15 @@ export const VoiceTripPlanner: React.FC = () => {
               </div>
 
               {/* Generated Itinerary Preview */}
-              {showResults && generatedItinerary.length > 0 && (
-                <div>
-                  <h3 className="font-semibold text-gray-900 mb-3">🗓️ Generated Itinerary Preview:</h3>
-                  <div className="space-y-4 max-h-64 overflow-y-auto">
-                    {generatedItinerary.map((day) => (
-                      <div key={day.id} className="border border-gray-200 rounded-lg p-4">
-                        <h4 className="font-medium text-gray-900 mb-2">Day {day.day}: {day.title}</h4>
-                        <div className="space-y-2">
-                          {day.activities.map((activity: any, index: number) => (
-                            <div key={index} className="flex items-start space-x-3 text-sm">
-                              <span className="text-sky-600 font-medium">{activity.time}</span>
-                              <div>
-                                <div className="text-gray-900">{activity.activity}</div>
-                                <div className="text-gray-500">{activity.location} • {activity.duration}</div>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    ))}
+              {parsedData && (
+                <div className="bg-green-50 border border-green-200 rounded-lg p-4 mt-4">
+                  <div className="flex items-center space-x-2 mb-2">
+                    <CheckCircle className="w-5 h-5 text-green-600" />
+                    <span className="font-semibold text-green-900">Ready to Create Trip!</span>
                   </div>
-
-                  <button
-                    onClick={createTripFromVoice}
-                    className="w-full mt-4 flex items-center justify-center space-x-2 px-6 py-3 bg-gradient-to-r from-sky-600 to-blue-600 text-white font-semibold rounded-xl hover:from-sky-700 hover:to-blue-700 transition-all duration-200 transform hover:scale-105"
-                  >
-                    <Sparkles className="w-5 h-5" />
-                    <span>Create This Trip</span>
-                  </button>
+                  <p className="text-green-800 text-sm">
+                    Your voice input has been processed. Click "Generate Trip" to continue with the trip creation process.
+                  </p>
                 </div>
               )}
             </div>
