@@ -72,18 +72,18 @@ const AppContent: React.FC = () => {
 
   console.log('User authenticated, showing main app');
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex">
       <DatabaseStatus onSetupComplete={() => setIsDatabaseReady(true)} />
       
       {!isOnline && (
-        <div className="bg-orange-500 text-white text-center py-2 text-sm font-medium">
+        <div className="bg-orange-500 text-white text-center py-2 text-sm font-medium fixed top-0 left-0 right-0 z-50">
           You're offline. Some features may be limited.
         </div>
       )}
       
       <Navigation activeView={activeView} setActiveView={setActiveView} />
       
-      <main className={`${!isOnline ? 'pt-20' : 'pt-16'}`}>
+      <main className={`flex-1 md:ml-64 ${!isOnline ? 'pt-10' : ''} pb-20 md:pb-0`}>
         {activeView === 'dashboard' && <Dashboard />}
         {activeView === 'create' && <TripCreator />}
         {activeView === 'voice' && <VoiceTripPlanner />}
