@@ -31,6 +31,7 @@ export const TripCreator: React.FC = () => {
   });
   const [showCustomBuilder, setShowCustomBuilder] = useState(false);
   const [builderStep, setBuilderStep] = useState<'flight' | 'hotel' | 'activities' | 'summary'>('flight');
+  const [showFinalComparison, setShowFinalComparison] = useState(false);
   // Check for voice data on component mount
   useEffect(() => {
     const voiceData = localStorage.getItem('voiceTripData');
@@ -190,7 +191,13 @@ export const TripCreator: React.FC = () => {
   const bookPackage = () => {
     // In a real app, this would process the booking
     alert('Package booked successfully! You will receive confirmation details shortly.');
-    window.dispatchEvent(new CustomEvent('navigate-to-dashboard'));
+    // Reset all states and go to dashboard
+    setCurrentStep(1);
+    setShowCustomBuilder(false);
+    setShowFinalComparison(false);
+    setTimeout(() => {
+      window.dispatchEvent(new CustomEvent('navigate-to-dashboard'));
+    }, 1000);
   };
 
   const customizePackage = () => {
