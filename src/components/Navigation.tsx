@@ -9,7 +9,7 @@ interface NavigationProps {
   setActiveView: (view: 'dashboard' | 'create' | 'voice' | 'booking' | 'navigation' | 'expenses' | 'memories' | 'profile' | 'admin') => void;
 }
 
-export const Navigation: React.FC<NavigationProps> = ({ activeView, setActiveView }) => {
+const Navigation: React.FC<NavigationProps> = ({ activeView, setActiveView }) => {
   const { logout, user, vendor } = useAuth();
   const showAdmin = canAccessAdmin(user || vendor);
   
@@ -125,4 +125,5 @@ export const Navigation: React.FC<NavigationProps> = ({ activeView, setActiveVie
       </div>
     </>
   );
-};
+
+export default Navigation;
