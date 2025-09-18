@@ -80,11 +80,7 @@ export const VoiceTripPlanner: React.FC = () => {
 
     return () => {
       if (recognitionRef.current) {
-        try {
         recognitionRef.current.stop();
-        } catch (error) {
-          // Ignore cleanup errors
-        }
       }
     };
   }, []);
@@ -310,11 +306,13 @@ export const VoiceTripPlanner: React.FC = () => {
       preferences: parsedData.interests || []
     };
 
-    // Store voice data for Create Trip form
-    localStorage.setItem('voiceTripData', JSON.stringify(tripData));
+    const newTrip = createTrip(tripData);
+    setActiveTrip(newTrip);
     
-    // Navigate to Create Trip for additional input
-    window.dispatchEvent(new CustomEvent('navigate-to-create'));
+    // Navigate to booking hub
+    setTimeout(() => {
+      window.dispatchEvent(new CustomEvent('navigate-to-booking'));
+    }, 1000);
   };
 
   if (!isSupported) {
