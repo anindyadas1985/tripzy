@@ -516,7 +516,6 @@ export const TripCreator: React.FC = () => {
                 <span>Generate Itinerary</span>
               </button>
             ) : null}
-            )}
           </div>
         </form>
       </div>
