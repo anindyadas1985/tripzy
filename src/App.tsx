@@ -91,7 +91,7 @@ const AppContent: React.FC = () => {
       
       <Navigation activeView={activeView} setActiveView={setActiveView} />
       
-      <main className={`${!isOnline ? 'pt-20' : 'pt-16'}`}>
+      <main className={`ml-64 ${!isOnline ? 'pt-4' : ''} md:ml-64 mobile:ml-0 mobile:pb-20`}>
         {activeView === 'dashboard' && <Dashboard />}
         {activeView === 'create' && <TripCreator />}
         {activeView === 'voice' && <VoiceTripPlanner />}
