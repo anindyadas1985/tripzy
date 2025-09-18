@@ -26,9 +26,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     user: null,
     vendor: null
   });
+  const [isInitialized, setIsInitialized] = useState(false);
 
   useEffect(() => {
-    console.log('AuthProvider mounted, authState:', authState);
+    if (isInitialized) return;
     
     // Handle OAuth callback on page load
     const handleAuthCallback = async () => {
@@ -53,11 +54,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
       } catch (error) {
         console.error('OAuth callback error:', error);
+      } finally {
+        setIsInitialized(true);
       }
     };
     
     handleAuthCallback();
-  }, [authState]);
+  }, [isInitialized]);
 
   const login = async (email: string, password: string, userType: 'traveler' | 'vendor'): Promise<boolean> => {
     console.log('Login attempt:', { email, userType });
