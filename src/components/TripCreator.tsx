@@ -205,6 +205,256 @@ export const TripCreator: React.FC = () => {
     setBuilderStep('flight');
   };
 
+  const prevBuilderStep = () => {
+    if (builderStep === 'hotel') setBuilderStep('flight');
+    else if (builderStep === 'activities') setBuilderStep('hotel');
+  };
+
+  const nextBuilderStep = () => {
+    if (builderStep === 'flight') setBuilderStep('hotel');
+    else if (builderStep === 'hotel') setBuilderStep('activities');
+    else if (builderStep === 'activities') {
+      setShowCustomBuilder(false);
+      setShowFinalComparison(true);
+    }
+  };
+
+  const skipBuilderStep = () => {
+    nextBuilderStep();
+  };
+
+  const renderCustomBuilder = () => {
+    const flightOptions = [
+      {
+        id: 1,
+        airline: 'Air India',
+        class: 'Economy',
+        duration: '2h 30m',
+        price: 15000,
+        departure: '08:00',
+        arrival: '10:30'
+      },
+      {
+        id: 2,
+        airline: 'IndiGo',
+        class: 'Economy',
+        duration: '2h 45m',
+        price: 12000,
+        departure: '14:00',
+        arrival: '16:45'
+      },
+      {
+        id: 3,
+        airline: 'Vistara',
+        class: 'Business',
+        duration: '2h 20m',
+        price: 25000,
+        departure: '18:00',
+        arrival: '20:20'
+      }
+    ];
+
+    const hotelOptions = [
+      {
+        id: 1,
+        name: 'Budget Inn',
+        rating: 3,
+        pricePerNight: 3000,
+        amenities: ['Free WiFi', 'Breakfast'],
+        location: 'City Center'
+      },
+      {
+        id: 2,
+        name: 'Comfort Hotel',
+        rating: 4,
+        pricePerNight: 6000,
+        amenities: ['Free WiFi', 'Breakfast', 'Pool', 'Gym'],
+        location: 'Business District'
+      },
+      {
+        id: 3,
+        name: 'Luxury Resort',
+        rating: 5,
+        pricePerNight: 12000,
+        amenities: ['Free WiFi', 'Breakfast', 'Pool', 'Spa', 'Room Service'],
+        location: 'Premium Location'
+      }
+    ];
+
+    const activityOptions = [
+      {
+        id: 1,
+        name: 'Essential Package',
+        price: 8000,
+        activities: ['City Tour', 'Museum Visit', 'Local Market']
+      },
+      {
+        id: 2,
+        name: 'Cultural Package',
+        price: 15000,
+        activities: ['Heritage Walk', 'Cultural Show', 'Art Gallery', 'Cooking Class']
+      },
+      {
+        id: 3,
+        name: 'Premium Package',
+        price: 25000,
+        activities: ['Private Guide', 'VIP Tours', 'Fine Dining', 'Exclusive Access']
+      }
+    ];
+
+    const selectFlight = (flight: any) => {
+      setCustomPackage(prev => ({
+        ...prev,
+        flight,
+        totalCost: prev.totalCost - (prev.flight?.price * formData.travelers || 0) + (flight.price * formData.travelers)
+      }));
+    };
+
+    const selectHotel = (hotel: any) => {
+      setCustomPackage(prev => ({
+        ...prev,
+        hotel,
+        totalCost: prev.totalCost - (prev.hotel?.pricePerNight * 7 || 0) + (hotel.pricePerNight * 7)
+      }));
+    };
+
+    const selectActivities = (activities: any) => {
+      setCustomPackage(prev => ({
+        ...prev,
+        activities,
+        totalCost: prev.totalCost - (prev.activities?.price || 0) + activities.price
+      }));
+    };
+
+    switch (builderStep) {
+      case 'flight':
+        return (
+          <div className="space-y-6">
+            <div className="text-center mb-8">
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">Select Your Flight</h2>
+              <p className="text-gray-600">Choose your preferred flight option (Optional)</p>
+            </div>
+
+            <div className="space-y-4">
+              {flightOptions.map((flight) => (
+                <button
+                  key={flight.id}
+                  onClick={() => selectFlight(flight)}
+                  className={`w-full p-6 rounded-xl border-2 transition-all duration-200 text-left ${
+                    customPackage.flight?.id === flight.id
+                      ? 'border-purple-500 bg-purple-50 shadow-lg'
+                      : 'border-gray-200 hover:border-gray-300 hover:shadow-md'
+                  }`}
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-4">
+                      <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                        ✈️
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-gray-900">{flight.airline}</h3>
+                        <p className="text-sm text-gray-600">{flight.class} • {flight.duration}</p>
+                        <p className="text-sm text-gray-500">{flight.departure} - {flight.arrival}</p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-xl font-bold text-gray-900">₹{(flight.price * formData.travelers).toLocaleString()}</div>
+                      <div className="text-sm text-gray-500">for {formData.travelers} traveler{formData.travelers > 1 ? 's' : ''}</div>
+                    </div>
+                  </div>
+                </button>
+              ))}
+            </div>
+          </div>
+        );
+
+      case 'hotel':
+        return (
+          <div className="space-y-6">
+            <div className="text-center mb-8">
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">Select Your Hotel</h2>
+              <p className="text-gray-600">Choose your accommodation (Optional)</p>
+            </div>
+
+            <div className="space-y-4">
+              {hotelOptions.map((hotel) => (
+                <button
+                  key={hotel.id}
+                  onClick={() => selectHotel(hotel)}
+                  className={`w-full p-6 rounded-xl border-2 transition-all duration-200 text-left ${
+                    customPackage.hotel?.id === hotel.id
+                      ? 'border-purple-500 bg-purple-50 shadow-lg'
+                      : 'border-gray-200 hover:border-gray-300 hover:shadow-md'
+                  }`}
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-4">
+                      <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                        🏨
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-gray-900">{hotel.name}</h3>
+                        <p className="text-sm text-gray-600">{'⭐'.repeat(hotel.rating)} • {hotel.location}</p>
+                        <p className="text-sm text-gray-500">{hotel.amenities.join(', ')}</p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-xl font-bold text-gray-900">₹{(hotel.pricePerNight * 7).toLocaleString()}</div>
+                      <div className="text-sm text-gray-500">for 7 nights</div>
+                    </div>
+                  </div>
+                </button>
+              ))}
+            </div>
+          </div>
+        );
+
+      case 'activities':
+        return (
+          <div className="space-y-6">
+            <div className="text-center mb-8">
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">Select Activities</h2>
+              <p className="text-gray-600">Choose your experience package (Optional)</p>
+            </div>
+
+            <div className="space-y-4">
+              {activityOptions.map((activity) => (
+                <button
+                  key={activity.id}
+                  onClick={() => selectActivities(activity)}
+                  className={`w-full p-6 rounded-xl border-2 transition-all duration-200 text-left ${
+                    customPackage.activities?.id === activity.id
+                      ? 'border-purple-500 bg-purple-50 shadow-lg'
+                      : 'border-gray-200 hover:border-gray-300 hover:shadow-md'
+                  }`}
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-4">
+                      <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                        🎭
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-gray-900">{activity.name}</h3>
+                        <p className="text-sm text-gray-600">{activity.activities.length} activities included</p>
+                        <p className="text-sm text-gray-500">{activity.activities.join(', ')}</p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-xl font-bold text-gray-900">₹{activity.price.toLocaleString()}</div>
+                      <div className="text-sm text-gray-500">total package</div>
+                    </div>
+                  </div>
+                </button>
+              ))}
+            </div>
+          </div>
+        );
+
+      default:
+        return null;
+    }
+  };
+
   const renderStep = () => {
     switch (currentStep) {
       case 1:
