@@ -124,17 +124,23 @@ export const BookingHub: React.FC = () => {
                 >
                   <Icon className="w-4 h-4" />
                   <span>{tab.label}</span>
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Tab Content */}
-        <div className="p-6">
-          {activeTab === 'flights' && <FlightSearch />}
-          {activeTab === 'hotels' && <HotelSearch />}
-          {activeTab === 'bookings' && <BookingsList />}
+          {showCustomizationSummary ? (
+            renderCustomizationSummary()
+          ) : (
+            <>
+              {activeTab === 'flights' && <FlightSearch 
+                onFlightSelect={isCustomizing ? handleFlightSelect : undefined}
+                selectedFlight={selectedFlight}
+                isCustomizing={isCustomizing}
+              />}
+              {activeTab === 'hotels' && <HotelSearch 
+                onHotelSelect={isCustomizing ? handleHotelSelect : undefined}
+                selectedHotel={selectedHotel}
+                isCustomizing={isCustomizing}
+              />}
+              {activeTab === 'bookings' && <BookingsList />}
+            </>
+          )}
         </div>
       </div>
     </div>
