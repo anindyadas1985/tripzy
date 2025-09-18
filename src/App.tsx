@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { AuthPage } from './components/AuthPage';
 import { DatabaseStatus } from './components/DatabaseStatus';
-import { Navigation } from './components/Navigation';
+import Navigation from './components/Navigation';
 import { Dashboard } from './components/Dashboard';
 import { TripCreator } from './components/TripCreator';
 import { TripPlanner } from './components/TripPlanner';
