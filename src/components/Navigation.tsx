@@ -125,5 +125,6 @@ const Navigation: React.FC<NavigationProps> = ({ activeView, setActiveView }) =>
       </div>
     </>
   );
+};
 
 export default Navigation;
