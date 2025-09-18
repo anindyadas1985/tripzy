@@ -4,8 +4,8 @@ import { useAuth } from '../contexts/AuthContext';
 import { canAccessAdmin } from '../config/admin';
 
 interface NavigationProps {
-  activeView: 'dashboard' | 'create' | 'voice' | 'planner' | 'booking' | 'navigation' | 'expenses' | 'memories' | 'profile' | 'admin';
-  setActiveView: (view: 'dashboard' | 'create' | 'voice' | 'planner' | 'booking' | 'navigation' | 'expenses' | 'memories' | 'profile' | 'admin') => void;
+  activeView: 'dashboard' | 'create' | 'voice' | 'booking' | 'navigation' | 'expenses' | 'memories' | 'profile' | 'admin';
+  setActiveView: (view: 'dashboard' | 'create' | 'voice' | 'booking' | 'navigation' | 'expenses' | 'memories' | 'profile' | 'admin') => void;
 }
 
 export const Navigation: React.FC<NavigationProps> = ({ activeView, setActiveView }) => {

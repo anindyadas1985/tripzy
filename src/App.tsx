@@ -5,7 +5,6 @@ import { DatabaseStatus } from './components/DatabaseStatus';
 import { Navigation } from './components/Navigation';
 import { Dashboard } from './components/Dashboard';
 import { TripCreator } from './components/TripCreator';
-import { TripPlanner } from './components/TripPlanner';
 import { BookingHub } from './components/BookingHub';
 import { NavigationMap } from './components/NavigationMap';
 import { UserProfile } from './components/UserProfile';
@@ -18,7 +17,7 @@ import { canAccessAdmin } from './config/admin';
 
 const AppContent: React.FC = () => {
   const { isAuthenticated, user, vendor } = useAuth();
-  const [activeView, setActiveView] = useState<'dashboard' | 'create' | 'voice' | 'planner' | 'booking' | 'navigation' | 'expenses' | 'memories' | 'profile' | 'admin'>('dashboard');
+  const [activeView, setActiveView] = useState<'dashboard' | 'create' | 'voice' | 'booking' | 'navigation' | 'expenses' | 'memories' | 'profile' | 'admin'>('dashboard');
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const [isDatabaseReady, setIsDatabaseReady] = useState(false);
 
@@ -28,7 +27,6 @@ const AppContent: React.FC = () => {
     const handleOnline = () => setIsOnline(true);
     const handleOffline = () => setIsOnline(false);
     const handleNavigateToCreate = () => setActiveView('create');
-    const handleNavigateToPlanner = () => setActiveView('planner');
     const handleNavigateToVoice = () => setActiveView('voice');
     const handleNavigateToBooking = () => setActiveView('booking');
     const handleNavigateToNavigation = () => setActiveView('navigation');
@@ -38,7 +36,6 @@ const AppContent: React.FC = () => {
     window.addEventListener('online', handleOnline);
     window.addEventListener('offline', handleOffline);
     window.addEventListener('navigate-to-create', handleNavigateToCreate);
-    window.addEventListener('navigate-to-planner', handleNavigateToPlanner);
     window.addEventListener('navigate-to-voice', handleNavigateToVoice);
     window.addEventListener('navigate-to-booking', handleNavigateToBooking);
     window.addEventListener('navigate-to-navigation', handleNavigateToNavigation);
@@ -49,7 +46,6 @@ const AppContent: React.FC = () => {
       window.removeEventListener('online', handleOnline);
       window.removeEventListener('offline', handleOffline);
       window.removeEventListener('navigate-to-create', handleNavigateToCreate);
-      window.removeEventListener('navigate-to-planner', handleNavigateToPlanner);
       window.removeEventListener('navigate-to-voice', handleNavigateToVoice);
       window.removeEventListener('navigate-to-booking', handleNavigateToBooking);
       window.removeEventListener('navigate-to-navigation', handleNavigateToNavigation);
