@@ -1717,7 +1717,7 @@ export const TripCreator: React.FC = () => {
                               {activity.transport && (
                                 <div className="mt-2 bg-sky-50 rounded-lg p-3">
                                   <div className="text-xs font-medium text-sky-900 mb-2 flex items-center space-x-1">
-                                    <Navigation className="w-3 h-3" />
+                                    <NavigationIcon className="w-3 h-3" />
                                     <span>Transport to Next Location</span>
                                   </div>
                                   <div className="grid grid-cols-2 gap-2">
