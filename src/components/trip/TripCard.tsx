@@ -1,5 +1,5 @@
 import React from 'react';
-import { Calendar, MapPin, Users, DollarSign, Clock } from 'lucide-react';
+import { Calendar, MapPin, Users, IndianRupee, Clock } from 'lucide-react';
 import { Trip } from '../../types';
 
 interface TripCardProps {
@@ -73,11 +73,11 @@ export const TripCard: React.FC<TripCardProps> = ({ trip, featured = false, onCl
         <div className="space-y-2">
           <div className="flex items-center justify-between text-sm">
             <div className="flex items-center space-x-1 text-gray-600">
-              <DollarSign className="w-4 h-4" />
+              <IndianRupee className="w-4 h-4" />
               <span>Budget</span>
             </div>
             <span className="font-medium">
-              ${trip.spent.toLocaleString()} / ${trip.budget.toLocaleString()}
+              ₹{trip.spent.toLocaleString()} / ₹{trip.budget.toLocaleString()}
             </span>
           </div>
           

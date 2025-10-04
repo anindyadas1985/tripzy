@@ -1,5 +1,5 @@
 import React from 'react';
-import { DollarSign, TrendingUp, PieChart, Users, Calendar, MapPin } from 'lucide-react';
+import { IndianRupee, TrendingUp, PieChart, Users, Calendar, MapPin } from 'lucide-react';
 
 interface TripStatsProps {
   totalBudget: number;
@@ -21,19 +21,19 @@ export const TripStats: React.FC<TripStatsProps> = ({
     {
       icon: PieChart,
       label: 'Total Budget',
-      value: `$${totalBudget.toLocaleString()}`,
+      value: `₹${totalBudget.toLocaleString()}`,
       color: 'bg-blue-50 text-blue-600'
     },
     {
       icon: TrendingUp,
       label: 'Total Spent',
-      value: `$${totalSpent.toLocaleString()}`,
+      value: `₹${totalSpent.toLocaleString()}`,
       color: 'bg-green-50 text-green-600'
     },
     {
-      icon: DollarSign,
+      icon: IndianRupee,
       label: 'Remaining',
-      value: `$${remainingBudget.toLocaleString()}`,
+      value: `₹${remainingBudget.toLocaleString()}`,
       color: 'bg-orange-50 text-orange-600'
     },
     {

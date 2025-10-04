@@ -262,11 +262,11 @@ export const HotelSearch: React.FC<HotelSearchProps> = ({
                     <div className="text-right">
                       {hotel.originalPrice && (
                         <div className="text-sm text-gray-400 line-through">
-                          ${hotel.originalPrice}/night
+                          ₹{hotel.originalPrice}/night
                         </div>
                       )}
                       <div className="text-2xl font-bold text-gray-900">
-                        ${hotel.price}<span className="text-sm font-normal">/night</span>
+                        ₹{hotel.price}<span className="text-sm font-normal">/night</span>
                       </div>
                     </div>
                   </div>

@@ -230,7 +230,7 @@ export const FlightSearch: React.FC<FlightSearchProps> = ({
 
                 <div className="text-right ml-6">
                   <div className="text-2xl font-bold text-gray-900 mb-1">
-                    ${flight.price}
+                    ₹{flight.price}
                   </div>
                   {isCustomizing ? (
                     <button 

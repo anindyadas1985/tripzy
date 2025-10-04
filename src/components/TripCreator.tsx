@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { MapPin, Calendar, Users, DollarSign, Clock, Heart, Briefcase, Baby, Plane, Building, Star, Check, CreditCard as Edit3, ArrowRight, ArrowLeft, Sparkles, Brain, Navigation as NavigationIcon } from 'lucide-react';
+import { MapPin, Calendar, Users, IndianRupee, Clock, Heart, Briefcase, Baby, Plane, Building, Star, Check, CreditCard as Edit3, ArrowRight, ArrowLeft, Sparkles, Brain, Navigation as NavigationIcon } from 'lucide-react';
 import { useTripContext } from '../contexts/TripContext';
 import { useAIAgent } from '../contexts/AIAgentContext';
 
@@ -1348,7 +1348,7 @@ export const TripCreator: React.FC = () => {
               {/* Cost Breakdown */}
               <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-200">
                 <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center">
-                  <DollarSign className="w-6 h-6 text-green-600 mr-2" />
+                  <IndianRupee className="w-6 h-6 text-green-600 mr-2" />
                   Estimated Costs
                 </h3>
                 <div className="space-y-3">
