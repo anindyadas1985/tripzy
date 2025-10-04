@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { MapPin, Calendar, Users, DollarSign, Clock, Heart, Briefcase, Baby, Plane, Building, Star, Check, CreditCard as Edit3, ArrowRight, ArrowLeft, Sparkles, Brain } from 'lucide-react';
+import { MapPin, Calendar, Users, DollarSign, Clock, Heart, Briefcase, Baby, Plane, Building, Star, Check, CreditCard as Edit3, ArrowRight, ArrowLeft, Sparkles, Brain, Navigation as NavigationIcon } from 'lucide-react';
 import { useTripContext } from '../contexts/TripContext';
 import { useAIAgent } from '../contexts/AIAgentContext';
 
@@ -83,6 +83,7 @@ interface AIAnalysis {
 export const TripCreator: React.FC = () => {
   const { createTrip, setActiveTrip } = useTripContext();
   const { createTask, isProcessing, isInitialized } = useAIAgent();
+  const [isLoadingLocation, setIsLoadingLocation] = useState(false);
   
   // Check for voice data from sessionStorage
   const getInitialFormData = () => {
@@ -109,11 +110,12 @@ export const TripCreator: React.FC = () => {
         console.error('Error parsing voice data:', error);
       }
     }
+    const today = new Date().toISOString().split('T')[0];
     return {
       title: '',
       origin: '',
       destination: '',
-      startDate: '',
+      startDate: today,
       endDate: '',
       travelers: 1,
       budget: '',
@@ -276,6 +278,46 @@ export const TripCreator: React.FC = () => {
         ? prev.preferences.filter(p => p !== pref)
         : [...prev.preferences, pref]
     }));
+  };
+
+  const getCurrentLocation = async () => {
+    setIsLoadingLocation(true);
+    try {
+      if (!navigator.geolocation) {
+        alert('Geolocation is not supported by your browser');
+        return;
+      }
+
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          const { latitude, longitude } = position.coords;
+
+          try {
+            // Use reverse geocoding to get city name
+            const response = await fetch(
+              `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=en`
+            );
+            const data = await response.json();
+
+            const city = data.city || data.locality || data.principalSubdivision || 'Unknown Location';
+            setFormData(prev => ({ ...prev, origin: city }));
+          } catch (error) {
+            console.error('Error getting location name:', error);
+            setFormData(prev => ({ ...prev, origin: `${latitude.toFixed(2)}, ${longitude.toFixed(2)}` }));
+          } finally {
+            setIsLoadingLocation(false);
+          }
+        },
+        (error) => {
+          console.error('Error getting location:', error);
+          alert('Unable to get your location. Please enter manually.');
+          setIsLoadingLocation(false);
+        }
+      );
+    } catch (error) {
+      console.error('Geolocation error:', error);
+      setIsLoadingLocation(false);
+    }
   };
 
   const generateAIAnalysis = async () => {
@@ -584,7 +626,7 @@ export const TripCreator: React.FC = () => {
       
       const totalCost = isCustomizing ? calculateCustomizedCost() : selectedPackage.totalCost;
       
-      alert(`🎉 Trip booked successfully!\n\nFlight: ${flightBooking.confirmationCode}\nHotel: ${hotelBooking.confirmationCode}\n\nTotal Cost: $${totalCost}`);
+      alert(`🎉 Trip booked successfully!\n\nFlight: ${flightBooking.confirmationCode}\nHotel: ${hotelBooking.confirmationCode}\n\nTotal Cost: ₹${totalCost}`);
       
       // Navigate to dashboard
       window.dispatchEvent(new CustomEvent('navigate-to-dashboard'));
@@ -942,9 +984,19 @@ export const TripCreator: React.FC = () => {
                           value={formData.origin}
                           onChange={(e) => setFormData({...formData, origin: e.target.value})}
                           placeholder="Origin city"
-                          className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-transparent outline-none"
+                          className="w-full pl-10 pr-24 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-transparent outline-none"
                           required
                         />
+                        <button
+                          type="button"
+                          onClick={getCurrentLocation}
+                          disabled={isLoadingLocation}
+                          className="absolute right-2 top-2 px-3 py-2 text-xs bg-sky-100 text-sky-700 rounded-lg hover:bg-sky-200 transition-colors flex items-center space-x-1 disabled:opacity-50"
+                          title="Use current location"
+                        >
+                          <NavigationIcon className={`w-3 h-3 ${isLoadingLocation ? 'animate-pulse' : ''}`} />
+                          <span>{isLoadingLocation ? 'Loading...' : 'Current'}</span>
+                        </button>
                       </div>
                     </div>
 
@@ -1012,14 +1064,14 @@ export const TripCreator: React.FC = () => {
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Budget (USD) *</label>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Budget (INR) *</label>
                       <div className="relative">
-                        <DollarSign className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
+                        <span className="absolute left-3 top-3 text-gray-400 font-semibold">₹</span>
                         <input
                           type="number"
                           value={formData.budget}
                           onChange={(e) => setFormData({...formData, budget: e.target.value})}
-                          placeholder="Total budget"
+                          placeholder="Total budget in rupees"
                           className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-transparent outline-none"
                           required
                         />
@@ -1151,23 +1203,23 @@ export const TripCreator: React.FC = () => {
                 <div className="space-y-3">
                   <div className="flex justify-between items-center p-3 bg-blue-50 rounded-lg">
                     <span className="text-gray-700">Flights</span>
-                    <span className="font-semibold text-gray-900">${aiAnalysis.estimatedCosts.flights.toLocaleString()}</span>
+                    <span className="font-semibold text-gray-900">₹{aiAnalysis.estimatedCosts.flights.toLocaleString()}</span>
                   </div>
                   <div className="flex justify-between items-center p-3 bg-green-50 rounded-lg">
                     <span className="text-gray-700">Accommodation</span>
-                    <span className="font-semibold text-gray-900">${aiAnalysis.estimatedCosts.accommodation.toLocaleString()}</span>
+                    <span className="font-semibold text-gray-900">₹{aiAnalysis.estimatedCosts.accommodation.toLocaleString()}</span>
                   </div>
                   <div className="flex justify-between items-center p-3 bg-yellow-50 rounded-lg">
                     <span className="text-gray-700">Activities</span>
-                    <span className="font-semibold text-gray-900">${aiAnalysis.estimatedCosts.activities.toLocaleString()}</span>
+                    <span className="font-semibold text-gray-900">₹{aiAnalysis.estimatedCosts.activities.toLocaleString()}</span>
                   </div>
                   <div className="flex justify-between items-center p-3 bg-orange-50 rounded-lg">
                     <span className="text-gray-700">Food & Dining</span>
-                    <span className="font-semibold text-gray-900">${aiAnalysis.estimatedCosts.food.toLocaleString()}</span>
+                    <span className="font-semibold text-gray-900">₹{aiAnalysis.estimatedCosts.food.toLocaleString()}</span>
                   </div>
                   <div className="flex justify-between items-center p-4 bg-gradient-to-r from-sky-600 to-blue-600 text-white rounded-lg font-bold text-lg">
                     <span>Total Budget</span>
-                    <span>${aiAnalysis.estimatedCosts.total.toLocaleString()}</span>
+                    <span>₹{aiAnalysis.estimatedCosts.total.toLocaleString()}</span>
                   </div>
                 </div>
               </div>
