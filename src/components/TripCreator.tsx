@@ -82,7 +82,7 @@ interface AIAnalysis {
 
 export const TripCreator: React.FC = () => {
   const { createTrip, setActiveTrip } = useTripContext();
-  const { createTask, isProcessing } = useAIAgent();
+  const { createTask, isProcessing, isInitialized } = useAIAgent();
   
   // Check for voice data from sessionStorage
   const getInitialFormData = () => {
@@ -287,22 +287,26 @@ export const TripCreator: React.FC = () => {
     setIsGeneratingAnalysis(true);
 
     try {
-      // Create AI task for trip planning
-      await createTask(
-        'plan_trip',
-        `Analyze trip from ${formData.origin} to ${formData.destination}`,
-        {
-          destination: formData.destination,
-          origin: formData.origin,
-          startDate: formData.startDate,
-          endDate: formData.endDate,
-          budget: parseInt(formData.budget),
-          travelers: formData.travelers,
-          style: formData.style,
-          pace: formData.pace,
-          preferences: formData.preferences
-        }
-      );
+      // Try to create AI task for trip planning (optional, gracefully fails if agent not ready)
+      try {
+        await createTask(
+          'plan_trip',
+          `Analyze trip from ${formData.origin} to ${formData.destination}`,
+          {
+            destination: formData.destination,
+            origin: formData.origin,
+            startDate: formData.startDate,
+            endDate: formData.endDate,
+            budget: parseInt(formData.budget),
+            travelers: formData.travelers,
+            style: formData.style,
+            pace: formData.pace,
+            preferences: formData.preferences
+          }
+        );
+      } catch (taskError) {
+        console.log('AI agent not ready, proceeding with analysis generation:', taskError);
+      }
 
       // Simulate AI analysis generation
       await new Promise(resolve => setTimeout(resolve, 3000));
@@ -1099,15 +1103,27 @@ export const TripCreator: React.FC = () => {
 
               {/* Generate AI Analysis Button */}
               <div className="text-center pt-6">
+                {!isInitialized && (
+                  <div className="mb-3 text-sm text-amber-600 flex items-center justify-center space-x-2">
+                    <Clock className="w-4 h-4 animate-spin" />
+                    <span>AI Assistant is initializing...</span>
+                  </div>
+                )}
                 <button
                   onClick={generateAIAnalysis}
                   disabled={isGeneratingAnalysis || isProcessing || !formData.origin || !formData.destination || !formData.budget || !formData.startDate || !formData.endDate}
-                  className="px-8 py-4 bg-gradient-to-r from-sky-600 to-blue-600 text-white font-semibold rounded-xl hover:from-sky-700 hover:to-blue-700 transition-all duration-200 transform hover:scale-105 shadow-lg shadow-sky-500/25 flex items-center space-x-3 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                  className="px-8 py-4 bg-gradient-to-r from-sky-600 to-blue-600 text-white font-semibold rounded-xl hover:from-sky-700 hover:to-blue-700 transition-all duration-200 transform hover:scale-105 shadow-lg shadow-sky-500/25 flex items-center space-x-3 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none mx-auto"
                 >
                   <Brain className="w-5 h-5" />
                   <span>{isGeneratingAnalysis ? 'AI Analyzing Your Trip...' : 'Generate AI Analysis'}</span>
                   <Sparkles className="w-5 h-5" />
                 </button>
+                {isInitialized && (
+                  <div className="mt-2 text-xs text-green-600 flex items-center justify-center space-x-1">
+                    <Check className="w-3 h-3" />
+                    <span>AI Assistant Ready</span>
+                  </div>
+                )}
               </div>
             </div>
           </div>
