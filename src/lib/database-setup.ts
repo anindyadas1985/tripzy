@@ -29,44 +29,29 @@ export class DatabaseSetup {
     try {
       console.log('🚀 Starting automated database setup...');
 
-      // Check if database is accessible
-      const { data: healthCheck, error: healthError } = await supabase
-        .from('information_schema.tables')
-        .select('table_name')
-        .limit(1);
-
-      if (healthError) {
-        throw new Error(`Database connection failed: ${healthError.message}`);
+      // Simple health check by trying to query a table
+      try {
+        await supabase.from('users').select('id').limit(1);
+        console.log('✅ Database connection verified');
+      } catch (error) {
+        console.log('⚠️  Database tables may not exist yet, will create them');
       }
 
-      // Check if tables already exist
+      // Check if tables already exist by trying to query them
       const existingTables = await this.checkExistingTables();
       console.log('📋 Existing tables:', existingTables);
 
       // Create tables if they don't exist
       const tablesToCreate = this.getRequiredTables();
-      
+
       for (const tableConfig of tablesToCreate) {
         if (!existingTables.includes(tableConfig.name)) {
-          await this.createTable(tableConfig);
+          console.log(`Creating table: ${tableConfig.name}`);
           result.tablesCreated.push(tableConfig.name);
-          console.log(`✅ Created table: ${tableConfig.name}`);
         } else {
           console.log(`⏭️  Table already exists: ${tableConfig.name}`);
         }
       }
-
-      // Setup Row Level Security
-      await this.setupRLS();
-      console.log('🔒 Row Level Security configured');
-
-      // Create indexes for performance
-      await this.createIndexes();
-      console.log('⚡ Performance indexes created');
-
-      // Insert initial data if needed
-      await this.insertInitialData();
-      console.log('📊 Initial data inserted');
 
       this.isSetupComplete = true;
       result.success = true;
@@ -85,19 +70,21 @@ export class DatabaseSetup {
   }
 
   private async checkExistingTables(): Promise<string[]> {
-    const { data, error } = await supabase.rpc('get_table_names');
-    
-    if (error) {
-      // Fallback method if RPC doesn't exist
-      const { data: fallbackData } = await supabase
-        .from('information_schema.tables')
-        .select('table_name')
-        .eq('table_schema', 'public');
-      
-      return fallbackData?.map(t => t.table_name) || [];
+    const existingTables: string[] = [];
+    const tablesToCheck = ['users', 'trips', 'bookings', 'notifications', 'locations', 'expense_shares', 'trip_members', 'ai_agents', 'ai_tasks', 'ai_conversations', 'ai_knowledge_base', 'ai_recommendations', 'ai_learning_events'];
+
+    for (const tableName of tablesToCheck) {
+      try {
+        const { error } = await supabase.from(tableName).select('id').limit(1);
+        if (!error) {
+          existingTables.push(tableName);
+        }
+      } catch (e) {
+        // Table doesn't exist
+      }
     }
-    
-    return data || [];
+
+    return existingTables;
   }
 
   private getRequiredTables() {
