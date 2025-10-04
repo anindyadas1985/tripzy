@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { MapPin, Calendar, Users, DollarSign, Zap, Clock, Heart, Briefcase, Baby, Plane, Building, Star, Check, CreditCard as Edit3, ArrowRight, ArrowLeft, Sparkles, Brain } from 'lucide-react';
+import { MapPin, Calendar, Users, DollarSign, Clock, Heart, Briefcase, Baby, Plane, Building, Star, Check, CreditCard as Edit3, ArrowRight, ArrowLeft, Sparkles, Brain } from 'lucide-react';
 import { useTripContext } from '../contexts/TripContext';
 import { useAIAgent } from '../contexts/AIAgentContext';
 

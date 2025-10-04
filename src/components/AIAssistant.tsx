@@ -9,11 +9,9 @@ import {
   Clock,
   TrendingUp,
   Lightbulb,
-  X,
-  Maximize2,
   Minimize2
 } from 'lucide-react';
-import type { AIConversation, AIRecommendation, AITask } from '../types/ai';
+import type { AIRecommendation, AITask } from '../types/ai';
 
 export const AIAssistant: React.FC = () => {
   const {

@@ -50,7 +50,7 @@ export interface Booking {
   date: Date;
   cost: number;
   status: 'pending' | 'confirmed' | 'cancelled' | 'completed';
-  details: any;
+  details: Record<string, unknown>;
   paymentMethod?: string;
   receipt?: string;
   cancellationPolicy?: string;
@@ -68,7 +68,7 @@ export interface TripUpdate {
   severity: 'low' | 'medium' | 'high' | 'critical';
   actionRequired?: boolean;
   suggestedAction?: string;
-  alternativeOptions?: any[];
+  alternativeOptions?: unknown[];
 }
 
 export interface SearchFilters {

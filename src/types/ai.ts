@@ -11,7 +11,7 @@ export interface AIAgent {
     navigation?: boolean;
     expense_tracking?: boolean;
   };
-  learning_model: Record<string, any>;
+  learning_model: Record<string, unknown>;
   status: 'active' | 'paused' | 'training';
   created_at: Date;
   updated_at: Date;
@@ -23,8 +23,8 @@ export interface AITask {
   user_id: string;
   task_type: string;
   description: string;
-  input_data: Record<string, any>;
-  output_data: Record<string, any>;
+  input_data: Record<string, unknown>;
+  output_data: Record<string, unknown>;
   status: 'pending' | 'in_progress' | 'completed' | 'failed' | 'cancelled';
   priority: number;
   dependencies: string[];
@@ -39,7 +39,7 @@ export interface AIConversation {
   user_id: string;
   message_type: 'user_message' | 'agent_response' | 'system_notification';
   content: string;
-  metadata: Record<string, any>;
+  metadata: Record<string, unknown>;
   sentiment?: 'positive' | 'neutral' | 'negative';
   created_at: Date;
 }
@@ -49,7 +49,7 @@ export interface AIKnowledge {
   agent_id: string;
   category: 'user_preferences' | 'trip_patterns' | 'booking_history' | 'location_insights' | 'behavior_patterns' | 'optimization_rules';
   key: string;
-  value: Record<string, any>;
+  value: Record<string, unknown>;
   confidence_score: number;
   source: 'learned' | 'manual' | 'imported' | 'system';
   last_updated: Date;
@@ -64,7 +64,7 @@ export interface AIRecommendation {
   recommendation_type: 'destination' | 'activity' | 'restaurant' | 'timing' | 'budget' | 'route' | 'accommodation' | 'general';
   title: string;
   description: string;
-  data: Record<string, any>;
+  data: Record<string, unknown>;
   confidence_score: number;
   reasoning?: string;
   status: 'pending' | 'accepted' | 'rejected' | 'expired';
@@ -77,7 +77,7 @@ export interface AILearningEvent {
   id: string;
   agent_id: string;
   event_type: 'user_feedback' | 'task_completion' | 'pattern_detected' | 'error_occurred' | 'preference_updated' | 'goal_achieved';
-  event_data: Record<string, any>;
+  event_data: Record<string, unknown>;
   impact_score: number;
   created_at: Date;
 }
@@ -101,7 +101,7 @@ export interface TaskStep {
   action: string;
   description: string;
   status: 'pending' | 'in_progress' | 'completed' | 'failed';
-  result?: any;
+  result?: unknown;
 }
 
 export interface AgentState {

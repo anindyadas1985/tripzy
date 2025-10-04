@@ -22,7 +22,7 @@ const AppContent: React.FC = () => {
   const { isAuthenticated, user, vendor } = useAuth();
   const [activeView, setActiveView] = useState<'dashboard' | 'create' | 'voice' | 'planner' | 'booking' | 'navigation' | 'expenses' | 'memories' | 'profile' | 'admin'>('dashboard');
   const [isOnline, setIsOnline] = useState(navigator.onLine);
-  const [isDatabaseReady, setIsDatabaseReady] = useState(false);
+  const [, setIsDatabaseReady] = useState(false);
 
   useEffect(() => {
     if (import.meta.env.DEV) {
