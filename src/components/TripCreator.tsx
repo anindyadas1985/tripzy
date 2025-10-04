@@ -720,7 +720,7 @@ export const TripCreator: React.FC = () => {
 
                   <div className="text-right ml-6">
                     <div className="text-2xl font-bold text-gray-900 mb-1">
-                      ${flight.price}
+                      ₹{flight.price}
                     </div>
                     {selectedFlight?.id === flight.id && (
                       <div className="flex items-center space-x-1 text-green-600 text-sm font-medium">
@@ -774,11 +774,11 @@ export const TripCreator: React.FC = () => {
                       <div className="text-right">
                         {hotel.originalPrice && (
                           <div className="text-sm text-gray-400 line-through">
-                            ${hotel.originalPrice}/night
+                            ₹{hotel.originalPrice}/night
                           </div>
                         )}
                         <div className="text-2xl font-bold text-gray-900">
-                          ${hotel.price}<span className="text-sm font-normal">/night</span>
+                          ₹{hotel.price}<span className="text-sm font-normal">/night</span>
                         </div>
                       </div>
                     </div>
@@ -830,18 +830,18 @@ export const TripCreator: React.FC = () => {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
               <div>
                 <div className="text-sm text-gray-600">Original Package</div>
-                <div className="text-2xl font-bold text-gray-900">${originalCost}</div>
+                <div className="text-2xl font-bold text-gray-900">₹{originalCost}</div>
               </div>
               <div>
                 <div className="text-sm text-gray-600">Your Selection</div>
-                <div className="text-2xl font-bold text-sky-600">${customizedCost}</div>
+                <div className="text-2xl font-bold text-sky-600">₹{customizedCost}</div>
               </div>
               <div>
                 <div className="text-sm text-gray-600">Difference</div>
                 <div className={`text-2xl font-bold ${
                   costDifference > 0 ? 'text-red-600' : costDifference < 0 ? 'text-green-600' : 'text-gray-600'
                 }`}>
-                  {costDifference > 0 ? '+' : ''}${costDifference}
+                  {costDifference > 0 ? '+' : ''}₹{costDifference}
                 </div>
               </div>
             </div>
@@ -871,7 +871,7 @@ export const TripCreator: React.FC = () => {
                     <div className="text-sm text-gray-600">{selectedFlight.duration}</div>
                   </div>
                   <div className="text-right">
-                    <div className="text-xl font-bold text-gray-900">${selectedFlight.price}</div>
+                    <div className="text-xl font-bold text-gray-900">₹{selectedFlight.price}</div>
                     {selectedFlight.stops === 0 && (
                       <span className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">Non-stop</span>
                     )}
@@ -910,9 +910,9 @@ export const TripCreator: React.FC = () => {
                   </div>
                   <div className="text-right">
                     <div className="text-xl font-bold text-gray-900">
-                      ${selectedHotel.price * (selectedPackage?.hotel.nights || 1)}
+                      ₹{selectedHotel.price * (selectedPackage?.hotel.nights || 1)}
                     </div>
-                    <div className="text-sm text-gray-600">${selectedHotel.price}/night</div>
+                    <div className="text-sm text-gray-600">₹{selectedHotel.price}/night</div>
                   </div>
                 </div>
               </div>
@@ -1330,8 +1330,8 @@ export const TripCreator: React.FC = () => {
                 <div key={pkg.id} className="bg-white border-2 border-gray-200 rounded-2xl p-6 hover:border-sky-500 hover:shadow-lg transition-all duration-200">
                   <div className="text-center mb-6">
                     <h3 className="text-xl font-bold text-gray-900 mb-2">{pkg.title}</h3>
-                    <div className="text-3xl font-bold text-sky-600 mb-1">${pkg.totalCost}</div>
-                    <div className="text-sm text-green-600">Save ${pkg.savings}</div>
+                    <div className="text-3xl font-bold text-sky-600 mb-1">₹{pkg.totalCost}</div>
+                    <div className="text-sm text-green-600">Save ₹{pkg.savings}</div>
                   </div>
 
                   {/* Flight Details */}
@@ -1343,7 +1343,7 @@ export const TripCreator: React.FC = () => {
                     <div className="text-sm text-gray-700">
                       <div>{pkg.flight.airline} {pkg.flight.flightNumber}</div>
                       <div>{pkg.flight.departure} - {pkg.flight.arrival}</div>
-                      <div>{pkg.flight.duration} • ${pkg.flight.price}</div>
+                      <div>{pkg.flight.duration} • ₹{pkg.flight.price}</div>
                     </div>
                   </div>
 
@@ -1360,7 +1360,7 @@ export const TripCreator: React.FC = () => {
                           {renderStars(pkg.hotel.rating)}
                         </div>
                       </div>
-                      <div>${pkg.hotel.price}/night • {pkg.hotel.nights} nights</div>
+                      <div>₹{pkg.hotel.price}/night • {pkg.hotel.nights} nights</div>
                       <div className="text-xs text-gray-600 mt-1">
                         {pkg.hotel.amenities.slice(0, 2).join(', ')}
                       </div>
@@ -1373,7 +1373,7 @@ export const TripCreator: React.FC = () => {
                     <div className="space-y-1">
                       {pkg.activities.slice(0, 2).map((activity, idx) => (
                         <div key={idx} className="text-sm text-gray-700">
-                          {activity.name} • ${activity.price}
+                          {activity.name} • ₹{activity.price}
                         </div>
                       ))}
                       {pkg.activities.length > 2 && (
@@ -1489,8 +1489,8 @@ export const TripCreator: React.FC = () => {
               <div className="bg-white border border-gray-200 rounded-2xl p-8">
                 <div className="text-center mb-6">
                   <h3 className="text-2xl font-bold text-gray-900 mb-2">{selectedPackage.title}</h3>
-                  <div className="text-4xl font-bold text-sky-600 mb-2">${selectedPackage.totalCost}</div>
-                  <div className="text-lg text-green-600">You save ${selectedPackage.savings}</div>
+                  <div className="text-4xl font-bold text-sky-600 mb-2">₹{selectedPackage.totalCost}</div>
+                  <div className="text-lg text-green-600">You save ₹{selectedPackage.savings}</div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
@@ -1506,7 +1506,7 @@ export const TripCreator: React.FC = () => {
                       <div><strong>Departure:</strong> {selectedPackage.flight.departure}</div>
                       <div><strong>Arrival:</strong> {selectedPackage.flight.arrival}</div>
                       <div><strong>Duration:</strong> {selectedPackage.flight.duration}</div>
-                      <div><strong>Price:</strong> ${selectedPackage.flight.price}</div>
+                      <div><strong>Price:</strong> ₹{selectedPackage.flight.price}</div>
                     </div>
                   </div>
 
@@ -1527,7 +1527,7 @@ export const TripCreator: React.FC = () => {
                       <div><strong>Check-in:</strong> {formData.startDate}</div>
                       <div><strong>Check-out:</strong> {formData.endDate}</div>
                       <div><strong>Nights:</strong> {selectedPackage.hotel.nights}</div>
-                      <div><strong>Total:</strong> ${selectedPackage.hotel.price * selectedPackage.hotel.nights}</div>
+                      <div><strong>Total:</strong> ₹{selectedPackage.hotel.price * selectedPackage.hotel.nights}</div>
                     </div>
                   </div>
                 </div>
