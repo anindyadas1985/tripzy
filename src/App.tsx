@@ -14,6 +14,8 @@ import { TripMemoryBook } from './components/TripMemoryBook';
 import { VoiceTripPlanner } from './components/VoiceTripPlanner';
 import { AdminConsole } from './components/AdminConsole';
 import { TripProvider } from './contexts/TripContext';
+import { AIAgentProvider } from './contexts/AIAgentContext';
+import { AIAssistant } from './components/AIAssistant';
 import { canAccessAdmin } from './config/admin';
 
 const AppContent: React.FC = () => {
@@ -144,15 +146,15 @@ const AppContent: React.FC = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex">
       <DatabaseStatus onSetupComplete={() => setIsDatabaseReady(true)} />
-      
+
       {!isOnline && (
         <div className="bg-orange-500 text-white text-center py-2 text-sm font-medium fixed top-0 left-0 right-0 z-50">
           You're offline. Some features may be limited.
         </div>
       )}
-      
+
       <Navigation activeView={activeView} setActiveView={setActiveView} />
-      
+
       <main className={`flex-1 md:ml-64 ${!isOnline ? 'pt-10' : ''} pb-20 md:pb-0`}>
         {activeView === 'dashboard' && <Dashboard />}
         {activeView === 'create' && <TripCreator />}
@@ -164,6 +166,8 @@ const AppContent: React.FC = () => {
         {activeView === 'profile' && <UserProfile />}
         {activeView === 'admin' && canAccessAdmin(user || vendor) && <AdminConsole />}
       </main>
+
+      <AIAssistant />
     </div>
   );
 };
@@ -172,13 +176,15 @@ const App: React.FC = () => {
   if (import.meta.env.DEV) {
     console.log('App component rendering');
   }
-  
+
   return (
     <ErrorBoundary>
       <AuthProvider>
-        <TripProvider>
-          <AppContent />
-        </TripProvider>
+        <AIAgentProvider>
+          <TripProvider>
+            <AppContent />
+          </TripProvider>
+        </AIAgentProvider>
       </AuthProvider>
     </ErrorBoundary>
   );
