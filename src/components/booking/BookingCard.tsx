@@ -43,10 +43,11 @@ export const BookingCard: React.FC<BookingCardProps> = ({
     }
   };
 
-  const formatDate = (date: Date) => {
-    return date.toLocaleDateString('en-US', { 
+  const formatDate = (date: Date | string) => {
+    const dateObj = typeof date === 'string' ? new Date(date) : date;
+    return dateObj.toLocaleDateString('en-US', {
       weekday: 'short',
-      month: 'short', 
+      month: 'short',
       day: 'numeric',
       year: 'numeric'
     });
@@ -102,7 +103,7 @@ export const BookingCard: React.FC<BookingCardProps> = ({
 
             <div className="text-right">
               <div className="text-lg font-semibold text-gray-900">
-                ${booking.cost.toLocaleString()}
+                ₹{booking.cost.toLocaleString()}
               </div>
             </div>
           </div>
