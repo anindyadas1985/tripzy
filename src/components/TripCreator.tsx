@@ -32,7 +32,23 @@ interface AIPackage {
   }>;
   itinerary: Array<{
     day: number;
-    activities: string[];
+    activities: Array<{
+      time: string;
+      title: string;
+      location: string;
+      duration: string;
+      transport?: {
+        mode: string;
+        duration: string;
+        cost: number;
+        options: Array<{
+          mode: string;
+          name: string;
+          duration: string;
+          cost: number;
+        }>;
+      };
+    }>;
   }>;
 }
 
@@ -442,9 +458,110 @@ export const TripCreator: React.FC = () => {
           { name: 'Seine River Cruise', price: 35, duration: '1.5 hours' }
         ],
         itinerary: [
-          { day: 1, activities: ['Airport Transfer', 'Hotel Check-in', 'Welcome Dinner'] },
-          { day: 2, activities: ['Eiffel Tower', 'Seine River Cruise', 'Local Restaurant'] },
-          { day: 3, activities: ['Louvre Museum', 'Shopping', 'Cultural Show'] }
+          {
+            day: 1,
+            activities: [
+              {
+                time: '09:00 AM',
+                title: 'Airport Arrival',
+                location: 'Charles de Gaulle Airport',
+                duration: '1h',
+                transport: {
+                  mode: 'Taxi',
+                  duration: '45 min',
+                  cost: 60,
+                  options: [
+                    { mode: 'Taxi', name: 'Airport Taxi', duration: '45 min', cost: 60 },
+                    { mode: 'Metro', name: 'RER B Train', duration: '55 min', cost: 15 },
+                    { mode: 'Bus', name: 'Roissybus', duration: '60 min', cost: 18 },
+                    { mode: 'Uber', name: 'Uber/Bolt', duration: '45 min', cost: 55 }
+                  ]
+                }
+              },
+              { time: '10:00 AM', title: 'Hotel Check-in', location: 'Le Marais District', duration: '30 min' },
+              {
+                time: '07:00 PM',
+                title: 'Welcome Dinner',
+                location: 'Latin Quarter',
+                duration: '2h',
+                transport: {
+                  mode: 'Metro',
+                  duration: '15 min',
+                  cost: 2,
+                  options: [
+                    { mode: 'Metro', name: 'Line 4', duration: '15 min', cost: 2 },
+                    { mode: 'Taxi', name: 'Taxi', duration: '10 min', cost: 15 },
+                    { mode: 'Walk', name: 'Walking', duration: '25 min', cost: 0 },
+                    { mode: 'Bike', name: 'Velib (Bike Share)', duration: '12 min', cost: 3 }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            day: 2,
+            activities: [
+              {
+                time: '09:00 AM',
+                title: 'Eiffel Tower Visit',
+                location: 'Champ de Mars',
+                duration: '2h',
+                transport: {
+                  mode: 'Metro',
+                  duration: '20 min',
+                  cost: 2,
+                  options: [
+                    { mode: 'Metro', name: 'Line 6', duration: '20 min', cost: 2 },
+                    { mode: 'Bus', name: 'Bus #42', duration: '25 min', cost: 2 },
+                    { mode: 'Bike', name: 'Velib', duration: '18 min', cost: 3 },
+                    { mode: 'Taxi', name: 'Taxi', duration: '15 min', cost: 20 }
+                  ]
+                }
+              },
+              {
+                time: '02:00 PM',
+                title: 'Seine River Cruise',
+                location: 'Pont Neuf',
+                duration: '1.5h',
+                transport: {
+                  mode: 'Metro',
+                  duration: '12 min',
+                  cost: 2,
+                  options: [
+                    { mode: 'Metro', name: 'Line 7', duration: '12 min', cost: 2 },
+                    { mode: 'Walk', name: 'Walk along Seine', duration: '30 min', cost: 0 },
+                    { mode: 'Bus', name: 'Bus #69', duration: '15 min', cost: 2 },
+                    { mode: 'Bike', name: 'Velib', duration: '10 min', cost: 3 }
+                  ]
+                }
+              },
+              { time: '07:00 PM', title: 'Dinner', location: 'Montmartre', duration: '2h' }
+            ]
+          },
+          {
+            day: 3,
+            activities: [
+              {
+                time: '10:00 AM',
+                title: 'Louvre Museum',
+                location: 'Rue de Rivoli',
+                duration: '3h',
+                transport: {
+                  mode: 'Metro',
+                  duration: '18 min',
+                  cost: 2,
+                  options: [
+                    { mode: 'Metro', name: 'Line 1', duration: '18 min', cost: 2 },
+                    { mode: 'Bus', name: 'Bus #21', duration: '22 min', cost: 2 },
+                    { mode: 'Taxi', name: 'Taxi', duration: '12 min', cost: 18 },
+                    { mode: 'Walk', name: 'Walking', duration: '35 min', cost: 0 }
+                  ]
+                }
+              },
+              { time: '03:00 PM', title: 'Shopping', location: 'Champs-Élysées', duration: '2h' },
+              { time: '07:00 PM', title: 'Cultural Show', location: 'Opera Garnier', duration: '2h' }
+            ]
+          }
         ]
       },
       {
@@ -475,9 +592,26 @@ export const TripCreator: React.FC = () => {
           { name: 'Food Market Tour', price: 40, duration: '2 hours' }
         ],
         itinerary: [
-          { day: 1, activities: ['Arrival', 'City Orientation', 'Local Dinner'] },
-          { day: 2, activities: ['Walking Tour', 'Museum Visit', 'Café Culture'] },
-          { day: 3, activities: ['Food Markets', 'Shopping', 'Farewell Dinner'] }
+          { day: 1, activities: [
+            { time: '10:15 AM', title: 'Arrival', location: 'Airport', duration: '1h' },
+            { time: '02:00 PM', title: 'City Orientation', location: 'City Center', duration: '2h',
+              transport: { mode: 'Metro', duration: '25 min', cost: 2, options: [
+                { mode: 'Metro', name: 'Metro Line 1', duration: '25 min', cost: 2 },
+                { mode: 'Bus', name: 'Bus', duration: '30 min', cost: 2 },
+                { mode: 'Taxi', name: 'Taxi', duration: '20 min', cost: 18 }
+              ]}},
+            { time: '07:00 PM', title: 'Local Dinner', location: 'Marais', duration: '2h' }
+          ]},
+          { day: 2, activities: [
+            { time: '09:00 AM', title: 'Walking Tour', location: 'Historic District', duration: '3h' },
+            { time: '02:00 PM', title: 'Museum Visit', location: 'Musée d\'Orsay', duration: '2h' },
+            { time: '06:00 PM', title: 'Café Culture', location: 'Saint-Germain', duration: '2h' }
+          ]},
+          { day: 3, activities: [
+            { time: '09:00 AM', title: 'Food Markets', location: 'Marché Bastille', duration: '2h' },
+            { time: '12:00 PM', title: 'Shopping', location: 'Le Marais', duration: '3h' },
+            { time: '07:00 PM', title: 'Farewell Dinner', location: 'Eiffel Tower Area', duration: '2h' }
+          ]}
         ]
       },
       {
@@ -508,9 +642,26 @@ export const TripCreator: React.FC = () => {
           { name: 'Local Market Visit', price: 0, duration: '1 hour' }
         ],
         itinerary: [
-          { day: 1, activities: ['Arrival', 'Free City Walk', 'Budget Dinner'] },
-          { day: 2, activities: ['Museum Visit', 'Park Stroll', 'Local Eatery'] },
-          { day: 3, activities: ['Market Visit', 'Last-minute Shopping', 'Departure'] }
+          { day: 1, activities: [
+            { time: '02:20 PM', title: 'Arrival', location: 'Airport', duration: '1h' },
+            { time: '05:00 PM', title: 'Free City Walk', location: 'City Center', duration: '2h',
+              transport: { mode: 'Bus', duration: '35 min', cost: 2, options: [
+                { mode: 'Bus', name: 'Airport Bus', duration: '35 min', cost: 2 },
+                { mode: 'Metro', name: 'RER Train', duration: '30 min', cost: 12 },
+                { mode: 'Shared Van', name: 'Shared Shuttle', duration: '40 min', cost: 8 }
+              ]}},
+            { time: '08:00 PM', title: 'Budget Dinner', location: 'Latin Quarter', duration: '1.5h' }
+          ]},
+          { day: 2, activities: [
+            { time: '10:00 AM', title: 'Museum Visit', location: 'Free Museum', duration: '2h' },
+            { time: '02:00 PM', title: 'Park Stroll', location: 'Luxembourg Gardens', duration: '2h' },
+            { time: '07:00 PM', title: 'Local Eatery', location: 'Belleville', duration: '1.5h' }
+          ]},
+          { day: 3, activities: [
+            { time: '09:00 AM', title: 'Market Visit', location: 'Local Market', duration: '1h' },
+            { time: '11:00 AM', title: 'Last-minute Shopping', location: 'Department Stores', duration: '2h' },
+            { time: '03:00 PM', title: 'Departure', location: 'Hotel to Airport', duration: '2h' }
+          ]}
         ]
       }
     ];
@@ -1534,11 +1685,62 @@ export const TripCreator: React.FC = () => {
 
                 {/* Itinerary Preview */}
                 <div className="mb-8 p-4 bg-purple-50 rounded-xl">
-                  <h4 className="font-semibold text-purple-900 mb-3">Sample Itinerary</h4>
-                  <div className="space-y-2">
+                  <h4 className="font-semibold text-purple-900 mb-4">Detailed Itinerary with Transport Options</h4>
+                  <div className="space-y-6">
                     {selectedPackage.itinerary.map((day) => (
-                      <div key={day.day} className="text-sm text-gray-700">
-                        <strong>Day {day.day}:</strong> {day.activities.join(' • ')}
+                      <div key={day.day} className="bg-white rounded-lg p-4">
+                        <div className="font-semibold text-gray-900 mb-3 flex items-center space-x-2">
+                          <div className="w-8 h-8 bg-purple-600 text-white rounded-full flex items-center justify-center text-sm">
+                            {day.day}
+                          </div>
+                          <span>Day {day.day}</span>
+                        </div>
+                        <div className="space-y-4">
+                          {day.activities.map((activity, idx) => (
+                            <div key={idx} className="border-l-2 border-purple-300 pl-4">
+                              <div className="flex items-start justify-between mb-2">
+                                <div className="flex-1">
+                                  <div className="flex items-center space-x-2 mb-1">
+                                    <span className="text-xs font-medium text-purple-600">{activity.time}</span>
+                                    <span className="text-sm font-semibold text-gray-900">{activity.title}</span>
+                                  </div>
+                                  <div className="text-xs text-gray-600 flex items-center space-x-1">
+                                    <MapPin className="w-3 h-3" />
+                                    <span>{activity.location}</span>
+                                    <span>•</span>
+                                    <Clock className="w-3 h-3" />
+                                    <span>{activity.duration}</span>
+                                  </div>
+                                </div>
+                              </div>
+
+                              {activity.transport && (
+                                <div className="mt-2 bg-sky-50 rounded-lg p-3">
+                                  <div className="text-xs font-medium text-sky-900 mb-2 flex items-center space-x-1">
+                                    <Navigation className="w-3 h-3" />
+                                    <span>Transport to Next Location</span>
+                                  </div>
+                                  <div className="grid grid-cols-2 gap-2">
+                                    {activity.transport.options.map((option, optIdx) => (
+                                      <div
+                                        key={optIdx}
+                                        className="bg-white border border-sky-200 rounded p-2 hover:border-sky-400 transition-colors cursor-pointer"
+                                      >
+                                        <div className="flex items-center justify-between mb-1">
+                                          <span className="text-xs font-medium text-gray-900">{option.name}</span>
+                                          <span className="text-xs font-semibold text-sky-600 flex items-center">
+                                            ₹{option.cost}
+                                          </span>
+                                        </div>
+                                        <div className="text-xs text-gray-500">{option.duration}</div>
+                                      </div>
+                                    ))}
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          ))}
+                        </div>
                       </div>
                     ))}
                   </div>
