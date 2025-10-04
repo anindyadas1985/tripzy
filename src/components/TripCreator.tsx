@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { MapPin, Calendar, Users, DollarSign, Zap, Clock, Heart, Briefcase, Baby, Plane, Building, Star, Check, Edit3, ArrowRight, ArrowLeft } from 'lucide-react';
+import { MapPin, Calendar, Users, DollarSign, Zap, Clock, Heart, Briefcase, Baby, Plane, Building, Star, Check, Edit3, ArrowRight, ArrowLeft, Sparkles, Brain } from 'lucide-react';
 import { useTripContext } from '../contexts/TripContext';
+import { useAIAgent } from '../contexts/AIAgentContext';
 
 interface AIPackage {
   id: string;
@@ -60,8 +61,28 @@ interface HotelOption {
   reviews: number;
 }
 
+interface AIAnalysis {
+  summary: string;
+  recommendations: string[];
+  estimatedCosts: {
+    flights: number;
+    accommodation: number;
+    activities: number;
+    food: number;
+    total: number;
+  };
+  suggestedItinerary: Array<{
+    day: number;
+    title: string;
+    activities: string[];
+  }>;
+  warnings: string[];
+  bestTimeToVisit: string;
+}
+
 export const TripCreator: React.FC = () => {
   const { createTrip, setActiveTrip } = useTripContext();
+  const { createTask, isProcessing } = useAIAgent();
   
   // Check for voice data from sessionStorage
   const getInitialFormData = () => {
@@ -105,6 +126,8 @@ export const TripCreator: React.FC = () => {
   
   const [formData, setFormData] = useState(getInitialFormData());
   const [currentStep, setCurrentStep] = useState(1);
+  const [isGeneratingAnalysis, setIsGeneratingAnalysis] = useState(false);
+  const [aiAnalysis, setAiAnalysis] = useState<AIAnalysis | null>(null);
   const [isGeneratingPackage, setIsGeneratingPackage] = useState(false);
   const [aiPackages, setAiPackages] = useState<AIPackage[]>([]);
   const [selectedPackage, setSelectedPackage] = useState<AIPackage | null>(null);
@@ -255,17 +278,92 @@ export const TripCreator: React.FC = () => {
     }));
   };
 
-  const generateAIPackages = async () => {
-    if (!formData.origin || !formData.destination || !formData.budget) {
-      alert('Please fill in origin, destination, and budget to generate packages');
+  const generateAIAnalysis = async () => {
+    if (!formData.origin || !formData.destination || !formData.budget || !formData.startDate || !formData.endDate) {
+      alert('Please fill in all required fields to generate AI analysis');
       return;
     }
 
+    setIsGeneratingAnalysis(true);
+
+    try {
+      // Create AI task for trip planning
+      await createTask(
+        'plan_trip',
+        `Analyze trip from ${formData.origin} to ${formData.destination}`,
+        {
+          destination: formData.destination,
+          origin: formData.origin,
+          startDate: formData.startDate,
+          endDate: formData.endDate,
+          budget: parseInt(formData.budget),
+          travelers: formData.travelers,
+          style: formData.style,
+          pace: formData.pace,
+          preferences: formData.preferences
+        }
+      );
+
+      // Simulate AI analysis generation
+      await new Promise(resolve => setTimeout(resolve, 3000));
+
+      const budget = parseInt(formData.budget);
+      const nights = Math.ceil((new Date(formData.endDate).getTime() - new Date(formData.startDate).getTime()) / (1000 * 60 * 60 * 24));
+
+      const mockAnalysis: AIAnalysis = {
+        summary: `Based on your ${formData.style} trip preferences with a ${formData.pace} pace, I've analyzed your ${nights}-day journey from ${formData.origin} to ${formData.destination}. This destination offers excellent value and aligns well with your interests in ${formData.preferences.slice(0, 3).join(', ')}.`,
+        recommendations: [
+          `Book flights 6-8 weeks in advance for best prices`,
+          `Consider ${formData.style === 'business' ? 'hotels near business districts' : formData.style === 'family' ? 'family-friendly accommodations' : 'centrally located boutique hotels'}`,
+          `Your ${formData.pace} pace allows for ${formData.pace === 'relaxed' ? '2-3' : formData.pace === 'moderate' ? '4-5' : '6+'} activities per day`,
+          `Budget allocation: 35% flights, 40% accommodation, 15% activities, 10% food`,
+          formData.preferences.includes('Food & Dining') ? 'Reserve popular restaurants 2-3 days in advance' : null
+        ].filter(Boolean) as string[],
+        estimatedCosts: {
+          flights: Math.round(budget * 0.35),
+          accommodation: Math.round(budget * 0.40),
+          activities: Math.round(budget * 0.15),
+          food: Math.round(budget * 0.10),
+          total: budget
+        },
+        suggestedItinerary: Array.from({ length: Math.min(nights, 3) }, (_, i) => ({
+          day: i + 1,
+          title: i === 0 ? 'Arrival & Orientation' : i === nights - 1 ? 'Final Exploration & Departure' : `Explore & Discover`,
+          activities: i === 0
+            ? ['Airport transfer', 'Hotel check-in', 'Welcome dinner', 'Evening stroll']
+            : i === nights - 1
+            ? ['Morning activity', 'Lunch', 'Last-minute shopping', 'Departure']
+            : formData.preferences.slice(0, formData.pace === 'relaxed' ? 3 : formData.pace === 'moderate' ? 4 : 6)
+        })),
+        warnings: [
+          budget < 50000 ? 'Budget might be tight for this destination. Consider off-peak travel dates.' : null,
+          nights < 3 ? 'Short trip duration - you may want to extend for a better experience.' : null,
+          formData.travelers > 4 ? 'Large group - book accommodations early for availability.' : null
+        ].filter(Boolean) as string[],
+        bestTimeToVisit: 'March to May and September to November for pleasant weather and fewer crowds'
+      };
+
+      setAiAnalysis(mockAnalysis);
+      setCurrentStep(1.5); // New step for AI analysis review
+    } catch (error) {
+      console.error('Failed to generate AI analysis:', error);
+      alert('Failed to generate AI analysis. Please try again.');
+    } finally {
+      setIsGeneratingAnalysis(false);
+    }
+  };
+
+  const handleConfirmAnalysis = () => {
+    setCurrentStep(2);
+    generateAIPackages();
+  };
+
+  const generateAIPackages = async () => {
     setIsGeneratingPackage(true);
-    
+
     // Simulate AI package generation
     await new Promise(resolve => setTimeout(resolve, 2000));
-    
+
     const budget = parseInt(formData.budget);
     const nights = Math.ceil((new Date(formData.endDate).getTime() - new Date(formData.startDate).getTime()) / (1000 * 60 * 60 * 24));
     
@@ -999,20 +1097,157 @@ export const TripCreator: React.FC = () => {
                 </div>
               </div>
 
-              {/* Generate AI Packages Button */}
+              {/* Generate AI Analysis Button */}
               <div className="text-center pt-6">
                 <button
-                  onClick={generateAIPackages}
-                  disabled={isGeneratingPackage || !formData.origin || !formData.destination || !formData.budget}
-                  className="px-8 py-4 bg-gradient-to-r from-sky-600 to-blue-600 text-white font-semibold rounded-xl hover:from-sky-700 hover:to-blue-700 transition-all duration-200 transform hover:scale-105 shadow-lg shadow-sky-500/25 flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                  onClick={generateAIAnalysis}
+                  disabled={isGeneratingAnalysis || isProcessing || !formData.origin || !formData.destination || !formData.budget || !formData.startDate || !formData.endDate}
+                  className="px-8 py-4 bg-gradient-to-r from-sky-600 to-blue-600 text-white font-semibold rounded-xl hover:from-sky-700 hover:to-blue-700 transition-all duration-200 transform hover:scale-105 shadow-lg shadow-sky-500/25 flex items-center space-x-3 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
                 >
-                  <Zap className="w-5 h-5" />
-                  <span>{isGeneratingPackage ? 'Generating AI Packages...' : 'Generate AI Packages'}</span>
+                  <Brain className="w-5 h-5" />
+                  <span>{isGeneratingAnalysis ? 'AI Analyzing Your Trip...' : 'Generate AI Analysis'}</span>
+                  <Sparkles className="w-5 h-5" />
                 </button>
               </div>
             </div>
           </div>
         );
+
+      case 1.5:
+        return aiAnalysis ? (
+          <div className="max-w-5xl mx-auto space-y-6">
+            <div className="bg-gradient-to-r from-blue-600 to-cyan-600 text-white rounded-2xl p-8 shadow-xl">
+              <div className="flex items-center justify-center space-x-3 mb-4">
+                <Brain className="w-8 h-8" />
+                <h2 className="text-3xl font-bold">AI Trip Analysis</h2>
+                <Sparkles className="w-8 h-8" />
+              </div>
+              <p className="text-blue-100 text-center text-lg">{aiAnalysis.summary}</p>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Cost Breakdown */}
+              <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-200">
+                <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center">
+                  <DollarSign className="w-6 h-6 text-green-600 mr-2" />
+                  Estimated Costs
+                </h3>
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center p-3 bg-blue-50 rounded-lg">
+                    <span className="text-gray-700">Flights</span>
+                    <span className="font-semibold text-gray-900">${aiAnalysis.estimatedCosts.flights.toLocaleString()}</span>
+                  </div>
+                  <div className="flex justify-between items-center p-3 bg-green-50 rounded-lg">
+                    <span className="text-gray-700">Accommodation</span>
+                    <span className="font-semibold text-gray-900">${aiAnalysis.estimatedCosts.accommodation.toLocaleString()}</span>
+                  </div>
+                  <div className="flex justify-between items-center p-3 bg-yellow-50 rounded-lg">
+                    <span className="text-gray-700">Activities</span>
+                    <span className="font-semibold text-gray-900">${aiAnalysis.estimatedCosts.activities.toLocaleString()}</span>
+                  </div>
+                  <div className="flex justify-between items-center p-3 bg-orange-50 rounded-lg">
+                    <span className="text-gray-700">Food & Dining</span>
+                    <span className="font-semibold text-gray-900">${aiAnalysis.estimatedCosts.food.toLocaleString()}</span>
+                  </div>
+                  <div className="flex justify-between items-center p-4 bg-gradient-to-r from-sky-600 to-blue-600 text-white rounded-lg font-bold text-lg">
+                    <span>Total Budget</span>
+                    <span>${aiAnalysis.estimatedCosts.total.toLocaleString()}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Recommendations */}
+              <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-200">
+                <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center">
+                  <Sparkles className="w-6 h-6 text-yellow-500 mr-2" />
+                  AI Recommendations
+                </h3>
+                <ul className="space-y-3">
+                  {aiAnalysis.recommendations.map((rec, index) => (
+                    <li key={index} className="flex items-start space-x-3 text-gray-700">
+                      <Check className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                      <span>{rec}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+
+            {/* Suggested Itinerary */}
+            <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-200">
+              <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center">
+                <Calendar className="w-6 h-6 text-blue-600 mr-2" />
+                Suggested Itinerary Preview
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {aiAnalysis.suggestedItinerary.map((day) => (
+                  <div key={day.day} className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-xl p-4 border border-blue-200">
+                    <div className="font-bold text-blue-900 mb-2">Day {day.day}: {day.title}</div>
+                    <ul className="space-y-1 text-sm text-gray-700">
+                      {day.activities.map((activity, idx) => (
+                        <li key={idx} className="flex items-center space-x-2">
+                          <div className="w-1.5 h-1.5 bg-blue-600 rounded-full"></div>
+                          <span>{activity}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Warnings */}
+            {aiAnalysis.warnings.length > 0 && (
+              <div className="bg-amber-50 border border-amber-200 rounded-2xl p-6">
+                <h3 className="text-lg font-bold text-amber-900 mb-3 flex items-center">
+                  <Clock className="w-5 h-5 mr-2" />
+                  Important Considerations
+                </h3>
+                <ul className="space-y-2">
+                  {aiAnalysis.warnings.map((warning, index) => (
+                    <li key={index} className="text-amber-800 flex items-start space-x-2">
+                      <span className="text-amber-600 font-bold">•</span>
+                      <span>{warning}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {/* Best Time to Visit */}
+            <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-2xl p-6">
+              <h3 className="text-lg font-bold text-green-900 mb-2 flex items-center">
+                <Calendar className="w-5 h-5 mr-2" />
+                Best Time to Visit
+              </h3>
+              <p className="text-green-800">{aiAnalysis.bestTimeToVisit}</p>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex justify-between items-center pt-6">
+              <button
+                onClick={() => {
+                  setCurrentStep(1);
+                  setAiAnalysis(null);
+                }}
+                className="px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 transition-all duration-200 flex items-center space-x-2"
+              >
+                <ArrowLeft className="w-5 h-5" />
+                <span>Modify Trip Details</span>
+              </button>
+
+              <button
+                onClick={handleConfirmAnalysis}
+                disabled={isGeneratingPackage}
+                className="px-8 py-4 bg-gradient-to-r from-green-600 to-emerald-600 text-white font-bold rounded-xl hover:from-green-700 hover:to-emerald-700 transition-all duration-200 transform hover:scale-105 shadow-lg flex items-center space-x-3 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <Check className="w-6 h-6" />
+                <span>{isGeneratingPackage ? 'Generating Packages...' : 'Proceed to Package Selection'}</span>
+                <ArrowRight className="w-6 h-6" />
+              </button>
+            </div>
+          </div>
+        ) : null;
 
       case 2:
         return (
