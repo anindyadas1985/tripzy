@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Clock, MapPin, Plane, Building, Activity, Coffee, Bus, Train, Car, Bike, Navigation, ChevronDown, ChevronUp, IndianRupee } from 'lucide-react';
+import { Clock, MapPin, Plane, Building, Activity, Coffee, Bus, Brain as Train, Car, Bike, Navigation, ChevronDown, ChevronUp, IndianRupee } from 'lucide-react';
 import { Trip } from '../types';
 
 interface TripTimelineProps {
